@@ -1,0 +1,2 @@
+module TrainingDrillsHelper
+end

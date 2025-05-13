@@ -1,0 +1,24 @@
+current directory: /home/vsm/webapps/hardlopen.metvirgil.nl/vendor/bundle/ruby/3.2.0/gems/date-3.4.1/ext/date
+/home/vsm/.rbenv/versions/3.2.3/bin/ruby extconf.rb
+checking for rb_category_warn()... yes
+checking for timezone in time.h with  -Werror... yes
+checking for altzone in time.h with  -Werror... no
+creating Makefile
+
+current directory: /home/vsm/webapps/hardlopen.metvirgil.nl/vendor/bundle/ruby/3.2.0/gems/date-3.4.1/ext/date
+make DESTDIR\= sitearchdir\=./.gem.20250512-52406-do527z sitelibdir\=./.gem.20250512-52406-do527z clean
+
+current directory: /home/vsm/webapps/hardlopen.metvirgil.nl/vendor/bundle/ruby/3.2.0/gems/date-3.4.1/ext/date
+make DESTDIR\= sitearchdir\=./.gem.20250512-52406-do527z sitelibdir\=./.gem.20250512-52406-do527z
+compiling date_core.c
+compiling date_parse.c
+compiling date_strftime.c
+compiling date_strptime.c
+linking shared-object date_core.so
+
+current directory: /home/vsm/webapps/hardlopen.metvirgil.nl/vendor/bundle/ruby/3.2.0/gems/date-3.4.1/ext/date
+make DESTDIR\= sitearchdir\=./.gem.20250512-52406-do527z sitelibdir\=./.gem.20250512-52406-do527z install
+/usr/bin/install -c -m 0755 date_core.so ./.gem.20250512-52406-do527z
+
+current directory: /home/vsm/webapps/hardlopen.metvirgil.nl/vendor/bundle/ruby/3.2.0/gems/date-3.4.1/ext/date
+make DESTDIR\= sitearchdir\=./.gem.20250512-52406-do527z sitelibdir\=./.gem.20250512-52406-do527z clean

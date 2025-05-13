@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @training_route %>
+
+<div>
+  <%= link_to "Edit this training route", edit_training_route_path(@training_route) %> |
+  <%= link_to "Back to training routes", training_routes_path %>
+
+  <%= button_to "Destroy this training route", @training_route, method: :delete %>
+</div>

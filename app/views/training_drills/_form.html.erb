@@ -1,0 +1,27 @@
+<%= form_with(model: training_drill) do |form| %>
+  <% if training_drill.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(training_drill.errors.count, "error") %> prohibited this training_drill from being saved:</h2>
+
+      <ul>
+        <% training_drill.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :training_id, style: "display: block" %>
+    <%= form.text_field :training_id %>
+  </div>
+
+  <div>
+    <%= form.label :drill_id, style: "display: block" %>
+    <%= form.text_field :drill_id %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

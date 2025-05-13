@@ -1,0 +1,32 @@
+<%= form_with(model: drill) do |form| %>
+  <% if drill.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(drill.errors.count, "error") %> prohibited this drill from being saved:</h2>
+
+      <ul>
+        <% drill.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :name, style: "display: block" %>
+    <%= form.text_field :name %>
+  </div>
+
+  <div>
+    <%= form.label :description, style: "display: block" %>
+    <%= form.text_area :description %>
+  </div>
+
+  <div>
+    <%= form.label :video_url, style: "display: block" %>
+    <%= form.text_field :video_url %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>
