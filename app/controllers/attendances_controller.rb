@@ -1,5 +1,6 @@
 class AttendancesController < ApplicationController
   before_action :set_attendance, only: %i[ show edit update destroy ]
+  before_action :require_login
 
   # GET /attendances or /attendances.json
   def index
@@ -21,30 +22,18 @@ class AttendancesController < ApplicationController
 
   # POST /attendances or /attendances.json
   def create
-    @attendance = Attendance.new(attendance_params)
-
-    respond_to do |format|
-      if @attendance.save
-        format.html { redirect_to @attendance, notice: "Attendance was successfully created." }
-        format.json { render :show, status: :created, location: @attendance }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @attendance.errors, status: :unprocessable_entity }
-      end
-    end
+    @training = Training.find(params[:training_id])
+    attendance = @training.attendances.find_or_initialize_by(user: current_user)
+    attendance.status = params[:status]
+    attendance.save
+    redirect_to trainings_path, notice: "Aanwezigheid bijgewerkt."
   end
 
   # PATCH/PUT /attendances/1 or /attendances/1.json
   def update
-    respond_to do |format|
-      if @attendance.update(attendance_params)
-        format.html { redirect_to @attendance, notice: "Attendance was successfully updated." }
-        format.json { render :show, status: :ok, location: @attendance }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @attendance.errors, status: :unprocessable_entity }
-      end
-    end
+    @attendance = Attendance.find(params[:id])
+    @attendance.update(status: params[:status])
+    redirect_back fallback_location: trainings_path, notice: "Status bijgewerkt."
   end
 
   # DELETE /attendances/1 or /attendances/1.json
@@ -65,6 +54,10 @@ class AttendancesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def attendance_params
-      params.require(:attendance).permit(:user_id, :training_id, :status)
+      params.require(:attendance).permit(:user_id, :training_session_id, :status) # Changed from training_id
+    end
+
+    def require_login
+      redirect_to login_path unless logged_in?
     end
 end

@@ -1,7 +1,7 @@
 <%= form_with(model: user) do |form| %>
   <% if user.errors.any? %>
     <div style="color: red">
-      <h2><%= pluralize(user.errors.count, "error") %> prohibited this user from being saved:</h2>
+      <h2><%= pluralize(user.errors.count, "fout") %> verhinderde dat deze loper werd opgeslagen:</h2>
 
       <ul>
         <% user.errors.each do |error| %>
@@ -12,41 +12,66 @@
   <% end %>
 
   <div>
-    <%= form.label :name, style: "display: block" %>
+    <%= form.label :name, "Naam", style: "display: block" %>
     <%= form.text_field :name %>
   </div>
 
   <div>
-    <%= form.label :email, style: "display: block" %>
+    <%= form.label :email, "E-mailadres", style: "display: block" %>
     <%= form.text_field :email %>
   </div>
 
   <div>
-    <%= form.label :phone, style: "display: block" %>
+    <%= form.label :status_id, "Status", style: "display: block" %>
+    <%= form.collection_select :status_id, Status.all, :id, :name, prompt: 'Kies status' %>
+  </div>
+
+  <div>
+    <%= form.label :phone, "Telefoonnummer", style: "display: block" %>
     <%= form.text_field :phone %>
   </div>
 
   <div>
-    <%= form.label :emergency_contact, style: "display: block" %>
+    <%= form.label :emergency_contact, "Noodcontact", style: "display: block" %>
     <%= form.text_field :emergency_contact %>
   </div>
 
   <div>
-    <%= form.label :birthday, style: "display: block" %>
+    <%= form.label :birthday, "Geboortedatum", style: "display: block" %>
     <%= form.date_field :birthday %>
   </div>
 
   <div>
-    <%= form.label :injury, style: "display: block" %>
+    <%= form.label :injury, "Blessure(s)", style: "display: block" %>
     <%= form.text_area :injury %>
   </div>
 
   <div>
-    <%= form.label :photo_permission, style: "display: block" %>
+    <%= form.label :photo_permission, "Toestemming voor foto's", style: "display: block" %>
     <%= form.check_box :photo_permission %>
   </div>
 
   <div>
-    <%= form.submit %>
+    <%= form.label :role, "Rol", style: "display: block" %>
+    <%= form.select :role, User.roles.keys.map { |r| [r.titleize, r] }, prompt: "Kies rol" %>
+  </div>
+
+  <div>
+    <%= form.label :password, "Wachtwoord", style: "display: block" %>
+    <%= form.password_field :password, autocomplete: "new-password" %>
+  </div>
+
+  <div>
+    <%= form.label :password_confirmation, "Bevestig wachtwoord", style: "display: block" %>
+    <%= form.password_field :password_confirmation, autocomplete: "new-password" %>
+  </div>
+
+  <div>
+    <%= form.label :csv_name, "CSV-naam (voor koppeling met historie)", style: "display: block" %>
+    <%= form.text_field :csv_name %>
+  </div>
+
+  <div>
+    <%= form.submit "Opslaan" %>
   </div>
 <% end %>

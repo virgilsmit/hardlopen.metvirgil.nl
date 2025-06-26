@@ -65,6 +65,6 @@ class TrainingRoutesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def training_route_params
-      params.require(:training_route).permit(:training_id, :route_id)
+      params.require(:training_route).permit(:training_session_id, :route_id)
     end
 end

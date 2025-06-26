@@ -1,10 +1,10 @@
-<h1>Editing user</h1>
+<h1>Loper bewerken</h1>
 
 <%= render "form", user: @user %>
 
 <br>
 
 <div>
-  <%= link_to "Show this user", @user %> |
-  <%= link_to "Back to users", users_path %>
+  <%= link_to "Toon deze loper", loper_path(@user) %> |
+  <%= link_to "Terug naar lopers", lopers_path %>
 </div>

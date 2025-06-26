@@ -12,13 +12,13 @@
   <% end %>
 
   <div>
-    <%= form.label :training_id, style: "display: block" %>
-    <%= form.text_field :training_id %>
+    <%= form.label :training_session_id, style: "display: block" %>
+    <%= form.collection_select :training_session_id, TrainingSession.all, :id, :id, prompt: true %>
   </div>
 
   <div>
     <%= form.label :route_id, style: "display: block" %>
-    <%= form.text_field :route_id %>
+    <%= form.collection_select :route_id, Route.all, :id, :name, prompt: true %>
   </div>
 
   <div>

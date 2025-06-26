@@ -1,0 +1,32 @@
+<h1>Preview van te importeren hardlopers</h1>
+
+<% if @headers && @rows %>
+  <table border="1" cellpadding="5" style="border-collapse: collapse; margin: 2rem auto;">
+    <thead>
+      <tr>
+        <% @headers.each do |header| %>
+          <th><%= header %></th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% @rows.each do |row| %>
+        <tr>
+          <% @headers.each do |header| %>
+            <td><%= row[header] %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>Geen data gevonden.</p>
+<% end %>
+
+<%= form_with url: import_path, method: :post, local: true do %>
+  <div style="margin-top: 2rem;">
+    <%= submit_tag 'Bevestig en importeer lopers', style: 'padding: 0.7rem 2.5rem; font-size: 1.2rem; background: #388e3c; color: white; border-radius: 8px; border: none; font-weight: bold;' %>
+  </div>
+<% end %>
+
+<%= link_to 'Terug', import_path, style: 'display: inline-block; margin-top: 2rem;' %> 

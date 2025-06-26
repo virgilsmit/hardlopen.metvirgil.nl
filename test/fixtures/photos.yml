@@ -1,13 +1,13 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  user: one
-  training: one
-  image: MyString
-  description: MyText
+  title: "Foto 1"
+  url: "https://example.com/foto1.jpg"
+  created_at: <%= Time.now %>
+  updated_at: <%= Time.now %>
 
 two:
-  user: two
-  training: two
-  image: MyString
-  description: MyText
+  title: "Foto 2"
+  url: "https://example.com/foto2.jpg"
+  created_at: <%= Time.now %>
+  updated_at: <%= Time.now %>

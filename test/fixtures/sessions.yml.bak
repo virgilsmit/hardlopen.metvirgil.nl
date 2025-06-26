@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  date: 2025-05-13
+  time: 2025-05-13 11:28:48
+  training_type: MyString
+  location: MyString
+  trainer: MyString
+
+two:
+  date: 2025-05-13
+  time: 2025-05-13 11:28:48
+  training_type: MyString
+  location: MyString
+  trainer: MyString

@@ -5,8 +5,13 @@
   </p>
 
   <p>
-    <strong>Trainer:</strong>
-    <%= group.trainer %>
+    <strong>Hoofdtrainer:</strong>
+    <%= group.hoofdtrainer&.email || 'Geen hoofdtrainer' %>
+  </p>
+
+  <p>
+    <strong>Medetrainer:</strong>
+    <%= group.medetrainer&.email || 'Geen medetrainer' %>
   </p>
 
 </div>

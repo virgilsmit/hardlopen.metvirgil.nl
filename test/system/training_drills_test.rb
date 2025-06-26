@@ -3,6 +3,10 @@ require "application_system_test_case"
 class TrainingDrillsTest < ApplicationSystemTestCase
   setup do
     @training_drill = training_drills(:one)
+    # Ensure related objects exist or are mocked if necessary
+    # @training_session = training_sessions(:one)
+    # @training_drill.training_session = @training_session
+    # @training_drill.save
   end
 
   test "visiting the index" do
@@ -15,7 +19,11 @@ class TrainingDrillsTest < ApplicationSystemTestCase
     click_on "New training drill"
 
     fill_in "Drill", with: @training_drill.drill_id
-    fill_in "Training", with: @training_drill.training_id
+    # fill_in "Training session", with: @training_drill.training_session_id # Assuming you have a way to select/input this
+    # If training_session_id is selected from a dropdown for an existing TrainingSession:
+    # select training_sessions(:one).id, from: "Training session" 
+    # Or if it's a direct input and you have a known ID:
+    # fill_in "Training session", with: training_sessions(:one).id
     click_on "Create Training drill"
 
     assert_text "Training drill was successfully created"
@@ -27,7 +35,7 @@ class TrainingDrillsTest < ApplicationSystemTestCase
     click_on "Edit this training drill", match: :first
 
     fill_in "Drill", with: @training_drill.drill_id
-    fill_in "Training", with: @training_drill.training_id
+    # fill_in "Training session", with: @training_drill.training_session_id # Adjust as per your form
     click_on "Update Training drill"
 
     assert_text "Training drill was successfully updated"

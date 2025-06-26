@@ -11,19 +11,28 @@
     </div>
   <% end %>
 
+  <% if performance.user_id.present? %>
+    <%= form.hidden_field :user_id %>
+  <% else %>
+    <div>
+      <%= form.label :user_id, 'Loper', style: 'display: block' %>
+      <%= form.collection_select :user_id, User.order(:name), :id, :name, prompt: 'Kies loper', required: true %>
+    </div>
+  <% end %>
+
   <div>
-    <%= form.label :user_id, style: "display: block" %>
-    <%= form.text_field :user_id %>
+    <%= form.label :test_type, 'Onderdeel', style: 'display: block' %>
+    <%= form.text_field :test_type, required: true %>
   </div>
 
   <div>
-    <%= form.label :test_type, style: "display: block" %>
-    <%= form.text_field :test_type %>
+    <%= form.label :distance, 'Afstand (meters)', style: 'display: block' %>
+    <%= form.number_field :distance, min: 1, step: 1, required: true %>
   </div>
 
   <div>
-    <%= form.label :value, style: "display: block" %>
-    <%= form.text_field :value %>
+    <%= form.label :value, 'Tijd (uu:mm:ss)', style: 'display: block' %>
+    <%= form.text_field :value, placeholder: '00:00:00', required: true %>
   </div>
 
   <div>

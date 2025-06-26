@@ -1,0 +1,28 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Statussen</h1>
+
+<%= link_to "Nieuwe status", new_status_path, class: "theme-btn", style: "margin-bottom:1rem; display:inline-block;" %>
+
+<table style="width:100%; border-collapse:collapse; margin-top:1rem;">
+  <thead>
+    <tr style="background:#f0f4f8;">
+      <th style="text-align:left; padding:8px;">Naam</th>
+      <th style="text-align:left; padding:8px;">Omschrijving</th>
+      <th style="text-align:left; padding:8px;">Acties</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @statuses.each do |status| %>
+      <tr>
+        <td style="padding:8px;"><%= status.name %></td>
+        <td style="padding:8px;"><%= status.description %></td>
+        <td style="padding:8px;">
+          <%= link_to 'Bekijken', status, class: 'theme-btn', style: 'margin-right:0.5rem;' %>
+          <%= link_to 'Bewerken', edit_status_path(status), class: 'theme-btn', style: 'margin-right:0.5rem;' %>
+          <%= link_to 'Verwijderen', status, method: :delete, data: { confirm: 'Weet je zeker dat je deze status wilt verwijderen?' }, class: 'theme-btn', style: 'background:#e57373;' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

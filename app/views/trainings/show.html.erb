@@ -1,10 +1,33 @@
-<p style="color: green"><%= notice %></p>
+<h1>Training: <%= @training.title %></h1>
+<p><%= @training.description %></p>
+<p><strong>Datum:</strong> <%= @training.date.strftime("%d %B %Y %H:%M") %></p>
 
-<%= render @training %>
-
-<div>
-  <%= link_to "Edit this training", edit_training_path(@training) %> |
-  <%= link_to "Back to trainings", trainings_path %>
-
-  <%= button_to "Destroy this training", @training, method: :delete %>
-</div>
+<h2>Aanwezigheid lopers</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Naam</th>
+      <th>Status</th>
+      <th>Actie</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% User.order(:name).each do |user| %>
+      <% attendance = @training.attendances.find_by(user: user) %>
+      <tr>
+        <td><%= user.name %></td>
+        <td><%= attendance&.status || 'onbekend' %></td>
+        <td>
+          <%= form_with url: training_attendance_path(@training, attendance || Attendance.new), method: :patch, local: true do |f| %>
+            <%= hidden_field_tag :status, 'aanwezig' %>
+            <%= submit_tag 'Aanwezig' %>
+          <% end %>
+          <%= form_with url: training_attendance_path(@training, attendance || Attendance.new), method: :patch, local: true do |f| %>
+            <%= hidden_field_tag :status, 'afwezig' %>
+            <%= submit_tag 'Afwezig' %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table> 

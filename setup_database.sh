@@ -10,3 +10,4 @@ sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE hardlopen_metvirgil T
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO vsm;" hardlopen_metvirgil
 
 echo "Database permissions set up successfully!"
+HTTP ERROR 400

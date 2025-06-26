@@ -17,8 +17,13 @@
   </div>
 
   <div>
-    <%= form.label :trainer, style: "display: block" %>
-    <%= form.text_field :trainer %>
+    <%= form.label :hoofdtrainer_id, 'Hoofdtrainer', style: 'display: block' %>
+    <%= form.collection_select :hoofdtrainer_id, User.where(role: [:trainer, :admin]), :id, :email, prompt: 'Kies hoofdtrainer' %>
+  </div>
+
+  <div>
+    <%= form.label :medetrainer_id, 'Medetrainer', style: 'display: block' %>
+    <%= form.collection_select :medetrainer_id, User.where(role: [:trainer, :admin]), :id, :email, prompt: 'Kies medetrainer (optioneel)' %>
   </div>
 
   <div>

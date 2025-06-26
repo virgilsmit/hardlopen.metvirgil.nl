@@ -1,10 +1,65 @@
 <p style="color: green"><%= notice %></p>
 
-<%= render @user %>
+<h1><%= @user.name %></h1>
+<p>Status: <%= @user.status&.name || 'onbekend' %></p>
+
+<p>Email: <%= @user.email %></p>
+<p>Phone: <%= @user.phone %></p>
+<p>Birthday: <%= @user.birthday.present? ? @user.birthday.strftime('%d-%m-%Y') : '' %></p>
+<p>Emergency Contact: <%= @user.emergency_contact %></p>
+<p>Group: <%= @user.groups.first&.name || 'No group assigned' %></p>
+<p>Hoofdtrainer: <%= @user.groups.first&.hoofdtrainer&.email || 'Geen hoofdtrainer' %></p>
+<p>Medetrainer: <%= @user.groups.first&.medetrainer&.email || 'Geen medetrainer' %></p>
+
+<%#= render @user %>
 
 <div>
-  <%= link_to "Edit this user", edit_user_path(@user) %> |
-  <%= link_to "Back to users", users_path %>
-
-  <%= button_to "Destroy this user", @user, method: :delete %>
+  <%= link_to 'Edit', edit_user_path(@user) %> |
+  <%= link_to 'Back', users_path %>
 </div>
+
+<% historie = lopers_historie_for(@user) %>
+<% if historie.any? %>
+  <div style="margin-top:2rem;">
+    <% laatste = historie.sort_by { |row| Date.strptime(row[:datum], '%d-%m-%y') rescue Date.new(1900,1,1) }.last %>
+    <% if laatste %>
+      <div style="background:#e3f2fd; border-radius:8px; padding:1rem; margin-bottom:1rem; max-width:400px;">
+        <strong>Anarobe drempel:</strong> <%= laatste[:ad] %><br>
+        <strong>Duurloop 85%:</strong> <%= laatste[:dl2_85] %>
+      </div>
+    <% end %>
+    <h2>Prestaties</h2>
+    <div style="overflow-x:auto;">
+      <table style="width:100%; margin-bottom: 1rem; border-collapse:collapse;">
+        <thead>
+          <tr style="background:#f0f4f8;">
+            <th style="text-align:left; padding:8px;">Datum</th>
+            <th style="text-align:left; padding:8px;">Afstand</th>
+            <th style="text-align:left; padding:8px;">Tijd</th>
+            <th style="text-align:left; padding:8px;">Prognose 10 km</th>
+            <th style="text-align:left; padding:8px;">1000m</th>
+            <th style="text-align:left; padding:8px;">km/min</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% historie.sort_by { |row| Date.strptime(row[:datum], '%d-%m-%y') rescue Date.new(1900,1,1) }.reverse.each do |row| %>
+            <tr>
+              <td style="text-align:left; padding:8px;">
+                <% begin %>
+                  <%= Date.strptime(row[:datum], '%d-%m-%y').strftime('%d-%m-%Y') %>
+                <% rescue %>
+                  <%= row[:datum] %>
+                <% end %>
+              </td>
+              <td style="text-align:left; padding:8px;"><%= row[:afstand] %></td>
+              <td style="text-align:left; padding:8px;"><%= row[:tijd] %></td>
+              <td style="text-align:left; padding:8px;"><%= row[:prognose_10km] %></td>
+              <td style="text-align:left; padding:8px;"><%= row[:meter_1000] %></td>
+              <td style="text-align:left; padding:8px;"><%= row[:km_min] %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% end %>

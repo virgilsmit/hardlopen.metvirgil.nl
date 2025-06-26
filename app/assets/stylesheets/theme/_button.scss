@@ -1,0 +1,24 @@
+@import 'variables';
+.theme-btn {
+  display: inline-block;
+  background: linear-gradient(90deg, $color-primary 60%, $color-primary-light 100%);
+  color: #fff;
+  border: none;
+  border-radius: 2em;
+  padding: 0.8em 2.2em;
+  font-size: $font-size-sm;
+  font-family: $font-main;
+  font-weight: 800;
+  box-shadow: 0 4px 24px $color-btn-shadow;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+  margin: 0.7em 0;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 8px rgba(76, 187, 23, 0.18), 0 1px 0 $color-primary-light;
+}
+.theme-btn:hover {
+  background: linear-gradient(90deg, $color-primary-light 60%, $color-primary 100%);
+  color: #fff;
+  box-shadow: 0 8px 32px $color-btn-shadow;
+  transform: translateY(-2px) scale(1.04);
+} 

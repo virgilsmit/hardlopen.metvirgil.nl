@@ -1,9 +1,13 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  training: one
-  route: one
+  name: "Route 1"
+  distance: 5.0
+  created_at: <%= Time.now %>
+  updated_at: <%= Time.now %>
 
 two:
-  training: two
-  route: two
+  name: "Route 2"
+  distance: 10.0
+  created_at: <%= Time.now %>
+  updated_at: <%= Time.now %>

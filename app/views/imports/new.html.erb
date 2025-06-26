@@ -1,0 +1,11 @@
+<h1>Importeer Hardlopers (CSV)</h1>
+
+<%= form_with url: import_preview_path, local: true, multipart: true do |form| %>
+  <div>
+    <%= form.label :file, 'Kies een CSV-bestand:' %>
+    <%= form.file_field :file, accept: '.csv' %>
+  </div>
+  <div style="margin-top: 1rem;">
+    <%= form.submit 'Preview', style: 'padding: 0.5rem 2rem;' %>
+  </div>
+<% end %> 

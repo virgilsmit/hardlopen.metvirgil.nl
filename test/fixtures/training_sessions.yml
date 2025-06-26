@@ -1,0 +1,18 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+# Ensure referenced user exists in users.yml
+one:
+  id: 1
+  date: 2025-05-14
+  description: MyText
+  training_schema: one
+  group: one
+  user_id: 1
+
+two:
+  id: 2
+  date: 2025-05-14
+  description: MyText
+  training_schema: two
+  group: two
+  user_id: 2

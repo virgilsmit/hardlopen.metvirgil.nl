@@ -1,96 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Hardlopen met Virgil</title>
+  <title></title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
 
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
   <%= stylesheet_link_tag "application", media: "all", "data-turbo-track": "reload" %>
   <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
-
-  <style>
-    body {
-      font-family: 'Helvetica Neue', Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f9f9f9;
-      color: #333;
-    }
-    header {
-      background: #004080;
-      color: white;
-      padding: 1rem 0;
-      text-align: center;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    nav ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      gap: 1.5rem;
-    }
-    nav ul li {
-      display: inline;
-    }
-    nav ul li a {
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 1.1rem;
-    }
-    nav ul li a:hover {
-      text-decoration: underline;
-    }
-    main {
-      padding: 2rem;
-      text-align: center;
-    }
-    footer {
-      background: #333;
-      color: white;
-      text-align: center;
-      padding: 1rem 0;
-      position: relative;
-      bottom: 0;
-      width: 100%;
-    }
-    .hero {
-      background: url('/assets/hero-image.jpg') no-repeat center center/cover;
-      color: white;
-      padding: 4rem 2rem;
-      text-align: center;
-    }
-    .hero h1 {
-      font-size: 2.5rem;
-      margin: 0;
-    }
-    .hero p {
-      font-size: 1.2rem;
-      margin: 1rem 0 0;
-    }
-  </style>
+  <%= favicon_link_tag 'RunForFun-zwart.svg' %>
 </head>
 <body>
-  <header>
-    <h1>Hardlopen met Virgil</h1>
-    <nav>
-      <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/photos">Photos</a></li>
-        <li><a href="/about">About</a></li>
-        <li><a href="/contact">Contact</a></li>
-      </ul>
-    </nav>
+  <header class="theme-header">
+    <%= link_to root_path, class: 'theme-header__logo-link' do %>
+      <%= image_tag 'RunForFun-zwart.svg', alt: 'Run For Fun logo', class: 'theme-header__logo', size: '48x48' %>
+    <% end %>
+    <span class="theme-header__title">Hardlopen met Virgil</span>
   </header>
+  <nav class="theme-menu">
+    <div class="theme-menu__inner">
+      <a href="/" class="theme-btn">Home</a>
+      <a href="/photos" class="theme-btn">Foto's</a>
+      <a href="/about" class="theme-btn">Over</a>
+      <a href="/contact" class="theme-btn">Contact</a>
+      <a href="/trainings" class="theme-btn">Trainingen</a>
+      <% if logged_in? && ["trainer", "admin"].include?(current_user.role) %>
+        <a href="/trainers" class="theme-btn">Trainers</a>
+      <% end %>
+      <% if logged_in? %>
+        <%= link_to "Logout", logout_path, method: :delete, class: "theme-btn" %>
+        <span style="color: #fff; font-size: 1rem;">Logged in as: <%= current_user.name %></span>
+      <% else %>
+        <a href="/login" class="theme-btn">Login</a>
+        <a href="/register" class="theme-btn">Register</a>
+      <% end %>
+    </div>
+  </nav>
 
-  <main>
+  <main class="theme-main">
+    <% if flash[:notice] %>
+      <div class="notice"><%= notice %></div>
+    <% end %>
+    <% if flash[:alert] %>
+      <div class="alert"><%= alert %></div>
+    <% end %>
     <%= yield %>
   </main>
 
-  <footer>
+  <footer class="theme-main">
     <p>&copy; 2025 Hardlopen met Virgil. Alle rechten voorbehouden.</p>
   </footer>
 </body>

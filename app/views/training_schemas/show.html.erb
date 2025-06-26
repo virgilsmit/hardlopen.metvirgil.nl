@@ -1,0 +1,48 @@
+<% # Bepaal het weeknummer van de eerste training van deze week %>
+<% weeknummer = @schemas.flat_map { |schema| schema.training_sessions.map { |sessie| sessie.week } }.uniq.first.presence || '-' %>
+<h1>Overzicht trainingen week <%= weeknummer %></h1>
+<table class="schema-table" style="width:100%; border-collapse:collapse; margin-bottom:2rem;">
+  <thead>
+    <tr style="background:#f0f4f8;">
+      <th class="schema-table__th">Datum</th>
+      <th class="schema-table__th">Dag</th>
+      <th class="schema-table__th">Training</th>
+      <th class="schema-table__th">Loopscholing</th>
+      <th class="schema-table__th">Trainer</th>
+      <th class="schema-table__th">Locatie</th>
+      <th class="schema-table__th">Fase</th>
+      <th class="schema-table__th">Wedstrijd</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% unique_sessions = @schemas.flat_map { |schema| schema.training_sessions.map { |sessie| [schema.name, sessie] } }
+      .uniq { |schema_name, sessie| [sessie.date, sessie.description] }
+      .sort_by { |schema_name, sessie| sessie.date || Date.new(1900,1,1) } %>
+    <% unique_sessions.each do |schema_name, sessie| %>
+      <tr class="schema-table__row" onclick="window.location='/training_sessions/<%= sessie.id %>'" style="cursor:pointer;">
+        <td style="padding:8px; white-space:nowrap;"><%= l(sessie.date) %></td>
+        <td style="padding:8px;">
+          <% if sessie.dag.to_s.downcase == 'zaterdag' %>
+            Zaterdag 08:45
+          <% elsif sessie.dag.to_s.downcase == 'dinsdag' %>
+            Dinsdag 18:45
+          <% else %>
+            <%= sessie.dag %>
+          <% end %>
+        </td>
+        <td style="padding:8px;"><%= sessie.description %></td>
+        <td style="padding:8px;"><%= sessie.loopscholing %></td>
+        <td style="padding:8px;">
+          <% if sessie.dag.to_s.downcase == 'donderdag' || sessie.dag.to_s.downcase == 'zondag' %>
+            Zelf
+          <% else %>
+            <%= sessie.trainer&.name || '-' %>
+          <% end %>
+        </td>
+        <td style="padding:8px;">GAC</td>
+        <td style="padding:8px;"><%= sessie.fase %></td>
+        <td style="padding:8px;"><%= sessie.wedstrijd %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

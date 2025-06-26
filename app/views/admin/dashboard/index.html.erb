@@ -1,0 +1,32 @@
+<h1 style="margin-bottom: 2rem;">Admin Dashboard</h1>
+<div class="theme-cards">
+  <div class="theme-card">
+    <div class="theme-card-icon">👤</div>
+    <h2>Gebruikersbeheer</h2>
+    <p>Bekijk en beheer alle gebruikers.</p>
+    <a href="/admin/users" class="theme-btn">Naar gebruikersbeheer</a>
+  </div>
+  <div class="theme-card">
+    <div class="theme-card-icon">📥</div>
+    <h2>Hardlopers importeren</h2>
+    <p>Importeer snel nieuwe hardlopers via CSV.</p>
+    <a href="/import" class="theme-btn">Importeren</a>
+  </div>
+  <div class="theme-card">
+    <div class="theme-card-icon">🔄</div>
+    <h2>Statussen beheren</h2>
+    <p>Bekijk en wijzig de status van alle lopers.</p>
+    <a href="/statuses" class="theme-btn">Statussen beheren</a>
+  </div>
+  <div class="theme-card">
+    <div class="theme-card-icon">📅</div>
+    <h2>Schema</h2>
+    <p>Bekijk het volledige trainingsschema en het weekschema.</p>
+    <a href="/schema" class="theme-btn">Naar schema</a>
+  </div>
+</div>
+<hr style="margin:2rem 0;">
+<h2>Nieuwe prestatie toevoegen</h2>
+<div style="max-width: 500px;">
+  <%= render 'performances/form', performance: Performance.new %>
+</div> 

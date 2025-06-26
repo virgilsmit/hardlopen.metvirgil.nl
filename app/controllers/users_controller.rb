@@ -3,11 +3,12 @@ class UsersController < ApplicationController
 
   # GET /users or /users.json
   def index
-    @users = User.all
+    @users = User.order(:name)
   end
 
   # GET /users/1 or /users/1.json
   def show
+    @user = User.find(params[:id])
   end
 
   # GET /users/new
@@ -57,6 +58,31 @@ class UsersController < ApplicationController
     end
   end
 
+  def register
+    @user = User.new
+  end
+
+  def create_registration
+    Rails.logger.info "Processing registration with params: #{user_params.inspect}"
+    @user = User.new(user_params)
+    if @user.save
+      session[:user_id] = @user.id # Log in the user after registration
+      Rails.logger.info "User #{@user.email} registered successfully."
+      redirect_to root_path, notice: 'Registration successful! Welcome!'
+    else
+      Rails.logger.error "User registration failed for email #{@user.email || 'unknown'}. Errors: #{@user.errors.full_messages.join(', ')}"
+      render :register, status: :unprocessable_entity
+    end
+  end
+
+  def profile
+    unless current_user
+      redirect_to login_path, alert: 'Log eerst in om je profiel te bekijken.'
+      return
+    end
+    @user = current_user
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_user
@@ -65,6 +91,6 @@ class UsersController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def user_params
-      params.require(:user).permit(:name, :email, :phone, :emergency_contact, :birthday, :injury, :photo_permission)
+      params.require(:user).permit(:name, :email, :phone, :emergency_contact, :birthday, :injury, :photo_permission, :password, :password_confirmation, :role, :status_id, :csv_name)
     end
 end

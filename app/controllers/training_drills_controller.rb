@@ -65,6 +65,6 @@ class TrainingDrillsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def training_drill_params
-      params.require(:training_drill).permit(:training_id, :drill_id)
+      params.require(:training_drill).permit(:training_session_id, :drill_id)
     end
 end

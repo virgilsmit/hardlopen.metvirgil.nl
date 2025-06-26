@@ -1,8 +1,9 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
+  id: 1
   name: MyString
-  email: MyString
+  email: user_one@example.com
   phone: MyString
   emergency_contact: MyString
   birthday: 2025-05-09
@@ -10,10 +11,29 @@ one:
   photo_permission: false
 
 two:
+  id: 2
   name: MyString
-  email: MyString
+  email: user_two@example.com
   phone: MyString
   emergency_contact: MyString
   birthday: 2025-05-09
   injury: MyText
   photo_permission: false
+
+binsbergen_benita:
+  id: 3
+  name: "Benita van Binsbergen"
+  email: "b.binsbergen@kpnmail.nl"
+  birthday: "1976-02-06"
+  emergency_contact: "0651136365"
+  injury: "-"
+  group_id: 1
+
+engelen_caja:
+  id: 4
+  name: "Caja Engelen"
+  email: "cajaengelen@gmail.com"
+  birthday: "1971-01-12"
+  emergency_contact: "0615831415"
+  injury: "Knee sensitivity, irritated heel/Achilles"
+  group_id: 1

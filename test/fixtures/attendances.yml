@@ -2,10 +2,10 @@
 
 one:
   user: one
-  training: one
-  status: MyString
+  training_session_id: one
+  status: 0
 
 two:
   user: two
-  training: two
-  status: MyString
+  training_session_id: two
+  status: 1

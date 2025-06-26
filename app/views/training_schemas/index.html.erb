@@ -1,0 +1,40 @@
+<h1>Trainingsschema's</h1>
+<table style="width:100%; border-collapse:collapse; margin-top:1rem;">
+  <thead>
+    <tr style="background:#f0f4f8;">
+      <th style="text-align:left; padding:8px;">Naam</th>
+      <th style="text-align:left; padding:8px;">Omschrijving</th>
+      <th style="text-align:left; padding:8px;">Aantal sessies</th>
+      <th style="text-align:left; padding:8px;">Eerste trainer</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% Array(@schemas).each do |schema| %>
+      <tr>
+        <td style="padding:8px;"><%= link_to schema.name, schema_volledig_path(id: schema.id) %></td>
+        <td style="padding:8px;"><%= schema.description %></td>
+        <td style="padding:8px;"><%= schema.training_sessions.count %></td>
+        <td style="padding:8px;">
+          <% eerste = schema.training_sessions.order(:date).detect(&:trainer) %>
+          <%= eerste&.trainer&.name || '-' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<h1>Trainingsschema</h1>
+<div class="theme-cards">
+  <div class="theme-card">
+    <div class="theme-card-icon">📖</div>
+    <h2>Volledig schema</h2>
+    <p>Bekijk het volledige trainingsschema van de groep.</p>
+    <a href="<%= schema_volledig_path %>" class="theme-btn">Bekijk volledig schema</a>
+  </div>
+  <div class="theme-card">
+    <div class="theme-card-icon">🗓️</div>
+    <h2>Schema van deze week</h2>
+    <p>Bekijk het schema voor de huidige week.</p>
+    <a href="<%= schema_week_path %>" class="theme-btn">Bekijk weekschema</a>
+  </div>
+</div>

@@ -8,6 +8,7 @@ class CreateUsers < ActiveRecord::Migration[7.1]
       t.date :birthday
       t.text :injury
       t.boolean :photo_permission
+      t.string :role
 
       t.timestamps
     end

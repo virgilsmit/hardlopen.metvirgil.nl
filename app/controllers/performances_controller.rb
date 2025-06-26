@@ -65,6 +65,6 @@ class PerformancesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def performance_params
-      params.require(:performance).permit(:user_id, :test_type, :value, :date, :notes)
+      params.require(:performance).permit(:user_id, :test_type, :value, :date, :notes, :distance)
     end
 end

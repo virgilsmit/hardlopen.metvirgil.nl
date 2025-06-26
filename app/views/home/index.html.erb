@@ -1,8 +1,62 @@
-<div class="hero">
-  <h1>Welkom bij Hardlopen met Virgil</h1>
-  <p>Ontdek onze trainingsroutes, foto's en meer!</p>
+<% unless current_user %>
+  <div style="text-align: center; margin-top: 2rem; margin-bottom: 2rem;">
+    <a href="/login?refresh=<%= Time.now.to_i %>" class="theme-btn">Login</a>
+    <a href="/register" class="theme-btn" style="background: linear-gradient(90deg, #00cfff 60%, #1976d2 100%);">Registreren</a>
+  </div>
+<% end %>
+
+<div class="theme-cards">
+  <% unless current_user&.role == 'user' || current_user&.role.blank? %>
+    <div class="theme-card">
+      <div class="theme-card-icon">👥</div>
+      <h2>Groepen</h2>
+      <p>Bekijk en beheer alle hardloopgroepen.</p>
+      <a href="/groups" class="theme-btn">Bekijk groepen</a>
+    </div>
+  <% end %>
+  <% if current_user %>
+    <div class="theme-card">
+      <div class="theme-card-icon">🏃‍♂️</div>
+      <h2>Hardlopers</h2>
+      <p>Bekijk alle lopers en hun profielen.</p>
+      <a href="/users" class="theme-btn">Bekijk hardlopers</a>
+    </div>
+  <% end %>
+  <div class="theme-card">
+    <div class="theme-card-icon">📸</div>
+    <h2>Foto's</h2>
+    <p>Bekijk sfeerimpressies en trainingsfoto's.</p>
+    <a href="/photos" class="theme-btn">Bekijk foto's</a>
+  </div>
+  <div class="theme-card">
+    <div class="theme-card-icon">ℹ️</div>
+    <h2>Over Ons</h2>
+    <p>Lees meer over de groep en trainers.</p>
+    <a href="/about" class="theme-btn">Lees meer</a>
+  </div>
+  <% if current_user && @upcoming_birthdays.present? && @upcoming_birthdays.any? %>
+    <div class="theme-card" style="max-width:400px;">
+      <div class="theme-card-icon">🎂</div>
+      <h2 style="font-size:1.3rem; margin-bottom:0.5rem;">Eerstvolgende jarigen</h2>
+      <ul style="list-style:none; padding:0; text-align:left;">
+        <% @upcoming_birthdays.each do |user| %>
+          <li style="margin-bottom:0.5rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+            <%= user.name %> - <%= user.birthday.strftime('%d-%m') %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
 </div>
-<div style="margin-top: 2rem;">
-  <a href="/photos" style="display: inline-block; margin: 1rem; padding: 1rem 2rem; background: #004080; color: white; text-decoration: none; border-radius: 5px;">Bekijk Foto's</a>
-  <a href="/about" style="display: inline-block; margin: 1rem; padding: 1rem 2rem; background: #333; color: white; text-decoration: none; border-radius: 5px;">Over Ons</a>
-</div>
+
+<% if current_user&.role == 'admin' %>
+  <div style="text-align: center; margin-top: 1rem;">
+    <a href="/admin" class="theme-btn" style="background: linear-gradient(90deg, #ff9800 60%, #ffd699 100%);">Admin dashboard</a>
+  </div>
+<% end %>
+
+<% if current_user %>
+  <div style="text-align: center; margin-top: 1rem;">
+    <a href="/profile" class="theme-btn" style="background: linear-gradient(90deg, #1976d2 60%, #00cfff 100%);">Mijn Profiel</a>
+  </div>
+<% end %>

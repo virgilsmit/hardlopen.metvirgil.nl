@@ -1,0 +1,30 @@
+<h1>Training details</h1>
+<table class="schema-table" style="width:auto; border-collapse:collapse; margin-top:1rem;">
+  <tr><th style="text-align:left; padding:8px;">Week</th><td style="padding:8px;"><%= @training_session.week %></td></tr>
+  <tr><th style="text-align:left; padding:8px;">Datum</th><td style="padding:8px;"><%= @training_session.date %></td></tr>
+  <tr><th style="text-align:left; padding:8px;">Dag</th><td style="padding:8px;">
+    <% if @training_session.dag.to_s.downcase == 'zaterdag' %>
+      Zaterdag 08:45
+    <% elsif @training_session.dag.to_s.downcase == 'dinsdag' %>
+      Dinsdag 18:45
+    <% else %>
+      <%= @training_session.dag %>
+    <% end %>
+  </td></tr>
+  <tr><th style="text-align:left; padding:8px;">Training</th><td style="padding:8px;"><%= @training_session.description %></td></tr>
+  <tr><th style="text-align:left; padding:8px;">Loopscholing</th><td style="padding:8px;"><%= @training_session.loopscholing %></td></tr>
+  <tr><th style="text-align:left; padding:8px;">Trainer</th><td style="padding:8px;"><%= @training_session.trainer&.name || '-' %></td></tr>
+  <tr><th style="text-align:left; padding:8px;">Locatie</th><td style="padding:8px;">GAC</td></tr>
+  <tr><th style="text-align:left; padding:8px;">Groep</th><td style="padding:8px;"><%= @training_session.group&.name || '-' %></td></tr>
+  <tr><th style="text-align:left; padding:8px;">Fase</th><td style="padding:8px;"><%= @training_session.fase %></td></tr>
+  <tr><th style="text-align:left; padding:8px;">Wedstrijd</th><td style="padding:8px;"><%= @training_session.wedstrijd %></td></tr>
+</table>
+
+<% if @training_session.attendances.any? %>
+  <h2>Aanwezigen</h2>
+  <ul>
+    <% @training_session.attendances.each do |attendance| %>
+      <li><%= attendance.user&.name %> (<%= attendance.status %>)</li>
+    <% end %>
+  </ul>
+<% end %> 

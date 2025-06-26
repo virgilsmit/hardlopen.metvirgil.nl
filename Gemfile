@@ -13,6 +13,8 @@ gem 'bootsnap', '>= 1.4.4', require: false
 gem 'dotenv-rails'
 gem 'turbolinks', '~> 5'
 gem 'sprockets-rails', '~> 3.4'
+gem 'bcrypt', '~> 3.1.7'
+gem 'simple_form'
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
@@ -29,4 +31,7 @@ group :test do
   gem 'capybara', '>= 3.26'
   gem 'selenium-webdriver'
   gem 'webdrivers'
+  gem 'rspec-rails', '~> 5.0'
+  gem 'rspec-core', '~> 3.13'
+  gem 'rspec', '~> 3.13'
 end

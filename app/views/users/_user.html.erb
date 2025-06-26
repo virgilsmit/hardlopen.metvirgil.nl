@@ -1,37 +1,37 @@
 <div id="<%= dom_id user %>">
   <p>
-    <strong>Name:</strong>
+    <strong>Naam:</strong>
     <%= user.name %>
   </p>
 
   <p>
-    <strong>Email:</strong>
+    <strong>E-mailadres:</strong>
     <%= user.email %>
   </p>
 
   <p>
-    <strong>Phone:</strong>
+    <strong>Telefoonnummer:</strong>
     <%= user.phone %>
   </p>
 
   <p>
-    <strong>Emergency contact:</strong>
+    <strong>Noodcontact:</strong>
     <%= user.emergency_contact %>
   </p>
 
   <p>
-    <strong>Birthday:</strong>
+    <strong>Geboortedatum:</strong>
     <%= user.birthday %>
   </p>
 
   <p>
-    <strong>Injury:</strong>
+    <strong>Blessure(s):</strong>
     <%= user.injury %>
   </p>
 
   <p>
-    <strong>Photo permission:</strong>
-    <%= user.photo_permission %>
+    <strong>Toestemming voor foto's:</strong>
+    <%= user.photo_permission ? 'Ja' : 'Nee' %>
   </p>
 
 </div>

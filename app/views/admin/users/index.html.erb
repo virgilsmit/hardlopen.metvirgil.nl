@@ -1,0 +1,29 @@
+<h1>Gebruikersbeheer</h1>
+
+<table style="width:100%; border-collapse: collapse;">
+  <thead>
+    <tr>
+      <th style="border-bottom: 1px solid #ccc;">ID</th>
+      <th style="border-bottom: 1px solid #ccc;">Naam</th>
+      <th style="border-bottom: 1px solid #ccc;">E-mail</th>
+      <th style="border-bottom: 1px solid #ccc;">Rol</th>
+      <th style="border-bottom: 1px solid #ccc;">Actie</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @users.each do |user| %>
+      <tr>
+        <td><%= user.id %></td>
+        <td><%= user.name %></td>
+        <td><%= user.email %></td>
+        <td><%= user.role == 'admin' ? 'admin' : 'user' %></td>
+        <td>
+          <%= form_with url: update_role_admin_user_path(user), method: :patch, local: true do |f| %>
+            <%= f.select :role, options_for_select([['user', 'user'], ['trainer', 'trainer'], ['admin', 'admin']], user.role || 'user'), {}, style: 'margin-right: 0.5rem;' %>
+            <%= f.submit 'Wijzig', style: 'padding: 0.2rem 0.8rem;' %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table> 

@@ -1,0 +1,374 @@
+@import 'theme/variables';
+@import 'theme/card';
+@import 'theme/button';
+@import 'theme/menu';
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
+// ---- THEME VARIABELEN ----
+$color-bg: #fff;
+$color-bg-alt: #f5f7fa;
+$color-text: #222;
+$color-card-shadow: rgba(25, 118, 210, 0.11);
+$color-btn-shadow: rgba(25, 118, 210, 0.13);
+$radius: 22px;
+$font-title: 'Lato', Arial, sans-serif;
+$font-main: 'Lato', Arial, sans-serif;
+$font-size-base: 1.09rem;
+$font-size-lg: 2.5rem;
+$font-size-md: 1.45rem;
+$font-size-sm: 1.13rem;
+$spacing: 2.2rem;
+$spacing-lg: 2.7rem;
+$spacing-sm: 1.1rem;
+
+// ---- BASIS ----
+:root {
+  --color-bg: #f9fbfc;
+  --color-bg-alt: #fff;
+  --color-header: #f4f8f5;
+  --color-card: #fff;
+  --color-border: #e6e6e6;
+  --color-text: #222;
+  --color-primary: #448923;
+  --color-primary-light: #6ee75a;
+  --color-btn-shadow: rgba(68,137,35,0.10);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #181f1b;
+    --color-bg-alt: #232a25;
+    --color-header: #232a25;
+    --color-card: #263129;
+    --color-border: #2e3a32;
+    --color-text: #f4f8f5;
+    --color-primary: #6ee75a;
+    --color-primary-light: #448923;
+    --color-btn-shadow: rgba(110,231,90,0.10);
+  }
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+  font-family: $font-main;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 1.08rem;
+  line-height: 1.7;
+}
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-title;
+  font-weight: 700;
+  color: $color-primary;
+  margin-top: 1.5rem;
+  margin-bottom: 1.1rem;
+  letter-spacing: 1.2px;
+}
+h1 { font-size: 2.7rem; }
+h2 { font-size: 1.7rem; }
+h3 { font-size: 1.3rem; }
+
+// ---- HEADER & MENU ----
+.theme-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--color-header);
+  color: var(--color-primary);
+  box-shadow: 0 2px 12px var(--color-btn-shadow);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.7rem 0 0.7rem 0;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  min-height: 60px;
+  margin-bottom: 0;
+}
+.theme-header__logo-link {
+  margin-left: 1.2rem;
+  margin-right: 1.2rem;
+  display: flex;
+  align-items: center;
+}
+.theme-header__logo {
+  height: 44px;
+  width: 44px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: none;
+  padding: 0;
+}
+.theme-header__title {
+  font-family: $font-title;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-left: 0.5rem;
+  letter-spacing: 1.2px;
+  text-shadow: none;
+}
+.theme-header .icon {
+  font-size: 1em;
+  margin-right: 0.3em;
+  vertical-align: middle;
+}
+.theme-header span,
+.theme-header h1,
+.theme-header h2 {
+  margin-top: 0.2rem;
+  margin-bottom: 0.2rem;
+  display: inline-block;
+}
+.theme-menu {
+  background: var(--color-header);
+  box-shadow: none;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+  margin-bottom: 2.2rem;
+  padding: 0.2rem 0;
+  position: sticky;
+  top: 60px;
+  z-index: 99;
+}
+.theme-menu__inner {
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.2rem 2rem;
+}
+.theme-menu a {
+  color: var(--color-primary);
+  font-family: $font-title;
+  font-weight: 700;
+  text-transform: none;
+  font-size: 1.08rem;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5em 1.2em;
+  transition: background 0.18s, color 0.18s;
+  box-shadow: none;
+  margin: 0 0.1em;
+  position: relative;
+}
+.theme-menu a:hover, .theme-menu a:focus {
+  background: var(--color-primary);
+  color: var(--color-bg-alt);
+}
+.theme-menu a.active {
+  background: var(--color-primary);
+  color: var(--color-bg-alt);
+}
+
+// ---- BUTTONS ----
+.theme-btn {
+  background: var(--color-primary);
+  color: var(--color-bg-alt);
+  border: none;
+  border-radius: 6px;
+  padding: 0.7em 2em;
+  font-size: 1.08rem;
+  font-family: $font-title;
+  font-weight: 700;
+  box-shadow: 0 2px 8px var(--color-btn-shadow);
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.18s, transform 0.1s;
+  margin: 0.7em 0;
+  letter-spacing: 0.5px;
+  text-shadow: none;
+}
+.theme-btn:hover, .theme-btn:focus {
+  background: var(--color-primary-light);
+  color: var(--color-bg-alt);
+  box-shadow: 0 4px 16px var(--color-btn-shadow);
+  transform: translateY(-1px) scale(1.03);
+}
+
+// ---- CARDS ----
+.theme-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.1rem;
+  justify-content: center;
+  align-items: stretch;
+  max-width: 1200px;
+  margin: 1.2rem auto 0 auto;
+  padding: 0 1rem 1.2rem 1rem;
+}
+.theme-card {
+  background: var(--color-card);
+  border-radius: 16px;
+  box-shadow: 0 2px 16px var(--color-btn-shadow);
+  border: 1px solid var(--color-border);
+  padding: 2.2rem 1.5rem 1.5rem 1.5rem;
+  min-width: 260px;
+  max-width: 340px;
+  flex: 1 1 260px;
+  margin-bottom: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: box-shadow 0.18s, transform 0.13s, border-color 0.18s;
+  color: var(--color-text);
+}
+.theme-card:hover {
+  box-shadow: 0 8px 32px var(--color-btn-shadow);
+  border-color: var(--color-primary);
+  transform: translateY(-2px) scale(1.02);
+  background: var(--color-bg-alt);
+}
+.theme-card h2 {
+  font-family: $font-title;
+  color: var(--color-primary);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1.1rem;
+  letter-spacing: 0.5px;
+}
+.theme-card p {
+  color: var(--color-text);
+  font-size: 1.09rem;
+  margin: 0.5rem 0 1.2rem 0;
+}
+.theme-card a.theme-btn {
+  margin-top: 1.2rem;
+}
+.theme-card-icon {
+  font-size: 2.5em;
+  margin-bottom: 0.7em;
+  color: #ff9800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// ---- RESPONSIVE ----
+@media (max-width: 900px) {
+  .theme-cards { flex-direction: column; align-items: center; }
+  .theme-card {
+    max-width: 98vw;
+    min-width: 0;
+    padding: 1.5rem 0.7rem 1.2rem 0.7rem;
+    font-size: 1.01rem;
+  }
+  .theme-header, .theme-menu__inner {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+@media (max-width: 600px) {
+  .theme-header, .theme-menu__inner {
+    padding-left: 0.3rem;
+    padding-right: 0.3rem;
+  }
+  .theme-card {
+    padding: 1.1rem 0.3rem 0.8rem 0.3rem;
+    font-size: 0.98rem;
+  }
+}
+
+// ---- HERO ----
+.theme-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: $color-bg-alt;
+  border-radius: $radius;
+  box-shadow: 0 8px 32px $color-card-shadow;
+  margin: 0 auto $spacing-sm auto;
+  padding: 1.2rem 1.2rem 1.2rem 1.2rem;
+  max-width: 1200px;
+  min-height: 120px;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+}
+.theme-hero-content {
+  flex: 1 1 350px;
+  min-width: 300px;
+  max-width: 600px;
+  text-align: left;
+}
+.theme-hero h1 {
+  font-size: 2.7rem;
+  color: $color-primary;
+  font-weight: 900;
+  margin-bottom: $spacing-sm;
+  letter-spacing: 1.5px;
+}
+.theme-hero-sub {
+  font-size: 1.25rem;
+  color: $color-primary-light;
+  margin-bottom: $spacing-sm;
+  font-weight: 600;
+}
+.theme-hero-highlight {
+  font-size: 1.15rem;
+  color: $color-text;
+  margin-bottom: $spacing;
+  font-weight: 600;
+}
+.theme-highlight {
+  color: #00bfae;
+  font-weight: 700;
+}
+.theme-hero-image {
+  flex: 1 1 300px;
+  min-width: 220px;
+  max-width: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.theme-hero-image img {
+  width: 100%;
+  max-width: 380px;
+  border-radius: $radius;
+  box-shadow: 0 8px 32px $color-card-shadow;
+  object-fit: cover;
+}
+.theme-btn-lg {
+  font-size: 1.25em;
+  padding: 1.1em 2.7em;
+  border-radius: 2.5em;
+  margin-top: 0.7em;
+}
+
+.theme-main {
+  padding-left: 1.2rem;
+  padding-right: 1.2rem;
+}
+
+.theme-header--test {
+  background: #0d2340;
+  padding-top: 1.1rem;
+  padding-bottom: 0.1rem;
+  border-bottom: none;
+}
+
+body, html {
+  transition: background 0.3s, color 0.3s;
+}
+
+// ---- SCHEMA TABEL ----
+.schema-table__th {
+  background: #222 !important;
+  color: #fff !important;
+  font-weight: 700;
+  font-size: 1.08rem;
+  letter-spacing: 0.5px;
+  padding: 10px 8px !important;
+  border-bottom: 2px solid #448923;
+  text-align: left;
+}
+.schema-table__row:hover {
+  background: #448923 !important;
+  color: #fff !important;
+} 

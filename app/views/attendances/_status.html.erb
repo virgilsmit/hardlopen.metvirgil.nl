@@ -1,0 +1,16 @@
+<% if attendance.present? %>
+  <span class="status-label <%= attendance.status %>">
+    <%= attendance.status.capitalize %>
+  </span>
+<% else %>
+  <span class="status-label onbekend">Onbekend</span>
+<% end %>
+
+<%= form_with url: training_attendances_path(training), method: :post, data: { turbo_stream: true }, class: 'inline-form' do %>
+  <%= hidden_field_tag :status, "aanwezig" %>
+  <%= submit_tag "Ik kom wel!", class: "theme-btn" %>
+<% end %>
+<%= form_with url: training_attendances_path(training), method: :post, data: { turbo_stream: true }, class: 'inline-form' do %>
+  <%= hidden_field_tag :status, "afwezig" %>
+  <%= submit_tag "Ik kom niet", class: "theme-btn" %>
+<% end %> 

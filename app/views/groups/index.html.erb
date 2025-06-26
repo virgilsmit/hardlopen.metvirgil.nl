@@ -3,12 +3,30 @@
 <h1>Groups</h1>
 
 <div id="groups">
-  <% @groups.each do |group| %>
-    <%= render group %>
-    <p>
-      <%= link_to "Show this group", group %>
-    </p>
-  <% end %>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Hoofdtrainer</th>
+        <th>Medetrainer</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @groups.each do |group| %>
+        <tr>
+          <td><%= group.name %></td>
+          <td><%= group.hoofdtrainer&.email || 'Geen hoofdtrainer' %></td>
+          <td><%= group.medetrainer&.email || 'Geen medetrainer' %></td>
+          <td>
+            <%= link_to 'Show', group_path(group) %>
+            <%= link_to 'Edit', edit_group_path(group) %>
+            <%= link_to 'Delete', group_path(group), method: :delete, data: { confirm: 'Are you sure?' } %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 </div>
 
-<%= link_to "New group", new_group_path %>
+<%= link_to 'New Group', new_group_path %>

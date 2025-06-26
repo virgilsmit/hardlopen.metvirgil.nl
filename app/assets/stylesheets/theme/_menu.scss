@@ -1,0 +1,30 @@
+@import 'variables';
+.theme-menu {
+  display: flex;
+  justify-content: center;
+  gap: $spacing-lg;
+  background: $color-primary;
+  padding-bottom: $spacing;
+  margin-bottom: $spacing-lg;
+  border-radius: 0 0 $radius $radius;
+  box-shadow: 0 4px 24px $color-card-shadow;
+  backdrop-filter: blur(2px);
+}
+.theme-menu a {
+  color: #fff;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: $font-size-sm;
+  letter-spacing: 1.2px;
+  text-decoration: none;
+  transition: color 0.2s, transform 0.15s;
+  padding: 0.2em 0.5em;
+  border-radius: 8px;
+  position: relative;
+}
+.theme-menu a:hover {
+  color: $color-accent;
+  background: $color-bg-alt;
+  transform: translateY(-2px) scale(1.07);
+  text-decoration: underline;
+} 

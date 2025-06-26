@@ -1,9 +1,17 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  name: MyString
-  trainer: MyString
+  name: GroupOne
+  created_at: <%= Time.now %>
+  updated_at: <%= Time.now %>
 
 two:
-  name: MyString
-  trainer: MyString
+  name: GroupTwo
+  created_at: <%= Time.now %>
+  updated_at: <%= Time.now %>
+
+gac_recreanten_ab:
+  id: 1
+  name: "GAC recreanten AB"
+  created_at: <%= Time.now %>
+  updated_at: <%= Time.now %>

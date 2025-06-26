@@ -1,0 +1,26 @@
+<h1>Importhistorie</h1>
+
+<table border="1" cellpadding="5" style="border-collapse: collapse; margin: 2rem auto;">
+  <thead>
+    <tr>
+      <th>Datum</th>
+      <th>Gebruiker</th>
+      <th>Bestand</th>
+      <th>Geïmporteerd</th>
+      <th>Overgeslagen</th>
+      <th>Fouten</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @imports.each do |import| %>
+      <tr>
+        <td><%= import.created_at.strftime('%Y-%m-%d %H:%M') %></td>
+        <td><%= import.user&.email || 'onbekend' %></td>
+        <td><%= import.filename %></td>
+        <td><%= import.imported %></td>
+        <td><%= import.skipped %></td>
+        <td><%= import.errors.presence || '-' %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
