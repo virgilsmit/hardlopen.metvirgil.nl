@@ -31,12 +31,16 @@
           <% end %>
         </div>
 
-        <div class="conditie-blok dark-bg" style="margin-top:1em;">
+        <div class="conditie-blok dark-bg">
           <strong class="conditie-title">Trainingsconditie</strong>
           <strong>Duurloop 85% (training):</strong> <%= @user.effective_training_tempo('duur').presence || '–' %><br>
           <strong>Intervaltempo (min/km, training):</strong> <%= @user.effective_training_tempo('interval').presence || '–' %><br>
-          <strong>Anaerobe drempel (training):</strong> <%= @user.gemiddelde_training_ad.presence || '–' %><br>
+
+          <hr class="conditie-hr">
+          <strong class="conditie-highlight">Anaerobe drempel (training)</strong>
+          <span class="conditie-value"><%= @user.gemiddelde_training_ad.presence || '–' %></span><br>
           <strong>10 km-prognose (training):</strong> <%= @user.training_prognose_10km.presence || '–' %><br>
+
           <% if @user.training_results.any? %>
             <hr class="conditie-hr">
             <strong class="conditie-highlight">AD Historie (training)</strong><br>
@@ -46,6 +50,7 @@
               <%= (tr.training_session&.date || tr.created_at).strftime('%d-%m-%Y') %>: <%= @user.ad_training(tr) %><br>
             <% end %>
           <% end %>
+
           <% unless @user.effective_training_tempo('duur').present? || @user.effective_training_tempo('interval').present? %>
             <small style="color:#aaa;">Wordt automatisch weergegeven zodra je trainingsregistraties opslaat.</small>
           <% end %>
