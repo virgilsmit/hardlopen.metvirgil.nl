@@ -1,0 +1,4 @@
+var userId = <%= @attendance.user_id %>;
+$("#attendance_user_" + userId).replaceWith('<%= j render partial: "attendances/attendance", locals: { user: @attendance.user, attendance: @attendance, training_session: @attendance.training_session } %>');
+$('#attendance_counts').html('<%= j render partial: "attendances/counts", locals: { training_session: @attendance.training_session } %>');
+$('#not_signed_up_list').html('<%= j render partial: "attendances/not_signed_up_list", locals: { training_session: @attendance.training_session, current_user: current_user } %>'); 

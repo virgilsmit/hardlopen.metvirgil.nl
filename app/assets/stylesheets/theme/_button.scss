@@ -1,7 +1,7 @@
 @import 'variables';
 .theme-btn {
   display: inline-block;
-  background: linear-gradient(90deg, $color-primary 60%, $color-primary-light 100%);
+  background: transparent;
   color: #fff;
   border: none;
   border-radius: 2em;
@@ -21,4 +21,93 @@
   color: #fff;
   box-shadow: 0 8px 32px $color-btn-shadow;
   transform: translateY(-2px) scale(1.04);
+}
+
+// Echte schuifknop voor aanwezigheid
+.attendance-toggle {
+  position: relative;
+  display: inline-block;
+  width: 110px;
+  height: 44px;
+  vertical-align: middle;
+  user-select: none;
+}
+.attendance-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.attendance-slider {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: 32px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18), 0 1.5px 0 #fff inset;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: $font-main;
+  font-weight: 700;
+  font-size: 1.15em;
+  overflow: hidden;
+  background: linear-gradient(180deg, #e74c3c 70%, #b71c1c 100%);
+  transition: background 0.25s cubic-bezier(.4,2,.6,1);
+}
+.attendance-slider .switch-text {
+  flex: 1 1 50%;
+  text-align: center;
+  z-index: 1;
+  color: #fff;
+  opacity: 0.5;
+  transition: color 0.2s, opacity 0.2s;
+  pointer-events: none;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  letter-spacing: 0.5px;
+  position: relative;
+  font-size: 0.95em;
+}
+.attendance-slider .switch-text.on {
+  color: #fff;
+}
+.attendance-slider .switch-text.off {
+  color: #fff;
+}
+.attendance-toggle input:checked + .attendance-slider {
+  background: linear-gradient(180deg, $color-primary-light 70%, #34c759 100%);
+}
+.attendance-toggle input:not(:checked) + .attendance-slider .switch-text.off {
+  opacity: 1;
+  font-weight: 800;
+}
+.attendance-toggle input:checked + .attendance-slider .switch-text.on {
+  opacity: 1;
+  font-weight: 800;
+}
+.attendance-slider .slider-knob {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(145deg, #fff 80%, #e0e0e0 100%);
+  border-radius: 50%;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18), 0 1.5px 0 #fff inset;
+  transition: left 0.25s cubic-bezier(.4,2,.6,1);
+  z-index: 2;
+}
+.attendance-toggle input:checked + .attendance-slider .slider-knob {
+  left: 70px;
+}
+
+// Verberg oude labels
+.attendance-toggle .toggle-label {
+  display: none;
+}
+
+.attendance-toggle .toggle-label.left {
+  left: 10px;
+  color: #e74c3c;
+}
+.attendance-toggle .toggle-label.right {
+  right: 10px;
+  color: #448923;
 } 

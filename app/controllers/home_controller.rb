@@ -6,6 +6,8 @@ class HomeController < ApplicationController
         bday = user.birthday.change(year: today.year)
         bday < today ? bday.next_year : bday
       end.first(3)
+      # Dynamische tegels uit tegelbeheer
+      @tiles = helpers.visible_tiles_for_dashboard(current_user)
     else
       @upcoming_birthdays = []
     end

@@ -1,0 +1,34 @@
+<%# Partial: app/views/training_schemas/_week_overview.html.erb %>
+<% week = Date.today.cweek %>
+<% year = Date.today.cwyear %>
+<% week_sessions = TrainingSession.where(week: week, date: Date.today.beginning_of_week..Date.today.end_of_week).order(:date) %>
+<p style="color:#888;">Aantal trainingen deze week (week <%= week %>): <%= week_sessions.size %></p>
+<h2 style="margin-top:2.5em;">Overzicht trainingen week <%= week %> - <%= year %></h2>
+<table style="width:100%; border-collapse:collapse; margin-top:1rem;">
+  <thead>
+    <tr>
+      <th style="text-align:left; padding:8px;">Datum</th>
+      <th style="text-align:left; padding:8px;">Dag</th>
+      <th style="text-align:left; padding:8px;">Training</th>
+      <th style="text-align:left; padding:8px;">Loopscholing</th>
+      <th style="text-align:left; padding:8px;">Trainer</th>
+      <th style="text-align:left; padding:8px;">Locatie</th>
+      <th style="text-align:left; padding:8px;">Fase</th>
+      <th style="text-align:left; padding:8px;">Wedstrijd</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% week_sessions.each do |sessie| %>
+      <tr class="schema-table__row" onclick="window.location='/training_sessions/<%= sessie.id %>'" style="cursor:pointer;">
+        <td style="padding:8px;"><%= sessie.date %></td>
+        <td style="padding:8px;"><%= sessie.dag %></td>
+        <td style="padding:8px;"><%= sessie.description %></td>
+        <td style="padding:8px;"><%= sessie.loopscholing %></td>
+        <td style="padding:8px;"><%= sessie.trainer || (sessie.trainer_id && User.find_by(id: sessie.trainer_id)&.name) || '-' %></td>
+        <td style="padding:8px;">GAC</td>
+        <td style="padding:8px;"><%= sessie.fase %></td>
+        <td style="padding:8px;"><%= sessie.wedstrijd %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table> 

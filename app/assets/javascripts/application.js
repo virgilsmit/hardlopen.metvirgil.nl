@@ -3,3 +3,4 @@
 
 //= require_tree .
 //= require rails-ujs
+//= require attendance_buttons

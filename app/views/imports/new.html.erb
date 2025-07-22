@@ -8,4 +8,15 @@
   <div style="margin-top: 1rem;">
     <%= form.submit 'Preview', style: 'padding: 0.5rem 2rem;' %>
   </div>
+<% end %>
+
+<h2 style="margin-top:2em;">Importeer Trainingsschema (CSV)</h2>
+<%= form_with url: import_trainings_imports_path, local: true, multipart: true do |form| %>
+  <div>
+    <%= form.label :file, 'Kies een CSV-bestand voor trainingen:' %>
+    <%= form.file_field :file, accept: '.csv' %>
+  </div>
+  <div style="margin-top: 1rem;">
+    <%= form.submit 'Importeer schema', style: 'padding: 0.5rem 2rem;' %>
+  </div>
 <% end %> 

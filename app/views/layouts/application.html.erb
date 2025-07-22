@@ -2,54 +2,111 @@
 <html>
 <head>
   <title></title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#448923">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Hardlopen">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="msapplication-TileColor" content="#448923">
+  <meta name="msapplication-tap-highlight" content="no">
+  
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
 
   <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon-192x192.png">
+  
   <%= stylesheet_link_tag "application", media: "all", "data-turbo-track": "reload" %>
   <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
   <%= favicon_link_tag 'RunForFun-zwart.svg' %>
 </head>
 <body>
-  <header class="theme-header">
-    <%= link_to root_path, class: 'theme-header__logo-link' do %>
-      <%= image_tag 'RunForFun-zwart.svg', alt: 'Run For Fun logo', class: 'theme-header__logo', size: '48x48' %>
-    <% end %>
-    <span class="theme-header__title">Hardlopen met Virgil</span>
-  </header>
-  <nav class="theme-menu">
-    <div class="theme-menu__inner">
-      <a href="/" class="theme-btn">Home</a>
-      <a href="/photos" class="theme-btn">Foto's</a>
-      <a href="/about" class="theme-btn">Over</a>
-      <a href="/contact" class="theme-btn">Contact</a>
-      <a href="/trainings" class="theme-btn">Trainingen</a>
-      <% if logged_in? && ["trainer", "admin"].include?(current_user.role) %>
-        <a href="/trainers" class="theme-btn">Trainers</a>
+  <div class="app-container">
+    <header class="theme-header">
+      <%= link_to root_path, class: 'theme-header__logo-link' do %>
+        <%= image_tag 'RunForFun-zwart.svg', alt: 'Run For Fun logo', class: 'theme-header__logo', size: '48x48' %>
       <% end %>
-      <% if logged_in? %>
-        <%= link_to "Logout", logout_path, method: :delete, class: "theme-btn" %>
-        <span style="color: #fff; font-size: 1rem;">Logged in as: <%= current_user.name %></span>
-      <% else %>
-        <a href="/login" class="theme-btn">Login</a>
-        <a href="/register" class="theme-btn">Register</a>
+      <span class="theme-header__title">Hardlopen met Virgil</span>
+      <button id="install-button" class="app-btn" style="display: none; font-size: 0.8rem; padding: 0.5rem 1rem;">Installeer App</button>
+    </header>
+    
+    <nav class="theme-menu">
+      <div class="theme-menu__inner">
+        <a href="/" class="theme-btn">Home</a>
+        <% if logged_in? %>
+          <% visible_tiles_for_menu(current_user).each do |tile| %>
+            <a href="<%= tile[:url] %>" class="theme-btn"><%= tile[:label] %></a>
+          <% end %>
+          <%= link_to "Logout", logout_path, method: :delete, class: "theme-btn" %>
+          <span style="color: #fff; font-size: 1rem;">Logged in as: <%= current_user.name %></span>
+        <% else %>
+          <a href="/login" class="theme-btn">Login</a>
+          <a href="/register" class="theme-btn">Register</a>
+        <% end %>
+      </div>
+    </nav>
+
+    <main class="theme-main">
+      <% if flash[:notice] %>
+        <div class="app-card" style="background: #d4edda; border-color: #c3e6cb; color: #155724;">
+          <%= notice %>
+        </div>
       <% end %>
-    </div>
-  </nav>
+      <% if flash[:alert] %>
+        <div class="app-card" style="background: #f8d7da; border-color: #f5c6cb; color: #721c24;">
+          <%= alert %>
+        </div>
+      <% end %>
+      <%= yield %>
+    </main>
 
-  <main class="theme-main">
-    <% if flash[:notice] %>
-      <div class="notice"><%= notice %></div>
-    <% end %>
-    <% if flash[:alert] %>
-      <div class="alert"><%= alert %></div>
-    <% end %>
-    <%= yield %>
-  </main>
+    <!-- Bottom Navigation voor mobiel -->
+    <nav class="app-bottom-nav" style="position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; height: 70px; background: #232a25; border-top: 2px solid #448923; display: flex; box-shadow: 0 -2px 10px rgba(0,0,0,0.1);">
+      <div class="app-bottom-nav__inner">
+        <a href="/" class="app-bottom-nav__item">
+          <div class="app-bottom-nav__icon">🏠</div>
+        </a>
+        <% if logged_in? %>
+          <% visible_tiles_for_menu(current_user).first(3).each do |tile| %>
+            <a href="<%= tile[:url] %>" class="app-bottom-nav__item">
+              <div class="app-bottom-nav__icon">
+                <% case tile[:label].downcase %>
+                <% when /training/ %>
+                  🏃
+                <% when /schema/ %>
+                  📅
+                <% when /prestatie/ %>
+                  📊
+                <% when /groep/ %>
+                  👥
+                <% when /foto/ %>
+                  📷
+                <% else %>
+                  📋
+                <% end %>
+              </div>
 
-  <footer class="theme-main">
-    <p>&copy; 2025 Hardlopen met Virgil. Alle rechten voorbehouden.</p>
-  </footer>
+            </a>
+          <% end %>
+          <a href="/profile" class="app-bottom-nav__item">
+            <div class="app-bottom-nav__icon">👤</div>
+          </a>
+        <% else %>
+          <a href="/login" class="app-bottom-nav__item">
+            <div class="app-bottom-nav__icon">🔑</div>
+          </a>
+          <a href="/register" class="app-bottom-nav__item">
+            <div class="app-bottom-nav__icon">📝</div>
+          </a>
+        <% end %>
+      </div>
+    </nav>
+
+    <footer class="theme-main" style="text-align: center; padding: 1rem; color: var(--color-text); opacity: 0.7;">
+      <p>&copy; 2025 Hardlopen met Virgil. Alle rechten voorbehouden.</p>
+    </footer>
+  </div>
 </body>
 </html>

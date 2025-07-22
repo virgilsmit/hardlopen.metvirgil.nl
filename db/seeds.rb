@@ -28,6 +28,6 @@ CSV.foreach(csv_file_path, headers: true, col_sep: ';') do |row|
   user.phone = row['Noodnummer']
   user.password = 'welkom2025'
   user.password_confirmation = 'welkom2025'
-  user.group = lopers_group # Associate with the group
+  user.group_id = lopers_group.id # Associate with the group
   user.save!
 end

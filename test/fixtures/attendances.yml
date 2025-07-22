@@ -1,11 +1,11 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  user: one
-  training_session_id: one
-  status: 0
+  user_id: 1
+  training_session_id: 1
+  status: aanwezig
 
 two:
-  user: two
-  training_session_id: two
-  status: 1
+  user_id: 2
+  training_session_id: 2
+  status: afwezig

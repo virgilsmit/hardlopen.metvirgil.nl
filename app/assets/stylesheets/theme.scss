@@ -8,6 +8,7 @@
 $color-bg: #fff;
 $color-bg-alt: #f5f7fa;
 $color-text: #222;
+$color-heading: #448923;
 $color-card-shadow: rgba(25, 118, 210, 0.11);
 $color-btn-shadow: rgba(25, 118, 210, 0.13);
 $radius: 22px;
@@ -20,30 +21,34 @@ $font-size-sm: 1.13rem;
 $spacing: 2.2rem;
 $spacing-lg: 2.7rem;
 $spacing-sm: 1.1rem;
+// ---- UNIVERSELE DONKERE TEKSTKLEUR ----
+$dark-bg-text-color: #fff;
 
 // ---- BASIS ----
 :root {
   --color-bg: #f9fbfc;
   --color-bg-alt: #fff;
   --color-header: #f4f8f5;
-  --color-card: #fff;
+  --color-card: #232a25;
   --color-border: #e6e6e6;
   --color-text: #222;
   --color-primary: #448923;
   --color-primary-light: #6ee75a;
   --color-btn-shadow: rgba(68,137,35,0.10);
+  --color-heading: #448923;
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --color-bg: #181f1b;
     --color-bg-alt: #232a25;
     --color-header: #232a25;
-    --color-card: #263129;
+    --color-card: #232a25;
     --color-border: #2e3a32;
     --color-text: #f4f8f5;
     --color-primary: #6ee75a;
     --color-primary-light: #448923;
     --color-btn-shadow: rgba(110,231,90,0.10);
+    --color-heading: #6ee75a;
   }
 }
 html, body {
@@ -53,9 +58,15 @@ html, body {
   overflow-x: hidden;
   font-family: $font-main;
   background: var(--color-bg);
-  color: var(--color-text);
+  color: var(--color-text) !important;
   font-size: 1.08rem;
   line-height: 1.7;
+}
+p, span, li, td, th, label, input, textarea {
+  color: var(--color-text) !important;
+}
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-heading) !important;
 }
 *, *::before, *::after {
   box-sizing: border-box;
@@ -203,7 +214,7 @@ h3 { font-size: 1.3rem; }
   padding: 0 1rem 1.2rem 1rem;
 }
 .theme-card {
-  background: var(--color-card);
+  background: var(--color-card) !important;
   border-radius: 16px;
   box-shadow: 0 2px 16px var(--color-btn-shadow);
   border: 1px solid var(--color-border);
@@ -224,6 +235,9 @@ h3 { font-size: 1.3rem; }
   border-color: var(--color-primary);
   transform: translateY(-2px) scale(1.02);
   background: var(--color-bg-alt);
+}
+.theme-card h2, .theme-card h3, .theme-card h4, .theme-card h5, .theme-card h6 {
+  color: var(--color-heading) !important;
 }
 .theme-card h2 {
   font-family: $font-title;
@@ -372,3 +386,161 @@ body, html {
   background: #448923 !important;
   color: #fff !important;
 } 
+
+// --- Responsive tables volgens Apple HIG en Material Design ---
+@media (max-width: 800px) {
+  .prestaties-table, .schema-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    background: none;
+    border: none;
+  }
+  .prestaties-table thead, .schema-table thead {
+    display: none;
+  }
+  .prestaties-table tbody tr, .schema-table tbody tr {
+    display: block;
+    margin-bottom: 1.2em;
+    background: var(--color-card);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px var(--color-btn-shadow);
+    padding: 1em;
+    border: 1px solid var(--color-border);
+  }
+  .prestaties-table td, .schema-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5em 0.7em;
+    border: none;
+    position: relative;
+    font-size: 1.05em;
+    min-width: 0;
+  }
+  .prestaties-table td:before, .schema-table td:before {
+    content: attr(data-label);
+    font-weight: bold;
+    color: var(--color-primary);
+    min-width: 120px;
+    margin-right: 1em;
+    flex-shrink: 0;
+  }
+} 
+
+// Universele tekstkleur op donkere achtergrond
+.dark-bg, .conditie-blok, .theme-card, [style*="background:#222"], [style*="background: #222"], [style*="background:rgba(30,40,40"],
+.schema-table tr[style*="background:#222"],
+.schema-table tr[style*="background:#232a25"],
+.schema-table td[style*="background:#222"],
+.schema-table td[style*="background:#232a25"],
+.schema-table th[style*="background:#222"],
+.schema-table th[style*="background:#232a25"] {
+  color: $dark-bg-text-color !important;
+}
+// Standaard tekstkleur voor tabellen op lichte achtergrond (overschrijft inline styles)
+.schema-table, .schema-table th, .schema-table td {
+  color: #222 !important;
+}
+// Tekst op donkere rijen, koppen en highlights altijd wit
+.schema-table tr[style*="background:#222"],
+.schema-table tr[style*="background:#232a25"],
+.schema-table tr[style*="background:#1a2733"],
+.schema-table td[style*="background:#222"],
+.schema-table td[style*="background:#232a25"],
+.schema-table td[style*="background:#1a2733"],
+.schema-table th[style*="background:#222"],
+.schema-table th[style*="background:#232a25"],
+.schema-table th[style*="background:#1a2733"],
+.schema-table tr.dark-bg,
+.schema-table td.dark-bg,
+.schema-table th.dark-bg {
+  color: $dark-bg-text-color !important;
+}
+// Tekstkleur bij selectie (highlight) voor extra donkere achtergrond (#1a2733)
+.schema-table tr[style*="background:#1a2733"] ::selection,
+.schema-table td[style*="background:#1a2733"] ::selection,
+.schema-table th[style*="background:#1a2733"] ::selection {
+  color: #fff !important;
+  background: #1976d2 !important;
+}
+table.dark-bg, table.dark-bg th, table.dark-bg td, table.dark-bg tr {
+  color: $dark-bg-text-color !important;
+}
+.dark-bg h1, .dark-bg h2, .dark-bg h3, .dark-bg h4, .dark-bg h5, .dark-bg h6,
+.conditie-blok h1, .conditie-blok h2, .conditie-blok h3, .conditie-blok h4, .conditie-blok h5, .conditie-blok h6,
+.theme-card h1, .theme-card h2, .theme-card h3, .theme-card h4, .theme-card h5, .theme-card h6 {
+  color: $dark-bg-text-color !important;
+} 
+.dark-bg .conditie-value, .conditie-blok .conditie-value {
+  color: $dark-bg-text-color !important;
+} 
+.dark-bg .theme-highlight, .dark-bg .theme-hero-highlight, .theme-card .theme-highlight, .conditie-blok .theme-highlight {
+  color: $dark-bg-text-color !important;
+} 
+// Tekstkleur bij selectie (highlight) altijd wit op donkere achtergronden
+.dark-bg ::selection,
+.conditie-blok ::selection,
+.theme-card ::selection,
+.schema-table tr[style*="background:#222"] ::selection,
+.schema-table tr[style*="background:#232a25"] ::selection,
+.schema-table td[style*="background:#222"] ::selection,
+.schema-table td[style*="background:#232a25"] ::selection,
+.schema-table th[style*="background:#222"] ::selection,
+.schema-table th[style*="background:#232a25"] ::selection,
+.schema-table tr.dark-bg ::selection,
+.schema-table td.dark-bg ::selection,
+.schema-table th.dark-bg ::selection,
+.schema-table tr.theme-highlight ::selection,
+.schema-table td.theme-highlight ::selection,
+.schema-table th.theme-highlight ::selection,
+.schema-table tr.theme-hero-highlight ::selection,
+.schema-table td.theme-hero-highlight ::selection,
+.schema-table th.theme-hero-highlight ::selection {
+  color: #fff !important;
+  background: #1976d2 !important;
+} 
+// Tekst zichtbaar houden op rijen die bij hover een donkere achtergrond krijgen
+.schema-table tr.clickable-row:hover,
+.schema-table tr.clickable-row:hover td,
+.schema-table tr.clickable-row:hover th,
+.schema-table tr.clickable-row:hover * {
+  color: $dark-bg-text-color !important;
+} 
+@media (prefers-color-scheme: dark) {
+  // Verbeterde tabel-weergave in dark-mode
+  .schema-table,
+  .schema-table th,
+  .schema-table td {
+    color: #fff !important;
+  }
+  .schema-table tr:nth-child(even) td,
+  .schema-table tr:nth-child(even) th {
+    background: #232a25 !important;
+    color: #fff !important;
+  }
+  .schema-table th {
+    background: #181f1b !important;
+    color: #6ee75a !important;
+  }
+  .schema-table tr.clickable-row:hover,
+  .schema-table tr.clickable-row:hover td,
+  .schema-table tr.clickable-row:hover th,
+  .schema-table tr.clickable-row:hover * {
+    background: #2e4728 !important; /* donker groen tint */
+    color: #fff !important;
+  }
+} 
+  .mobile-card {
+    background: #232a25 !important;
+    color: #fff !important;
+  }
+  .mobile-card *,
+  .mobile-card .mobile-card-title,
+  .mobile-card .mobile-card-status,
+  .mobile-card .mobile-card-details,
+  .mobile-card .mobile-card-btns,
+  .mobile-card .mobile-card-more {
+    color: #fff !important;
+  } 

@@ -6,7 +6,10 @@
 <h2>Members</h2>
 <ul>
   <% @group.users.each do |user| %>
-    <li><%= user.name %></li>
+    <li>
+      <%= user.name %>
+      <%= button_to 'Verwijderen', remove_member_group_path(@group, user_id: user.id), method: :delete, data: { confirm: 'Weet je zeker dat je deze loper uit de groep wilt verwijderen?' }, form_class: 'inline', class: 'theme-btn', style: 'padding:0.2em 1em;font-size:0.95em;background:#e74c3c;color:#fff;margin-left:1em;' %>
+    </li>
   <% end %>
 </ul>
 

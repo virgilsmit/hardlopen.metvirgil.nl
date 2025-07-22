@@ -75,6 +75,21 @@ class ImportsController < ApplicationController
     render plain: result
   end
 
+  # NIEUW: Import via formulier
+  def import_trainings_via_form
+    if params[:file].present?
+      dir = Rails.root.join('storage', 'imports')
+      FileUtils.mkdir_p(dir)
+      filename = "trainings_#{Time.now.to_i}_#{params[:file].original_filename}"
+      path = dir.join(filename)
+      File.open(path, 'wb') { |f| f.write(params[:file].read) }
+      result = TrainingImporter.new(path.to_s).import
+      render plain: result
+    else
+      redirect_to import_path, alert: 'Geen bestand geselecteerd voor trainingen.'
+    end
+  end
+
   private
   def require_admin
     unless current_user&.role == 'admin'

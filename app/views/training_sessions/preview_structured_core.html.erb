@@ -1,0 +1,11 @@
+<h1>Preview gestructureerde kern</h1>
+
+<p><strong>Originele core-tekst:</strong></p>
+<pre style="background:#f7f7f7; padding:0.8rem; border-radius:6px;"><%= @training_session.description %></pre>
+
+<p><strong>Gestructureerde preview:</strong></p>
+<pre style="background:#eef; padding:0.8rem; border-radius:6px;">
+<%= JSON.pretty_generate(@structured_preview) %>
+</pre>
+
+<p><em>Deze output wordt nog niet opgeslagen. Geef akkoord als deze interpretatie klopt, dan voegen we database-velden en opslag toe.</em></p> 

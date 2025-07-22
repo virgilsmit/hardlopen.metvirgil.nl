@@ -1,0 +1,39 @@
+<h1>Training bewerken</h1>
+<%= form_with model: @training_session, local: true do |f| %>
+  <div style="margin-bottom:1em;">
+    <%= f.label :date, 'Datum' %><br>
+    <%= f.date_field :date %>
+  </div>
+  <div style="margin-bottom:1em;">
+    <%= f.label :description, 'Omschrijving' %><br>
+    <%= f.text_field :description, style: 'width:320px;' %>
+  </div>
+  <div style="margin-bottom:1em;">
+    <%= f.label :loopscholing, 'Loopscholing' %><br>
+    <%= f.text_field :loopscholing, style: 'width:320px;' %>
+  </div>
+  <div style="margin-bottom:1em;">
+    <%= f.label :fase, 'Fase' %><br>
+    <%= f.text_field :fase, style: 'width:220px;' %>
+  </div>
+  <div style="margin-bottom:1em;">
+    <%= f.label :wedstrijd, 'Wedstrijd' %><br>
+    <%= f.text_field :wedstrijd, style: 'width:220px;' %>
+  </div>
+  <div style="margin-bottom:1em;">
+    <%= f.label :dag, 'Dag' %><br>
+    <%= f.text_field :dag, style: 'width:120px;' %>
+  </div>
+  <div style="margin-bottom:1em;">
+    <%= f.label :location, 'Locatie' %><br>
+    <%= f.text_field :location, style: 'width:220px;', placeholder: @training_session.locatie %>
+  </div>
+  <div style="margin-bottom:1em;">
+    <%= f.label :trainer_id, 'Trainer' %><br>
+    <%= f.collection_select :trainer_id, User.with_role(:trainer), :id, :name, include_blank: true %>
+  </div>
+  <div>
+    <%= f.submit 'Opslaan', class: 'theme-btn' %>
+    <%= link_to 'Annuleren', training_session_path(@training_session), class: 'theme-btn', style: 'background:#e74c3c;margin-left:1em;' %>
+  </div>
+<% end %> 

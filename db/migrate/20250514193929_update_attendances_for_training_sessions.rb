@@ -31,13 +31,7 @@ class UpdateAttendancesForTrainingSessions < ActiveRecord::Migration[7.1]
       add_foreign_key :attendances, :training_sessions, column: :training_session_id
     end
 
-    # Status kolom (integer voor enum)
-    unless column_exists?(:attendances, :status)
-      add_column :attendances, :status, :integer, default: 0, null: false
-    else
-      change_column_default :attendances, :status, 0
-      change_column_null :attendances, :status, false
-    end
+    # Status conversie is al gedaan door de nieuwe migratie, dus overslaan
 
     # Non-null constraints
     user_id_column = columns(:attendances).find { |c| c.name == 'user_id' }

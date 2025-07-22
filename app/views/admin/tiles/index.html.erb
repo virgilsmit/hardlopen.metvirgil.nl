@@ -1,0 +1,138 @@
+<h1>Tegels per rol beheren</h1>
+<p>Wijzig de zichtbaarheid, titel en volgorde van tegels. Klik op <b>Opslaan</b> om je wijzigingen op te slaan, of <b>Annuleer</b> om terug te keren naar de laatst opgeslagen situatie.</p>
+<div style="display:flex;gap:2.5em;align-items:flex-start;">
+  <% @roles.each do |role| %>
+    <div style="min-width:220px;flex:1;">
+      <h3 style="text-transform:capitalize;text-align:center;"> <%= role %> </h3>
+      <form class="tile-form" data-role="<%= role %>">
+        <table style="width:100%;border-collapse:collapse;margin-bottom:0.7em;">
+          <tr>
+            <th style="width:40px;"></th>
+            <th style="width:70px;text-align:center;">Dashboard</th>
+            <th style="width:70px;text-align:center;">Menu</th>
+            <th style="text-align:left;">Titel</th>
+          </tr>
+        </table>
+        <ul class="tile-sortable" data-role="<%= role %>" style="list-style:none;padding:0;min-height:60px;">
+          <% sorted_tiles = @tiles.map { |tile| [tile, (@tile_assignments[[role, tile[:key]]]&.first)] }
+            .sort_by { |tile, assignment| assignment&.position || 999 } %>
+          <% sorted_tiles.each do |tile, assignment| %>
+            <li class="tile-sortable-item" data-tile="<%= tile[:key] %>" style="background:transparent;border:1px solid #ddd;border-radius:8px;padding:0.7em 0.7em 0.5em 0.7em;margin-bottom:0.7em;box-shadow:0 2px 8px #0001;cursor:grab;display:flex;align-items:center;gap:0.7em;">
+              <span style="font-size:1.3em;">☰</span>
+              <span style="width:70px;display:inline-block;text-align:center;">
+                <label class="switch" style="margin-bottom:0;">
+                  <input type="hidden" name="visible" value="0">
+                  <input type="checkbox" name="visible" data-role="<%= role %>" data-tile="<%= tile[:key] %>" value="1" <%= assignment&.visible != false ? 'checked' : '' %>>
+                  <span class="slider round"></span>
+                </label>
+              </span>
+              <span style="width:70px;display:inline-block;text-align:center;">
+                <label class="switch" style="margin-bottom:0;">
+                  <input type="hidden" name="show_in_menu" value="0">
+                  <input type="checkbox" name="show_in_menu" data-role="<%= role %>" data-tile="<%= tile[:key] %>" value="1" <%= assignment&.show_in_menu != false ? 'checked' : '' %>>
+                  <span class="slider round"></span>
+                </label>
+              </span>
+              <input type="text" name="custom_label" class="tile-label-input" data-role="<%= role %>" data-tile="<%= tile[:key] %>" value="<%= assignment&.custom_label.presence || tile[:label] %>" style="width:70%;max-width:160px;">
+            </li>
+          <% end %>
+        </ul>
+        <div style="text-align:center;margin-top:1em;">
+          <button type="submit" class="theme-btn" style="margin-right:1em;">Opslaan</button>
+          <button type="button" class="theme-btn" onclick="window.location.reload();" style="background:#e74c3c;">Annuleer</button>
+        </div>
+      </form>
+    </div>
+  <% end %>
+</div>
+<div id="tile-feedback" style="margin-top:1rem;color:#388e3c;font-weight:bold;display:none;">Opgeslagen!</div>
+
+<style>
+.switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: #34c759; }
+input:checked + .slider:before { transform: translateX(20px); }
+.slider.round { border-radius: 24px; }
+.tile-label-input { font-size:0.98em; padding:0.2em 0.5em; border-radius:6px; border:1px solid #bbb; margin-top:0.3em; }
+.tile-sortable { min-height: 60px; }
+.tile-sortable-item { transition: box-shadow 0.18s, background 0.18s; }
+.tile-sortable-item.dragging { background: #e0f7fa; box-shadow: 0 4px 16px #00bfae33; }
+</style>
+<script>
+// Drag & drop sortering
+function sortableInit() {
+  document.querySelectorAll('.tile-sortable').forEach(function(list) {
+    let draggingEl;
+    list.querySelectorAll('.tile-sortable-item').forEach(function(item) {
+      item.draggable = true;
+      item.addEventListener('dragstart', function(e) {
+        draggingEl = item;
+        item.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      item.addEventListener('dragend', function() {
+        draggingEl = null;
+        item.classList.remove('dragging');
+      });
+    });
+    list.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      const afterEl = getDragAfterElement(list, e.clientY);
+      if (afterEl == null) {
+        list.appendChild(draggingEl);
+      } else {
+        list.insertBefore(draggingEl, afterEl);
+      }
+    });
+  });
+}
+function getDragAfterElement(list, y) {
+  const items = [...list.querySelectorAll('.tile-sortable-item:not(.dragging)')];
+  return items.reduce((closest, child) => {
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+    if (offset < 0 && offset > closest.offset) {
+      return { offset: offset, element: child };
+    } else {
+      return closest;
+    }
+  }, { offset: -Infinity }).element;
+}
+document.addEventListener('DOMContentLoaded', function() {
+  sortableInit();
+  document.querySelectorAll('.tile-form').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var role = form.getAttribute('data-role');
+      var tiles = Array.from(form.querySelectorAll('.tile-sortable-item')).map(function(item) {
+        var key = item.getAttribute('data-tile');
+        var visible = item.querySelector('input[type=checkbox][name=visible]').checked;
+        var show_in_menu = item.querySelector('input[type=checkbox][name=show_in_menu]').checked;
+        var custom_label = item.querySelector('input[type=text]').value;
+        return { key: key, visible: visible, show_in_menu: show_in_menu, custom_label: custom_label };
+      });
+      fetch('/admin/tiles/save_all', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').content },
+        body: JSON.stringify({ role: role, tiles: tiles })
+      })
+      .then(function(response) { return response.json(); })
+      .then(function(data) {
+        var feedback = document.getElementById('tile-feedback');
+        if(data.success) {
+          feedback.style.display = 'block';
+          feedback.style.color = '#388e3c';
+          feedback.textContent = 'Opgeslagen!';
+          setTimeout(function(){ feedback.style.display = 'none'; window.location.reload(); }, 1200);
+        } else {
+          feedback.style.display = 'block';
+          feedback.style.color = '#e74c3c';
+          feedback.textContent = 'Fout: ' + (data.error || 'Onbekend');
+        }
+      });
+    });
+  });
+});
+</script> 

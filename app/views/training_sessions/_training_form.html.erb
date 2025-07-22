@@ -1,0 +1,75 @@
+<div class="training-card" style="padding:1rem; border:1px solid #ddd; border-radius:8px; margin-bottom:1rem;">
+  <h3 style="margin-top:0;">Training van <%= ts.date.strftime('%A %d %B %Y') %></h3>
+
+  <h4>Kern overzicht</h4>
+  <ul class="core-list" style="list-style:none; padding-left:0;" id="core-list">
+    <% human_core(ts.structured_core, current_user).each_with_index do |line,idx| %>
+      <li style="margin-bottom:0.3em;" data-idx="<%= idx %>">✅ <span class="core-line"><%= line %></span> <button type="button" class="core-edit-btn" style="background:none;border:none;color:#4db3ff;cursor:pointer;">✏️</button></li>
+    <% end %>
+  </ul>
+  <textarea name="structured_core" id="structured_core_field" hidden><%= ts.structured_core.to_json %></textarea>
+
+  <%= form_with url: update_core_training_session_path(ts), method: :patch, local: true, id: 'core-update-form' do |f| %>
+    <%= f.hidden_field :structured_core, value: ts.structured_core.to_json, id: 'structured_core_input' %>
+    <div class="app-form-group" style="margin-top:0.8rem;">
+      <%= f.check_box :will_do, {}, '1', '0' %> Ik ga deze training doen
+    </div>
+    <%= f.submit 'Training opslaan', class:'app-btn', style:'background:#34c759; color:#fff;' %>
+  <% end %>
+
+  <div id="export-btn-wrapper" style="margin-top:1rem;">
+    <button class="app-btn" style="background:#2196f3; color:#fff;">Download voor Apple Watch / iPhone</button>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function(){
+    const selectWeek = document.getElementById('week-session-select');
+    if(!selectWeek) return;
+
+    selectWeek.addEventListener('change', function(){
+      fetch('/training_sessions/' + this.value + '/data')
+        .then(r=>r.json())
+        .then(json=>{
+          // update header
+          const h3 = document.querySelector('#training-form-wrapper h3');
+          h3.textContent = `Training van ${new Date(json.date).toLocaleDateString('nl-NL', {weekday:'long', day:'2-digit', month:'long', year:'numeric'})}`;
+          // rebuild core list
+          const ul = document.querySelector('#training-form-wrapper ul.core-list');
+          ul.innerHTML = '';
+          json.human_core.forEach((line, idx) => {
+            const li = document.createElement('li');
+            li.dataset.idx = idx;
+            li.style.marginBottom = '0.3em';
+            li.innerHTML = `✅ <span class="core-line">${line}</span> <button type="button" class="core-edit-btn" style="background:none;border:none;color:#4db3ff;cursor:pointer;">✏️</button>`;
+            ul.appendChild(li);
+          });
+          // update hidden structured_core
+          textarea.textContent = JSON.stringify(json.structured_core);
+          inputHidden.value = textarea.textContent;
+        });
+    });
+
+    const list   = document.getElementById('core-list');
+    const textarea = document.getElementById('structured_core_field');
+    const inputHidden = document.getElementById('structured_core_input');
+
+    list.addEventListener('click', function(e){
+      if(e.target.classList.contains('core-edit-btn')){
+        const li = e.target.closest('li');
+        const idx = parseInt(li.dataset.idx,10);
+        const data = JSON.parse(textarea.textContent);
+        const seg = data[idx];
+        const newDur = prompt('Nieuwe duur voor segment', seg.dur || seg['duur']);
+        if(!newDur) return;
+        seg['duur'] = newDur;
+        const newRep = prompt('Nieuwe herhalingen', seg.herhalingen);
+        if(newRep) seg.herhalingen = parseInt(newRep,10);
+        textarea.textContent = JSON.stringify(data);
+        inputHidden.value = textarea.textContent;
+        // rebuild display line
+        li.querySelector('.core-line').textContent = `${seg.herhalingen>1?seg.herhalingen+'× ':''}${seg.dur||seg['duur']} – ${seg.type} – tempo ${'??'}`;
+      }
+    });
+  });
+</script> 

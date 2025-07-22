@@ -1,17 +1,31 @@
-<div id="<%= dom_id attendance %>">
-  <p>
-    <strong>User:</strong>
-    <%= attendance.user_id %>
-  </p>
-
-  <p>
-    <strong>Training:</strong>
-    <%= attendance.training_id %>
-  </p>
-
-  <p>
-    <strong>Status:</strong>
-    <%= attendance.status %>
-  </p>
-
+<li style="margin-bottom:1.5em;" id="attendance_user_<%= user.id %>">
+  <strong><%= user.name %></strong> (<%= user.email %>)
+  <% if current_user.admin? || current_user.trainer? || current_user.id == user.id %>
+    <% attendance = Attendance.where(user_id: user.id, training_session_id: training_session.id).order(updated_at: :desc).first %>
+    <% attendance_obj = attendance || @training_session.attendances.build(user: user, status: :onbekend) %>
+    <% form_action = attendance_obj.persisted? ? attendance_path(attendance_obj) : attendances_path %>
+    <%= form_with model: attendance_obj, url: "#{form_action}#attendance_user_#{user.id}", method: attendance_obj.persisted? ? :patch : :post, local: true do |f| %>
+      <%= f.hidden_field :user_id %>
+      <%= f.hidden_field :training_session_id, value: training_session.id %>
+      <div style="display:inline-flex;gap:0.5em;align-items:center;">
+        <%= f.submit 'Aanwezig', name: 'attendance[status]', value: 'aanwezig', class: 'attendance-btn attendance-btn-aanwezig', style: "background:#34c759; color:#fff; border:#{attendance&.status == 'aanwezig' ? '2px solid #222' : 'none'}; font-weight:bold; padding:0.2em 0.7em; font-size:0.95em; min-width: 60px; opacity:#{attendance&.status == 'aanwezig' ? '1' : '0.4'};" %>
+        <%= f.submit 'Afwezig', name: 'attendance[status]', value: 'afwezig', class: 'attendance-btn attendance-btn-afwezig', style: "background:#e74c3c; color:#fff; border:#{attendance&.status == 'afwezig' ? '2px solid #222' : 'none'}; font-weight:bold; padding:0.2em 0.7em; font-size:0.95em; min-width: 60px; opacity:#{attendance&.status == 'afwezig' ? '1' : '0.4'};" %>
+      </div>
+      <% if attendance&.afwezig? %>
+        <div style="margin-top:0.5em;">
+          <%= f.label :note, 'Notitie (optioneel):' %><br>
+          <%= f.text_field :note, style: 'width:220px;' %>
 </div>
+      <% end %>
+    <% end %>
+  <% else %>
+    <% if attendance&.aanwezig? %>
+      <span>Aanwezig</span>
+    <% elsif attendance&.afwezig? %>
+      <span>Afwezig</span>
+      <% if attendance.note.present? %> - <span><%= attendance.note %></span><% end %>
+    <% else %>
+      <span>Niet aangemeld</span>
+    <% end %>
+  <% end %>
+</li>

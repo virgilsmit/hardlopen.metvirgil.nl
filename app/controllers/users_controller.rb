@@ -4,11 +4,13 @@ class UsersController < ApplicationController
   # GET /users or /users.json
   def index
     @users = User.order(:name)
+    @actieve_lopers_count = User.actief.count
   end
 
   # GET /users/1 or /users/1.json
   def show
     @user = User.find(params[:id])
+    @performances = @user.performances.order(date: :desc)
   end
 
   # GET /users/new
@@ -39,7 +41,7 @@ class UsersController < ApplicationController
   def update
     respond_to do |format|
       if @user.update(user_params)
-        format.html { redirect_to @user, notice: "User was successfully updated." }
+        format.html { redirect_to edit_user_path(@user), notice: "User was successfully updated." }
         format.json { render :show, status: :ok, location: @user }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -80,7 +82,23 @@ class UsersController < ApplicationController
       redirect_to login_path, alert: 'Log eerst in om je profiel te bekijken.'
       return
     end
-    @user = current_user
+
+    # admin of trainer kan ?id=<user_id> bekijken
+    if params[:id].present? && (current_user.admin? || current_user.trainer?)
+      @user = User.find_by(id: params[:id]) || current_user
+    else
+      @user = current_user
+    end
+    @performances = @user.performances.order(date: :desc)
+  end
+
+  def update_training_days
+    @user = (params[:user_id] && (current_user.admin? || current_user.trainer?)) ? User.find(params[:user_id]) : current_user
+    if @user.update(training_days: params[:user][:training_days] || [])
+      redirect_to request.referer || users_path, notice: 'Trainingsdagen opgeslagen.'
+    else
+      redirect_to request.referer || users_path, alert: 'Opslaan mislukt: ' + @user.errors.full_messages.join(', ')
+    end
   end
 
   private
@@ -91,6 +109,6 @@ class UsersController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def user_params
-      params.require(:user).permit(:name, :email, :phone, :emergency_contact, :birthday, :injury, :photo_permission, :password, :password_confirmation, :role, :status_id, :csv_name)
+      params.require(:user).permit(:name, :email, :phone, :emergency_contact, :birthday, :injury, :photo_permission, :password, :password_confirmation, :role, :status_id, :csv_name, training_days: [])
     end
 end

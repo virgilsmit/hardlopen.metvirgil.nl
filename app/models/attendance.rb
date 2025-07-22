@@ -6,7 +6,7 @@ class Attendance < ApplicationRecord
 
   validates :user_id, presence: true
   validates :training_session_id, presence: true
-  validates :status, presence: true, inclusion: { in: ["aanwezig", "afwezig"] }
+  validates :status, presence: true, inclusion: { in: ["aanwezig", "afwezig", "onbekend"] }
 
   # Zorgt ervoor dat een gebruiker maar één attendance record per training sessie kan hebben
   validates :user_id, uniqueness: { scope: :training_session_id }

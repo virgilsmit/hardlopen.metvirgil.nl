@@ -1,4 +1,47 @@
 @import 'theme';
+@import 'mobile_app';
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
 
 // Plaats hier eventueel extra globale CSS of imports. 
+
+button[name='attendance[status]'][value='aanwezig'] {
+  background-color: green !important;
+  color: white !important;
+}
+
+button[name='attendance[status]'][value='afwezig'] {
+  background-color: red !important;
+  color: white !important;
+}
+
+.attendance-btn {
+  border: none;
+  border-radius: 6px;
+  padding: 0.5em 1.5em;
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  margin: 0 0.2em;
+  transition: background 0.18s, color 0.18s;
+  opacity: 0.4;
+}
+.attendance-btn.active {
+  opacity: 1;
+  box-shadow: 0 0 0 3px #fff7;
+  z-index: 1;
+}
+.attendance-btn-aanwezig {
+  background: #34c759 !important;
+  color: #fff !important;
+}
+.attendance-btn-afwezig {
+  background: #e74c3c !important;
+  color: #fff !important;
+}
+.attendance-btn-aanwezig:hover, .attendance-btn-aanwezig:focus {
+  background: #28a745 !important;
+}
+.attendance-btn-afwezig:hover, .attendance-btn-afwezig:focus {
+  background: #c0392b !important;
+} 

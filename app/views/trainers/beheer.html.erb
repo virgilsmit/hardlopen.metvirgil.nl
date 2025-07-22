@@ -1,0 +1,29 @@
+<h1>Trainers beheren</h1>
+
+<div style="margin-bottom:1.5em;">
+  <%= form_with url: promote_trainer_trainers_path, method: :post, local: true do |f| %>
+    <%= select_tag :user_id, options_from_collection_for_select(@promoteable_lopers, :id, :name), prompt: 'Selecteer loper' %>
+    <%= f.submit 'Promoveer tot trainer', class: 'theme-btn', style: 'background:#34c759;color:#222;font-weight:bold;margin-left:1em;' %>
+  <% end %>
+</div>
+
+<table class="schema-table">
+  <thead>
+    <tr>
+      <th>Naam</th>
+      <th>Email</th>
+      <th>Acties</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @trainers.each do |trainer| %>
+      <tr>
+        <td><%= trainer.name %></td>
+        <td><%= trainer.email %></td>
+        <td>
+          <%= link_to 'Bewerk', edit_user_path(trainer), class: 'theme-btn', style: 'background:#3498db;color:#fff;margin-right:0.5em;' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table> 

@@ -1,0 +1,23 @@
+<h1>Log training voor aanwezige lopers</h1>
+
+<h3><%= @training_session.description.presence || @training_session.dag || @training_session.date.strftime('%A %d %B %Y') %></h3>
+
+<p><strong>Aanwezig:</strong> <%= @attendances.map { |a| a.user.name }.join(', ') %></p>
+
+<%= form_with url: log_attendance_training_session_path(@training_session), local: true do |f| %>
+  <div class="app-form-group">
+    <%= f.label :time, 'Tijd (mm:ss of hh:mm:ss)' %>
+    <%= f.text_field :time, name:'bulk[time]', class:'app-form-input' %>
+  </div>
+  <div class="app-form-group">
+    <%= f.label :distance, 'Afstand (km)' %>
+    <%= f.number_field :distance, step:0.01, name:'bulk[distance]', class:'app-form-input' %>
+  </div>
+  <div class="app-form-group">
+    <%= f.label :notes, 'Notities' %>
+    <%= f.text_area :notes, rows:3, name:'bulk[notes]', class:'app-form-input' %>
+  </div>
+  <%= f.submit 'Opslaan voor alle aanwezigen', class:'app-btn', style:'background:#34c759;color:#fff;' %>
+<% end %>
+
+<%= link_to 'Annuleren', training_session_path(@training_session), class:'app-btn', style:'margin-top:1rem;' %> 

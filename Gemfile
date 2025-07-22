@@ -15,6 +15,7 @@ gem 'turbolinks', '~> 5'
 gem 'sprockets-rails', '~> 3.4'
 gem 'bcrypt', '~> 3.1.7'
 gem 'simple_form'
+gem 'rack', '~> 2.2'
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]

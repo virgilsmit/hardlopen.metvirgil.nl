@@ -22,3 +22,13 @@ Things you may want to cover:
 * Deployment instructions
 
 * ...
+
+## Werkafspraak: Automatische server-restart
+
+Na elke wijziging in de codebase wordt automatisch het volgende commando uitgevoerd:
+
+```
+sudo systemctl restart hardlopen-metvirgil.service
+```
+
+Hierdoor is de live server altijd direct up-to-date na elke aanpassing. Handmatig herstarten is niet meer nodig.

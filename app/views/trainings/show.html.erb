@@ -12,7 +12,7 @@
     </tr>
   </thead>
   <tbody>
-    <% User.order(:name).each do |user| %>
+    <% User.actief.order(:name).each do |user| %>
       <% attendance = @training.attendances.find_by(user: user) %>
       <tr>
         <td><%= user.name %></td>

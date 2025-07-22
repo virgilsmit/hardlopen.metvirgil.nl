@@ -1,0 +1,132 @@
+<h1>Mijn trainingen</h1>
+
+<div style="display:flex; gap:0.5rem; margin-bottom:1rem;">
+  <button id="tab-btn-today" class="theme-btn dark-bg" style="flex:1;" data-active="true">Vandaag</button>
+  <button id="tab-btn-history" class="theme-btn" style="flex:1;">Historie</button>
+  <button id="tab-btn-presence" class="theme-btn" style="flex:1;">Aanwezig</button>
+</div>
+
+<div id="tab-content-today">
+  <% if @today_session %>
+    <% selected_ts = @today_session %>
+  <% elsif @week_sessions.any? %>
+    <% selected_ts = @week_sessions.first %>
+  <% else %>
+    <% selected_ts = nil %>
+  <% end %>
+
+  <% if @week_sessions.any? && !@today_session %>
+    <div style="margin-bottom:1rem;">
+      <label for="week-session-select">Kies training uit deze week:</label><br>
+      <select id="week-session-select" class="app-form-input" style="width:100%; padding:0.5rem;">
+        <% @week_sessions.each do |ws| %>
+          <option value="<%= ws.id %>"><%= ws.date.strftime('%A %d %B') %> – <%= ws.description.presence || ws.dag %></option>
+        <% end %>
+      </select>
+    </div>
+  <% end %>
+
+  <% if selected_ts %>
+    <div id="training-form-wrapper">
+      <%= render partial: 'training_sessions/training_form', locals: { ts: selected_ts, warmup_distance: @warmup_distance, warmup_time: @warmup_time, cooldown_distance: @cooldown_distance, cooldown_time: @cooldown_time, pace_zone1: @pace_zone1 } %>
+    </div>
+  <% else %>
+    <p>Geen training gepland deze week.</p>
+  <% end %>
+</div>
+
+<div id="tab-content-history" style="display:none;">
+  <% if @historical_sessions.any? %>
+    <% @historical_sessions.each do |ts| %>
+      <div class="training-card" style="margin-bottom:1rem; padding:1rem; border:1px solid #e5e5e5; border-radius:8px;">
+        <h3 style="margin:0 0 0.3rem 0;">
+          <%= link_to ts.description.presence || ts.dag || ts.date.strftime('%d %B %Y'), training_session_path(ts), style: 'text-decoration:none;color:#448923;' %>
+        </h3>
+        <p style="margin:0 0 0.2rem 0; font-size:0.95rem; color:#555;">
+          <strong><%= ts.date.strftime('%A %d %B %Y') %></strong> – <%= ts.description.presence || '-' %>
+        </p>
+        <% attendance = ts.attendances.find_by(user_id: current_user.id) %>
+        <% if attendance %>
+          <% status_color = attendance.aanwezig? ? '#34c759' : (attendance.afwezig? ? '#e74c3c' : '#888') %>
+          <p style="margin:0; font-size:0.9rem;">
+            Status: <span style="color:<%= status_color %>;"><%= attendance.status.capitalize %></span>
+            <% if attendance.note.present? %>
+              – <em><%= attendance.note %></em>
+            <% end %>
+          </p>
+        <% end %>
+        <% summary = human_core(ts.structured_core, current_user).first %>
+        <% if summary.present? %>
+          <p style="margin:0.2rem 0; font-size:0.9rem; color:#222;">🏁 <%= summary %></p>
+        <% end %>
+        <p style="margin-top:0.5rem;">
+          <%= link_to 'Log als mijn training', log_training_session_path(ts), class:'app-btn', style:'background:#2196f3;color:#fff;' %>
+        </p>
+      </div>
+    <% end %>
+  <% else %>
+    <p>Geen eerdere trainingen gevonden.</p>
+  <% end %>
+</div>
+
+<div id="tab-content-presence" style="display:none;">
+  <% if @logged_results.any? %>
+    <% @logged_results.each do |tr| %>
+      <% ts = tr.training_session %>
+      <div class="training-card" style="margin-bottom:1rem; padding:1rem; border:1px solid #e5e5e5; border-radius:8px;">
+        <h3 style="margin:0 0 0.3rem 0;">
+          <%= ts.date.strftime('%A %d %B %Y') %> – <%= ts.description.presence || ts.dag %>
+        </h3>
+        <p style="margin:0; font-size:0.9rem;">⏱ <%= current_user.seconden_naar_tijd(tr.time) if tr.time.present? %> | 🛣 <%= tr.distance&.round(2) || '-' %> km</p>
+        <% if tr.notes.present? %>
+          <p style="margin:0.2rem 0; font-size:0.9rem; color:#555;"><em><%= tr.notes %></em></p>
+        <% end %>
+        <p style="margin-top:0.5rem;">
+          <%= link_to '✏️ Wijzig', edit_training_result_path(tr), class:'app-btn', style:'background:#ff9500;color:#fff;' %>
+        </p>
+      </div>
+    <% end %>
+  <% else %>
+    <p>Nog geen gelogde trainingen.</p>
+  <% end %>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const btnToday = document.getElementById('tab-btn-today');
+    const btnHistory = document.getElementById('tab-btn-history');
+    const btnPresence = document.getElementById('tab-btn-presence');
+    const contentToday = document.getElementById('tab-content-today');
+    const contentHistory = document.getElementById('tab-content-history');
+    const contentPresence = document.getElementById('tab-content-presence');
+
+    function activate(tab) {
+      if (tab === 'today') {
+        btnToday.classList.add('dark-bg');
+        btnHistory.classList.remove('dark-bg');
+        btnPresence.classList.remove('dark-bg');
+        contentToday.style.display = 'block';
+        contentHistory.style.display = 'none';
+        contentPresence.style.display = 'none';
+      } else if (tab === 'history') {
+        btnHistory.classList.add('dark-bg');
+        btnToday.classList.remove('dark-bg');
+        btnPresence.classList.remove('dark-bg');
+        contentHistory.style.display = 'block';
+        contentToday.style.display = 'none';
+        contentPresence.style.display = 'none';
+      } else {
+        btnPresence.classList.add('dark-bg');
+        btnToday.classList.remove('dark-bg');
+        btnHistory.classList.remove('dark-bg');
+        contentPresence.style.display = 'block';
+        contentToday.style.display = 'none';
+        contentHistory.style.display = 'none';
+      }
+    }
+
+    btnToday.addEventListener('click', () => activate('today'));
+    btnHistory.addEventListener('click', () => activate('history'));
+    btnPresence.addEventListener('click', () => activate('presence'));
+  });
+</script> 

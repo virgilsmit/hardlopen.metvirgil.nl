@@ -12,30 +12,13 @@ if %w[development test].include?(Rails.env)
   Dotenv.load('.env')
 end
 
-# Laad .env-variabelen in productieomgeving
-require 'dotenv/rails'
-Dotenv::Rails.load if Rails.env.production?
-
 module HardlopenMetvirgilNl
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.1
 
-    # Autoload lib, maar negeer submappen die geen .rb bestanden bevatten
-    config.autoload_lib(ignore: %w(assets tasks))
-
-    # Explicitly set eager_load for all environments
-    config.eager_load = Rails.env.production?
-
-    # Explicitly set eager_load for the test environment
-    config.eager_load = ENV['RAILS_ENV'] == 'production'
-
     # Algemene configuratie hier plaatsen indien nodig:
-    #
     # config.time_zone = "Amsterdam"
     # config.eager_load_paths << Rails.root.join("extras")
-
-    # Voor performance in productie eventueel Dotenv uitzetten
-    # Dotenv wordt hierboven alleen in development/test geladen
   end
 end

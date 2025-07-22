@@ -71,10 +71,31 @@ class GroupsController < ApplicationController
     if users.empty?
       redirect_to @group, alert: "Geen geldige gebruikers geselecteerd." and return
     end
-    users.each { |user| @group.add_member(user) }
+    users.each do |user|
+      @group.add_member(user)
+      # Koppel aan alle trainingen van het schema van deze groep
+      @group.training_schemas.each do |schema|
+        schema.training_sessions.each do |sessie|
+          Attendance.find_or_create_by!(user: user, training_session: sessie) do |attendance|
+            attendance.status = 'onbekend'
+          end
+        end
+      end
+    end
     redirect_to @group, notice: "#{users.count} loper(s) toegevoegd aan de groep."
   rescue => e
     redirect_to @group, alert: "Fout bij toevoegen: #{e.message}"
+  end
+
+  def remove_member
+    @group = Group.find(params[:id])
+    user = User.find_by(id: params[:user_id])
+    if user && @group.users.include?(user)
+      @group.remove_member(user)
+      redirect_to @group, notice: "Loper #{user.name} is verwijderd uit de groep."
+    else
+      redirect_to @group, alert: "Loper niet gevonden of niet in deze groep."
+    end
   end
 
   private

@@ -1,134 +1,241 @@
-<h1>Mijn Profiel</h1>
+<p style="color: green"><%= notice %></p>
 
-<%= link_to 'Profiel bewerken', edit_user_path(@user), class: 'theme-btn', style: 'margin-bottom: 1.5rem; display: inline-block;' %>
-
-<div style="max-width: 500px; margin: 0 auto; text-align: left;">
-  <p><strong>Naam:</strong> <%= @user.name %></p>
-  <p><strong>E-mail:</strong> <%= @user.email %></p>
-  <p><strong>Rol:</strong> <%= @user.role.presence || 'hardloper' %></p>
-  <p><strong>Telefoon:</strong> <%= @user.phone.presence || '-' %></p>
-  <p><strong>Geboortedatum:</strong> <%= @user.birthday.present? ? @user.birthday.strftime('%d-%m-%Y') : '-' %></p>
-  <p><strong>Noodcontact:</strong> <%= @user.emergency_contact.presence || '-' %></p>
-
-  <% if @user.role == 'admin' %>
-    <div style="margin-top: 1.5rem; padding: 1rem; background: #e3f2fd; border-radius: 8px;">
-      <strong>Beheerder:</strong> Je hebt toegang tot alle gebruikers en instellingen.
-    </div>
-  <% elsif @user.role == 'trainer' %>
-    <div style="margin-top: 1.5rem; padding: 1rem; background: #fff3cd; border-radius: 8px;">
-      <strong>Trainer:</strong> Je kunt je eigen groepen en hardlopers beheren.
-      <!-- Hier kun je later een overzicht van groepen/hardlopers tonen -->
-    </div>
-  <% else %>
-    <div style="margin-top: 1.5rem; padding: 1rem; background: #d4edda; border-radius: 8px;">
-      <strong>Hardloper:</strong> Je ziet hier je eigen profiel en trainingsinformatie.
-      <!-- Hier kun je later persoonlijke trainingsdata tonen -->
-    </div>
-  <% end %>
-
-  <% unless @user.role == 'user' || @user.role.blank? %>
-    <h2>Mijn groepen (lid)</h2>
-    <% if @user.groups.any? %>
-      <ul>
-        <% @user.groups.each do |group| %>
-          <li>
-            <strong><%= group.name %></strong>
-            (<%= group.hoofdtrainer&.email ? "Hoofdtrainer: #{group.hoofdtrainer.email}" : 'Geen hoofdtrainer' %>
-            <% if group.medetrainer&.email %>, Medetrainer: <%= group.medetrainer.email %><% end %>)
-          </li>
-        <% end %>
-      </ul>
-    <% else %>
-      <p>Je bent nog geen lid van een groep.</p>
-    <% end %>
-  <% end %>
-
-  <% if @user.hoofdtrainer_groepen.any? %>
-    <h2>Groepen waar ik hoofdtrainer ben</h2>
-    <ul>
-      <% @user.hoofdtrainer_groepen.each do |group| %>
-        <li><strong><%= group.name %></strong></li>
-      <% end %>
-    </ul>
-  <% end %>
-  <% if @user.medetrainer_groepen.any? %>
-    <h2>Groepen waar ik medetrainer ben</h2>
-    <ul>
-      <% @user.medetrainer_groepen.each do |group| %>
-        <li><strong><%= group.name %></strong></li>
-      <% end %>
-    </ul>
-  <% end %>
-  <h2>Mijn prestaties/tijden</h2>
-  <% if @user.performances.any? %>
-    <table style="width:100%; margin-bottom: 1rem;">
-      <thead>
-        <tr>
-          <th>Datum</th>
-          <th>Test</th>
-          <th>Waarde</th>
-          <th>Notities</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @user.performances.order(date: :desc).each do |performance| %>
-          <tr>
-            <td><%= performance.date %></td>
-            <td><%= performance.test_type %></td>
-            <td><%= performance.value %></td>
-            <td><%= performance.notes %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  <% else %>
-    <p>Je hebt nog geen prestaties geregistreerd.</p>
-  <% end %>
-  <h3>Nieuwe tijd/prestatie toevoegen</h3>
-  <%= render 'performances/form', performance: Performance.new(user_id: @user.id) %>
-  <% historie = lopers_historie_for(@user) %>
-  <% if historie.any? %>
-    <div style="margin-top:2rem;">
-      <% laatste = historie.sort_by { |row| Date.strptime(row[:datum], '%d-%m-%y') rescue Date.new(1900,1,1) }.last %>
+<h1 class="profile-title"><%= @user.name %></h1>
+<p><strong>Aanwezige trainingen tot nu toe:</strong> <%= @user.attended_trainings_count_up_to_today %></p>
+<div class="profile-header-row">
+  <div class="profile-left">
+    <p>Status: <%= @user.status&.name || 'onbekend' %></p>
+    <p>Email: <%= @user.email %></p>
+    <p>Phone: <%= @user.phone %></p>
+    <p>Birthday: <%= @user.birthday.present? ? @user.birthday.strftime('%d-%m-%Y') : '' %></p>
+    <p>Emergency Contact: <%= @user.emergency_contact %></p>
+    <p>Group: <%= @user.groups.first&.name || 'No group assigned' %></p>
+    <p>Hoofdtrainer: <%= @user.groups.first&.hoofdtrainer&.email || 'Geen hoofdtrainer' %></p>
+    <p>Medetrainer: <%= @user.groups.first&.medetrainer&.email || 'Geen medetrainer' %></p>
+  </div>
+  <div class="profile-conditie">
+    <% if @performances.any? %>
+      <% laatste = @performances.order(:date).last %>
       <% if laatste %>
-        <div style="background:#e3f2fd; border-radius:8px; padding:1rem; margin-bottom:1rem; max-width:400px;">
-          <strong>Anarobe drempel:</strong> <%= laatste[:ad] %><br>
-          <strong>Duurloop 85%:</strong> <%= laatste[:dl2_85] %>
+        <div class="conditie-blok dark-bg">
+          <strong class="conditie-title">Conditie</strong>
+          <strong>Duurloop 85% (gemiddelde):</strong> <%= @user.gemiddelde_dl2_85 %><br>
+          <strong>Intervaltempo (min/km):</strong> <%= @user.gemiddelde_tempo_per_km %><br>
+          <hr class="conditie-hr">
+          <strong class="conditie-highlight">Anaerobe drempel</strong>
+          <span class="conditie-value"><%= @user.gemiddelde_ad %></span><br>
+          <hr class="conditie-hr">
+          <strong class="conditie-highlight">AD Historie</strong>
+          <% @performances.order(:date).last(10).reverse.each do |p| %>
+            <%= p.date&.strftime('%d-%m-%Y') %>: <%= ad(p) %><br>
+          <% end %>
+        </div>
+
+        <div class="conditie-blok dark-bg" style="margin-top:1em;">
+          <strong class="conditie-title">Trainingsconditie</strong>
+          <strong>Duurloop 85% (training):</strong> <%= @user.effective_training_tempo('duur').presence || '–' %><br>
+          <strong>Intervaltempo (min/km, training):</strong> <%= @user.effective_training_tempo('interval').presence || '–' %><br>
+          <strong>Anaerobe drempel (training):</strong> <%= @user.gemiddelde_training_ad.presence || '–' %><br>
+          <strong>10 km-prognose (training):</strong> <%= @user.training_prognose_10km.presence || '–' %><br>
+          <% if @user.training_results.any? %>
+            <hr class="conditie-hr">
+            <strong class="conditie-highlight">AD Historie (training)</strong><br>
+            <% valid_trs = @user.training_results.includes(:training_session).select { |tr| @user.ad_training(tr).present? && @user.ad_training(tr) != '00:00' } %>
+            <% grouped = valid_trs.group_by { |tr| (tr.training_session&.date || tr.created_at.to_date) } %>
+            <% grouped.values.map { |arr| arr.first }.sort_by { |tr| tr.training_session&.date || tr.created_at }.reverse.each do |tr| %>
+              <%= (tr.training_session&.date || tr.created_at).strftime('%d-%m-%Y') %>: <%= @user.ad_training(tr) %><br>
+            <% end %>
+          <% end %>
+          <% unless @user.effective_training_tempo('duur').present? || @user.effective_training_tempo('interval').present? %>
+            <small style="color:#aaa;">Wordt automatisch weergegeven zodra je trainingsregistraties opslaat.</small>
+          <% end %>
         </div>
       <% end %>
-      <h2>Prestaties</h2>
+    <% end %>
+  </div>
+</div>
+
+<div class="dark-bg" style="background:#222; color:#fff; border:1px solid #444; border-radius:8px; padding:1em; margin:1.5em 0;">
+  <strong>Afmelden voor de training van vandaag?</strong><br>
+  Gebruik deze persoonlijke link om je zonder inloggen af te melden voor de training van vandaag:<br>
+  <code style="word-break:break-all; background:#333; color:#6ee75a; padding:0.2em 0.4em; border-radius:4px; display:block; margin:0.5em 0;">
+    <%= public_afmelden_url(slug: @user.slug, token: @user.public_token) %>
+  </code>
+  <small style="color:#ccc;">Let op: deze link is persoonlijk en alleen geldig voor jouw account.</small>
+</div>
+
+<h2>Trainingsdagen</h2>
+<%= form_with url: update_training_days_path, method: :patch, local: true do |f| %>
+  <% if (current_user.admin? || current_user.trainer?) && current_user.id != @user.id %>
+    <%= hidden_field_tag :user_id, @user.id %>
+  <% end %>
+  <label style="margin-right:1.5em;">
+    <%= check_box_tag 'user[training_days][]', 'Dinsdag', @user.training_days.present? ? @user.training_days.include?('Dinsdag') : true %> Dinsdag
+  </label>
+  <label>
+    <%= check_box_tag 'user[training_days][]', 'Zaterdag', @user.training_days.present? ? @user.training_days.include?('Zaterdag') : true %> Zaterdag
+  </label>
+  <br>
+  <%= f.submit 'Opslaan', class: 'theme-btn', style: 'margin-top:0.7em;' %>
+<% end %>
+
+<div>
+  <%= link_to '✏️ Profiel', edit_user_path(@user), class: 'theme-btn', style: 'background:#3498db; color:#fff; padding:0.1em 0.5em; font-size:0.9em; margin-bottom: 1.5rem; display: inline-block;' %> |
+  <%= link_to 'Terug', users_path %>
+</div>
+
+<div style="text-align: left; margin-left: 0;">
+  <div style="text-align:left;">
+    <h2>Prestaties</h2>
+    <% if @performances.any? %>
       <div style="overflow-x:auto;">
-        <table style="width:100%; margin-bottom: 1rem; border-collapse:collapse;">
+        <table class="prestaties-table" style="width:100%; margin-bottom: 1rem; border-collapse:collapse;">
           <thead>
-            <tr style="background:#f0f4f8;">
+            <tr>
               <th style="text-align:left; padding:8px;">Datum</th>
+              <th style="text-align:left; padding:8px;">Onderdeel</th>
               <th style="text-align:left; padding:8px;">Afstand</th>
               <th style="text-align:left; padding:8px;">Tijd</th>
               <th style="text-align:left; padding:8px;">Prognose 10 km</th>
-              <th style="text-align:left; padding:8px;">1000m</th>
+              <th style="text-align:left; padding:8px;">AD</th>
+              <th style="text-align:left; padding:8px;">Duurloop 85%</th>
               <th style="text-align:left; padding:8px;">km/min</th>
+              <th style="text-align:left; padding:8px;">Notities</th>
+              <th style="text-align:left; padding:8px;">Acties</th>
             </tr>
           </thead>
           <tbody>
-            <% historie.sort_by { |row| Date.strptime(row[:datum], '%d-%m-%y') rescue Date.new(1900,1,1) }.reverse.each do |row| %>
+            <% @performances.each do |performance| %>
               <tr>
-                <td style="text-align:left; padding:8px;">
-                  <% begin %>
-                    <%= Date.strptime(row[:datum], '%d-%m-%y').strftime('%d-%m-%Y') %>
-                  <% rescue %>
-                    <%= row[:datum] %>
-                  <% end %>
-                </td>
-                <td style="text-align:left; padding:8px;"><%= row[:afstand] %></td>
-                <td style="text-align:left; padding:8px;"><%= row[:tijd] %></td>
-                <td style="text-align:left; padding:8px;"><%= row[:prognose_10km] %></td>
-                <td style="text-align:left; padding:8px;"><%= row[:meter_1000] %></td>
-                <td style="text-align:left; padding:8px;"><%= row[:km_min] %></td>
+                <td style="text-align:left; padding:8px;" data-label="Datum"><%= performance.date&.strftime('%d-%m-%Y') %></td>
+                <td style="text-align:left; padding:8px;" data-label="Onderdeel"><%= performance.test_type %></td>
+                <td style="text-align:left; padding:8px;" data-label="Afstand"><%= performance.distance %></td>
+                <td style="text-align:left; padding:8px;" data-label="Tijd"><%= performance.value %></td>
+                <td style="text-align:left; padding:8px;" data-label="Prognose 10 km"><%= prognose_10km(performance) %></td>
+                <td style="text-align:left; padding:8px;" data-label="AD"><%= ad(performance) %></td>
+                <td style="text-align:left; padding:8px;" data-label="Duurloop 85%"><%= dl2_85(performance) %></td>
+                <td style="text-align:left; padding:8px;" data-label="km/min"><%= km_min(performance) %></td>
+                <td style="text-align:left; padding:8px;" data-label="Notities"><%= performance.notes %></td>
+                <% if current_user&.admin? || current_user&.id == performance.user_id %>
+                  <td style="text-align:left; padding:8px;">
+                    <%= link_to '✏️', edit_performance_path(performance), class: 'theme-btn', style: 'background:#3498db; color:#fff; padding:0.2em 0.7em; font-size:0.95em; margin-right:0.5em;' %>
+                    <%= button_to performance_path(performance), method: :delete, data: { confirm: 'Weet je zeker dat je deze prestatie wilt verwijderen?' }, class: 'theme-btn', style: 'background:#e74c3c; color:#fff; padding:0.2em 0.7em; font-size:0.95em; margin-left:0.5em;' do %>
+                      🗑️
+                    <% end %>
+                  </td>
+                <% end %>
               </tr>
             <% end %>
           </tbody>
         </table>
       </div>
-    </div>
-  <% end %>
-</div> 
+    <% else %>
+      <p>Je hebt nog geen prestaties geregistreerd.</p>
+    <% end %>
+    <h3>Nieuwe tijd/prestatie toevoegen</h3>
+    <%= render 'performances/form', performance: Performance.new(user_id: @user.id) %>
+  </div>
+</div>
+
+<style>
+.profile-title {
+  margin-bottom: 0;
+}
+.profile-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2em;
+  align-items: flex-start;
+  margin-bottom: 2em;
+}
+.profile-left,
+.profile-conditie {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  align-self: flex-start;
+}
+.profile-left p:first-child {
+  margin-top: 0 !important;
+}
+.conditie-blok {
+  margin-top: 0 !important;
+}
+.profile-left {
+  min-width: 260px;
+  max-width: 400px;
+  flex: 1 1 320px;
+}
+.profile-left h1 {
+  margin-top: 0;
+  margin-bottom: 0.5em;
+}
+.profile-conditie {
+  min-width: 260px;
+  max-width: 500px;
+  flex: 1 1 320px;
+  display: flex;
+  align-items: flex-start;
+}
+.conditie-blok {
+  background: rgba(30,40,40,0.95);
+  color: #fff;
+  border-radius: 12px;
+  padding: 1.5em;
+  margin-bottom: 2em;
+  width: 100%;
+  box-sizing: border-box;
+}
+.conditie-title {
+  font-size: 1.3em;
+  display: block;
+  margin-bottom: 0.7em;
+}
+.conditie-highlight {
+  font-size: 1.1em;
+  color: #6ee75a;
+  display: block;
+  margin-bottom: 0.5em;
+}
+.conditie-value {
+  font-size: 1.15em;
+}
+.conditie-hr {
+  border: 1px solid #444;
+  margin: 1.2em 0 0.7em 0;
+}
+@media (max-width: 900px) {
+  .profile-header-row {
+    flex-direction: column !important;
+    gap: 0.5em !important;
+    margin-top: 1.2em;
+  }
+}
+@media (max-width: 800px) {
+  .prestaties-table, .prestaties-table thead, .prestaties-table tbody, .prestaties-table tr, .prestaties-table th, .prestaties-table td {
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+  .prestaties-table thead {
+    display: none !important;
+  }
+  .prestaties-table tr {
+    margin-bottom: 1.5em;
+    border-bottom: 2px solid #222;
+    background: none;
+  }
+  .prestaties-table td {
+    padding: 0.5em 0.7em;
+    border: none;
+    position: relative;
+  }
+  .prestaties-table td:before {
+    content: attr(data-label);
+    font-weight: bold;
+    display: inline-block;
+    min-width: 120px;
+    color: #6ee75a;
+    margin-right: 1em;
+  }
+}
+</style> 

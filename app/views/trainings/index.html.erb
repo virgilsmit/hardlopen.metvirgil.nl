@@ -1,4 +1,16 @@
 <h1>Trainingen</h1>
+<div style="display:flex; gap:2rem; margin-bottom:2rem;">
+  <a href="/schema/alle" class="theme-btn dark-bg" style="flex:1; font-size:1.1rem; background:#222; color:#fff; padding:1.5rem 1rem; border-radius:12px; display:block; text-align:center; box-shadow:0 2px 8px #0002;">
+    <div style="font-size:2.2rem; margin-bottom:0.5rem;">📅</div>
+    <div style="font-weight:bold; font-size:1.2rem;">Alle trainingen</div>
+    <div style="font-size:0.98rem; color:#bbb;">Bekijk alle toekomstige trainingen</div>
+  </a>
+  <a href="/schema/dezeweek" class="theme-btn" style="flex:1; font-size:1.1rem; background:#34c759; color:#fff; padding:1.5rem 1rem; border-radius:12px; display:block; text-align:center; box-shadow:0 2px 8px #0002;">
+    <div style="font-size:2.2rem; margin-bottom:0.5rem;">🗓️</div>
+    <div style="font-weight:bold; font-size:1.2rem;">Deze week</div>
+    <div style="font-size:0.98rem; color:#eaffea;">Bekijk de trainingen van deze week</div>
+  </a>
+</div>
 <div class="trainings-list">
   <% @trainings.each do |training| %>
     <div class="training-card">

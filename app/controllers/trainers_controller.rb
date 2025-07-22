@@ -21,9 +21,29 @@ class TrainersController < ApplicationController
     end
   end
 
+  def beheer
+    @trainers = User.with_role(:trainer).order(:name)
+    @promoteable_lopers = User.with_role(:user).where.not("roles @> ARRAY[?]::varchar[]", 'trainer').order(:name)
+  end
+
+  def promote_trainer
+    user = User.find(params[:user_id])
+    user.add_role(:trainer)
+    redirect_to trainers_beheer_path, notice: "#{user.name} is nu ook trainer."
+  end
+
+  def overzicht
+    # Hier kunnen straks statistieken en overzichten geladen worden
+  end
+
+  def ad_gemiddelden
+    @lopers = User.alleen_actieve_lopers.to_a.select { |u| u.gemiddelde_ad.present? && u.gemiddelde_ad != '' }
+    @lopers.sort_by! { |u| u.tijd_naar_seconden(u.gemiddelde_ad) }
+  end
+
   private
   def require_trainer_or_admin
-    unless current_user&.role.in?(["trainer", "admin"])
+    unless current_user&.has_role?(:trainer) || current_user&.has_role?(:admin)
       redirect_to root_path, alert: 'Alleen trainers en beheerders mogen deze pagina zien.'
     end
   end

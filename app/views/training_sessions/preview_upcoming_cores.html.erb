@@ -1,0 +1,13 @@
+<h1>Voorbeeld-conversie kern – komende weken</h1>
+
+<% if @parsed_sessions.empty? %>
+  <p>Geen toekomstige trainingen gevonden in de komende 3 weken.</p>
+<% else %>
+  <% @parsed_sessions.each do |entry| %>
+    <h3><%= entry[:session].date.strftime('%A %d %B') %>: <%= entry[:session].respond_to?(:title) ? entry[:session].title : (entry[:session].description || '-') %></h3>
+    <p><strong>Oorspronkelijke kern:</strong> <%= entry[:original_core].presence || '–' %></p>
+    <p><strong>Conversie:</strong> <%= entry[:status] %></p>
+    <pre><%= JSON.pretty_generate(entry[:parsed_core]) rescue 'Fout bij weergave' %></pre>
+    <hr>
+  <% end %>
+<% end %> 

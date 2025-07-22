@@ -1,0 +1,7 @@
+<h2>Loper: <%= @user.name %></h2>
+<p><strong>Training:</strong> <%= @training.date.strftime('%d-%m-%Y') %> - <%= @training.description %></p>
+<p><strong>Status:</strong> <%= @attendance.status.capitalize %></p>
+<% if @attendance.note.present? %>
+  <p><strong>Reden:</strong> <%= @attendance.note %></p>
+<% end %>
+<p><strong>Actie:</strong> <%= @actie.capitalize %></p> 

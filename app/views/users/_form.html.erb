@@ -72,6 +72,16 @@
   </div>
 
   <div>
+    <label style="display:block; font-weight:bold; margin-top:1em;">Trainingsdagen</label>
+    <label style="margin-right:1.5em;">
+      <%= check_box_tag 'user[training_days][]', 'Dinsdag', user.training_days.present? ? user.training_days.include?('Dinsdag') : true %> Dinsdag
+    </label>
+    <label>
+      <%= check_box_tag 'user[training_days][]', 'Zaterdag', user.training_days.present? ? user.training_days.include?('Zaterdag') : true %> Zaterdag
+    </label>
+  </div>
+
+  <div>
     <%= form.submit "Opslaan" %>
   </div>
 <% end %>

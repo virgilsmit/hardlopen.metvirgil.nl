@@ -1,0 +1,69 @@
+<h1>Groep koppelen aan trainingsschema</h1>
+<% if flash[:notice] %>
+  <div style="color: green; font-weight: bold; margin-bottom:1em;"> <%= flash[:notice] %> </div>
+<% elsif flash[:alert] %>
+  <div style="color: red; font-weight: bold; margin-bottom:1em;"> <%= flash[:alert] %> </div>
+<% end %>
+
+<h2 style="margin-top:2em;">Overzicht huidige koppelingen</h2>
+<table class="schema-table dark-bg" style="width:100%;margin-bottom:2em;background:#222;color:#fff;border-radius:8px;overflow:hidden;">
+  <thead style="background:#333;">
+    <tr>
+      <th style="padding:8px;text-align:left;">Groep</th>
+      <th style="padding:8px;text-align:left;">Schema</th>
+      <th style="padding:8px;text-align:left;">Aantal sessies</th>
+      <th style="padding:8px;text-align:left;">Acties</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% Group.all.each do |group| %>
+      <% schema = group.training_schemas.first %>
+      <tr>
+        <td data-label="Groep" style="padding:8px;">
+          <%= link_to group.name, edit_group_path(group), target: '_blank', style: 'color:#6ee75a;text-decoration:underline;font-weight:bold;' %>
+        </td>
+        <td data-label="Schema" style="padding:8px;">
+          <% if params[:edit_schema_id].to_i == schema&.id %>
+            <%= form_with url: admin_schemas_rename_path, method: :post, local: true do |f| %>
+              <%= hidden_field_tag :schema_id, schema.id %>
+              <%= text_field_tag :new_name, schema.name, style: 'width:140px;' %>
+              <button class="theme-btn" style="padding:0.2em 1em;font-size:0.95em;">Opslaan</button>
+            <% end %>
+          <% else %>
+            <%= schema&.name || '-' %>
+          <% end %>
+        </td>
+        <td data-label="Aantal sessies" style="padding:8px;"><%= schema ? schema.training_sessions.count : 0 %></td>
+        <td data-label="Acties" style="padding:8px;">
+          <% if schema %>
+            <%= link_to 'Bewerken', admin_schemas_koppelen_path(edit_schema_id: schema.id), class: 'theme-btn', style: 'padding:0.2em 1em;font-size:0.95em;background:#6ee75a;color:#222;' %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<p>Kies een groep en een schema om te koppelen.</p>
+
+<%= form_with url: admin_schemas_koppelen_path, method: :post, local: true do |form| %>
+  <div>
+    <label for="group_id">Groep</label><br>
+    <select name="group_id" id="group_id">
+      <% @groups.each do |group| %>
+        <option value="<%= group.id %>"><%= group.name %></option>
+      <% end %>
+    </select>
+  </div>
+  <div style="margin-top:1rem;">
+    <label for="schema_id">Schema</label><br>
+    <select name="schema_id" id="schema_id">
+      <% @schemas.each do |schema| %>
+        <option value="<%= schema.id %>"><%= schema.name %></option>
+      <% end %>
+    </select>
+  </div>
+  <div style="margin-top:1.5rem;">
+    <button class="theme-btn">Koppelen</button>
+  </div>
+<% end %> 

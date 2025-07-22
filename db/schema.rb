@@ -10,16 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_06_25_130751) do
+ActiveRecord::Schema[7.1].define(version: 2025_06_27_120005) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "attendances", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "training_session_id", null: false
-    t.string "status", default: "0", null: false
+    t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "note"
     t.index ["status"], name: "index_attendances_on_status"
     t.index ["training_session_id"], name: "index_attendances_on_training_session_id"
     t.index ["user_id", "training_session_id"], name: "index_attendances_on_user_id_and_training_session_id", unique: true
@@ -178,6 +179,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_25_130751) do
     t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "dinsdag_interval"
+    t.string "zaterdag_duurloop"
     t.index ["group_id"], name: "index_training_schemas_on_group_id"
     t.index ["user_id"], name: "index_training_schemas_on_user_id"
   end
@@ -190,6 +193,13 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_25_130751) do
     t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "trainer"
+    t.bigint "trainer_id"
+    t.integer "week"
+    t.string "dag"
+    t.string "loopscholing"
+    t.string "fase"
+    t.string "wedstrijd"
     t.index ["group_id"], name: "index_training_sessions_on_group_id"
     t.index ["training_schema_id"], name: "index_training_sessions_on_training_schema_id"
     t.index ["user_id"], name: "index_training_sessions_on_user_id"

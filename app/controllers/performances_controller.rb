@@ -22,10 +22,17 @@ class PerformancesController < ApplicationController
   # POST /performances or /performances.json
   def create
     @performance = Performance.new(performance_params)
+    unless User.exists?(@performance.user_id)
+      redirect_to profile_path, alert: 'Ongeldige loper geselecteerd.' and return
+    end
 
     respond_to do |format|
       if @performance.save
-        format.html { redirect_to @performance, notice: "Performance was successfully created." }
+        if current_user.id == @performance.user_id
+          format.html { redirect_to profile_path, notice: "Prestatie succesvol toegevoegd." }
+        else
+          format.html { redirect_to user_path(@performance.user_id), notice: "Prestatie succesvol toegevoegd voor loper." }
+        end
         format.json { render :show, status: :created, location: @performance }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -38,7 +45,7 @@ class PerformancesController < ApplicationController
   def update
     respond_to do |format|
       if @performance.update(performance_params)
-        format.html { redirect_to @performance, notice: "Performance was successfully updated." }
+        format.html { redirect_to user_path(@performance.user_id), notice: "Prestatie succesvol aangepast." }
         format.json { render :show, status: :ok, location: @performance }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -49,11 +56,15 @@ class PerformancesController < ApplicationController
 
   # DELETE /performances/1 or /performances/1.json
   def destroy
-    @performance.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to performances_path, status: :see_other, notice: "Performance was successfully destroyed." }
-      format.json { head :no_content }
+    if current_user&.admin? || @performance.user_id == current_user&.id
+      user_id = @performance.user_id
+      @performance.destroy!
+      respond_to do |format|
+        format.html { redirect_to user_path(user_id), status: :see_other, notice: "Prestatie verwijderd." }
+        format.json { head :no_content }
+      end
+    else
+      redirect_to profile_path, alert: "Je mag deze prestatie niet verwijderen."
     end
   end
 

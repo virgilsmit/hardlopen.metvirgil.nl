@@ -1,0 +1,28 @@
+<h1>Wijzig trainingresultaat</h1>
+
+<h3><%= @training_session.description.presence || @training_session.dag || @training_session.date.strftime('%A %d %B %Y') %></h3>
+
+<p><strong>Kern</strong></p>
+<ul>
+  <% human_core(@training_session.structured_core, current_user).each do |line| %>
+    <li><%= line %></li>
+  <% end %>
+</ul>
+
+<%= form_with model: @training_result, url: training_result_path(@training_result), local: true, method: :patch do |f| %>
+  <div class="app-form-group">
+    <%= f.label :time, 'Tijd (mm:ss of hh:mm:ss)' %>
+    <%= f.text_field :time, value: current_user.seconden_naar_tijd(@training_result.time), class:'app-form-input' %>
+  </div>
+  <div class="app-form-group">
+    <%= f.label :distance, 'Afstand (km)' %>
+    <%= f.number_field :distance, step:0.01, class:'app-form-input' %>
+  </div>
+  <div class="app-form-group">
+    <%= f.label :notes, 'Notities' %>
+    <%= f.text_area :notes, rows:4, class:'app-form-input' %>
+  </div>
+  <%= f.submit 'Bijwerken', class:'app-btn', style:'background:#34c759;color:#fff;' %>
+<% end %>
+
+<%= link_to 'Annuleren', mijn_trainingen_path, class:'app-btn', style:'margin-top:1rem;' %> 

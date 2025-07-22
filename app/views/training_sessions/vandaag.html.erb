@@ -1,0 +1,33 @@
+<h1 style="font-size:1.3em;margin-bottom:1.2em;">Training vandaag</h1>
+<% if @training_session %>
+  <div style="margin-bottom:1.2em;">
+    <strong>Datum:</strong> <%= l(@training_session.date) %><br>
+    <strong>Training:</strong> <%= @training_session.description %><br>
+    <strong>Locatie:</strong> GAC
+  </div>
+  <% attendance = @training_session.attendances.find_by(user_id: current_user.id) %>
+  <div style="display:flex;gap:1em;align-items:center;">
+    <%= form_with url: attendances_path, method: :post, local: true, style: 'display:inline;' do |f| %>
+      <%= f.hidden_field :user_id, value: current_user.id %>
+      <%= f.hidden_field :training_session_id, value: @training_session.id %>
+      <%= f.hidden_field :status, value: 'aanwezig' %>
+      <button type="submit" class="theme-btn" style="background:#34c759; color:#fff; border:<%= (attendance&.status == 'aanwezig') ? '2px solid #222' : 'none' %>; font-weight:bold; padding:0.5em 1.2em; font-size:1.1em; min-width: 90px; opacity:<%= (attendance&.status == 'aanwezig') ? '1' : '0.4' %>;"><span>Aanwezig</span></button>
+    <% end %>
+    <%= form_with url: attendances_path, method: :post, local: true, style: 'display:inline;' do |f| %>
+      <%= f.hidden_field :user_id, value: current_user.id %>
+      <%= f.hidden_field :training_session_id, value: @training_session.id %>
+      <%= f.hidden_field :status, value: 'afwezig' %>
+      <%= f.text_field :note, value: (attendance&.status == 'afwezig' ? attendance&.note : nil), placeholder: 'Notitie (optioneel)', style: 'margin-left:0.5em;width:120px;font-size:1em;' %>
+      <button type="submit" class="theme-btn" style="background:#e74c3c; color:#fff; border:<%= (attendance&.status == 'afwezig') ? '2px solid #222' : 'none' %>; font-weight:bold; padding:0.5em 1.2em; font-size:1.1em; min-width: 90px; opacity:<%= (attendance&.status == 'afwezig') ? '1' : '0.4' %>;"><span>Afwezig</span></button>
+    <% end %>
+  </div>
+  <% if attendance&.status == 'aanwezig' %>
+    <div style="margin-top:1em;color:#34c759;font-weight:bold;">Je bent aangemeld als aanwezig.</div>
+  <% elsif attendance&.status == 'afwezig' %>
+    <div style="margin-top:1em;color:#e74c3c;font-weight:bold;">Je bent afgemeld voor deze training.</div>
+  <% else %>
+    <div style="margin-top:1em;color:#888;">Je hebt je nog niet aangemeld of afgemeld.</div>
+  <% end %>
+<% else %>
+  <div style="color:#e74c3c;">Er is geen training voor vandaag.</div>
+<% end %> 

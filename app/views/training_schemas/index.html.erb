@@ -1,7 +1,7 @@
 <h1>Trainingsschema's</h1>
 <table style="width:100%; border-collapse:collapse; margin-top:1rem;">
   <thead>
-    <tr style="background:#f0f4f8;">
+    <tr>
       <th style="text-align:left; padding:8px;">Naam</th>
       <th style="text-align:left; padding:8px;">Omschrijving</th>
       <th style="text-align:left; padding:8px;">Aantal sessies</th>
@@ -37,4 +37,53 @@
     <p>Bekijk het schema voor de huidige week.</p>
     <a href="<%= schema_week_path %>" class="theme-btn">Bekijk weekschema</a>
   </div>
+  <div class="theme-card">
+    <div class="theme-card-icon">📅</div>
+    <h2>Alle trainingen</h2>
+    <p>Bekijk een lijst van alle trainingen vanaf vandaag.</p>
+    <a href="<%= schema_all_path %>" class="theme-btn">Bekijk alle trainingen</a>
+  </div>
+  <div class="theme-card">
+    <div class="theme-card-icon">🗓️</div>
+    <h2>Deze week</h2>
+    <p>Bekijk alleen de trainingen van deze week.</p>
+    <a href="<%= schema_dezeweek_path %>" class="theme-btn">Bekijk deze week</a>
+  </div>
 </div>
+
+<!-- WEEKOVERZICHT -->
+<%= render partial: 'week_overview' %>
+
+<!-- ALLE AANKOMENDE TRAININGEN -->
+<% if @upcoming_sessions.present? %>
+  <p style="color:#888;">Aantal aankomende trainingen vanaf vandaag: <%= @upcoming_sessions.size %></p>
+  <h2 style="margin-top:2.5em;">Alle aankomende trainingen vanaf vandaag</h2>
+  <table style="width:100%; border-collapse:collapse; margin-top:1rem;">
+    <thead>
+      <tr>
+        <th style="text-align:left; padding:8px;">Datum</th>
+        <th style="text-align:left; padding:8px;">Dag</th>
+        <th style="text-align:left; padding:8px;">Training</th>
+        <th style="text-align:left; padding:8px;">Loopscholing</th>
+        <th style="text-align:left; padding:8px;">Trainer</th>
+        <th style="text-align:left; padding:8px;">Locatie</th>
+        <th style="text-align:left; padding:8px;">Fase</th>
+        <th style="text-align:left; padding:8px;">Wedstrijd</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @upcoming_sessions.each do |sessie| %>
+        <tr>
+          <td style="padding:8px;"><%= sessie.date %></td>
+          <td style="padding:8px;"><%= sessie.dag %></td>
+          <td style="padding:8px;"><%= sessie.description %></td>
+          <td style="padding:8px;"><%= sessie.loopscholing %></td>
+          <td style="padding:8px;"><%= sessie.trainer || (sessie.trainer_id && User.find_by(id: sessie.trainer_id)&.name) || '-' %></td>
+          <td style="padding:8px;">GAC</td>
+          <td style="padding:8px;"><%= sessie.fase %></td>
+          <td style="padding:8px;"><%= sessie.wedstrijd %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>

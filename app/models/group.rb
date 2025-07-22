@@ -4,7 +4,7 @@ class Group < ApplicationRecord
   belongs_to :medetrainer, class_name: 'User', optional: true
   has_many :group_memberships, dependent: :destroy
   has_many :users, through: :group_memberships
-  has_many :training_schemas, dependent: :destroy # Schemas specifically for this group
+  has_many :training_schemas # Schemas specifically for this group
   has_many :training_sessions, dependent: :destroy # Trainings specifically for this group
 
   # Validations

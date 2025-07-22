@@ -3,6 +3,7 @@ require "test_helper"
 class AttendancesControllerTest < ActionDispatch::IntegrationTest
   setup do
     @attendance = attendances(:one)
+    post login_path, params: { email: 'virgil@virgilhomemade.nl', password: 'muffel2406' }
   end
 
   test "should get index" do
@@ -17,10 +18,9 @@ class AttendancesControllerTest < ActionDispatch::IntegrationTest
 
   test "should create attendance" do
     assert_difference("Attendance.count") do
-      post attendances_url, params: { attendance: { status: @attendance.status, training_session_id: @attendance.training_session_id, user_id: @attendance.user_id } } # Changed training_id to training_session_id
+      post attendances_url, params: { attendance: { user_id: @attendance.user_id, training_session_id: @attendance.training_session_id, status: @attendance.status } }
     end
-
-    assert_redirected_to attendance_url(Attendance.last)
+    assert_redirected_to schema_week_path
   end
 
   test "should show attendance" do
@@ -34,8 +34,8 @@ class AttendancesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update attendance" do
-    patch attendance_url(@attendance), params: { attendance: { status: @attendance.status, training_session_id: @attendance.training_session_id, user_id: @attendance.user_id } } # Changed training_id to training_session_id
-    assert_redirected_to attendance_url(@attendance)
+    patch attendance_url(@attendance), params: { attendance: { user_id: @attendance.user_id, training_session_id: @attendance.training_session_id, status: @attendance.status } }
+    assert_redirected_to trainings_path
   end
 
   test "should destroy attendance" do

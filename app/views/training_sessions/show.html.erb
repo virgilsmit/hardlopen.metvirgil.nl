@@ -1,4 +1,16 @@
 <h1>Training details</h1>
+<% if current_user.admin? %>
+  <% users = @training_session.group&.users&.select { |u| (u.has_role?(:trainer) || (u.has_role?(:trainer) == false && User.alleen_actieve_lopers.include?(u))) }&.sort_by(&:name) || [] %>
+<% else %>
+  <% users = @training_session.group&.users&.select { |u| u.has_role?(:trainer) == false && User.alleen_actieve_lopers.include?(u) }&.sort_by(&:name) || [] %>
+<% end %>
+<% users.unshift(users.delete(current_user)) if users.include?(current_user) %>
+<% # Sorteer de overige gebruikers op status: afwezig -> aanwezig -> geen status %>
+<% overige = users[1..-1] || [] %>
+<% afwezig = overige.select { |u| @training_session.attendances.find_by(user: u)&.status == 'afwezig' } %>
+<% aanwezig = overige.select { |u| @training_session.attendances.find_by(user: u)&.status == 'aanwezig' } %>
+<% geen_status = overige - afwezig - aanwezig %>
+<% gesorteerde_users = [users.first] + afwezig + aanwezig + geen_status %>
 <table class="schema-table" style="width:auto; border-collapse:collapse; margin-top:1rem;">
   <tr><th style="text-align:left; padding:8px;">Week</th><td style="padding:8px;"><%= @training_session.week %></td></tr>
   <tr><th style="text-align:left; padding:8px;">Datum</th><td style="padding:8px;"><%= @training_session.date %></td></tr>
@@ -14,17 +26,145 @@
   <tr><th style="text-align:left; padding:8px;">Training</th><td style="padding:8px;"><%= @training_session.description %></td></tr>
   <tr><th style="text-align:left; padding:8px;">Loopscholing</th><td style="padding:8px;"><%= @training_session.loopscholing %></td></tr>
   <tr><th style="text-align:left; padding:8px;">Trainer</th><td style="padding:8px;"><%= @training_session.trainer&.name || '-' %></td></tr>
-  <tr><th style="text-align:left; padding:8px;">Locatie</th><td style="padding:8px;">GAC</td></tr>
+  <% aanwezige_trainers = @training_session.group&.users&.select { |u| u.has_role?(:trainer) && @training_session.attendances.find_by(user: u)&.status == 'aanwezig' } || [] %>
+  <% afwezige_trainers = @training_session.group&.users&.select { |u| u.has_role?(:trainer) && @training_session.attendances.find_by(user: u)&.status == 'afwezig' } || [] %>
+  <% if aanwezige_trainers.any? %>
+    <tr><th style="text-align:left; padding:8px;">Aanwezige trainers</th><td style="padding:8px;">
+      <%= aanwezige_trainers.map(&:name).join(', ') %>
+    </td></tr>
+  <% end %>
+  <% if afwezige_trainers.any? %>
+    <tr><th style="text-align:left; padding:8px; color:#e74c3c;">Afwezige trainers</th><td style="padding:8px;">
+      <% afwezige_trainers.each do |trainer| %>
+        <% attendance = @training_session.attendances.find_by(user_id: trainer.id) %>
+        <span style="display:inline-block;margin-right:1.2em;">
+          <strong><%= trainer.name %></strong>
+          <% if attendance.note.present? %>
+            <span style="margin-left:0.5em;color:#888;font-style:italic;">- <%= attendance.note %></span>
+          <% end %>
+        </span>
+      <% end %>
+    </td></tr>
+  <% end %>
+  <tr><th style="text-align:left; padding:8px;">Locatie</th><td style="padding:8px;"><%= @training_session.locatie %></td></tr>
   <tr><th style="text-align:left; padding:8px;">Groep</th><td style="padding:8px;"><%= @training_session.group&.name || '-' %></td></tr>
   <tr><th style="text-align:left; padding:8px;">Fase</th><td style="padding:8px;"><%= @training_session.fase %></td></tr>
   <tr><th style="text-align:left; padding:8px;">Wedstrijd</th><td style="padding:8px;"><%= @training_session.wedstrijd %></td></tr>
 </table>
 
-<% if @training_session.attendances.any? %>
-  <h2>Aanwezigen</h2>
-  <ul>
-    <% @training_session.attendances.each do |attendance| %>
-      <li><%= attendance.user&.name %> (<%= attendance.status %>)</li>
+<h2>Kern overzicht</h2>
+<ul class="core-list" style="list-style:none; padding:0;">
+  <% human_core(@training_session.structured_core, current_user).each do |line| %>
+    <li style="margin-bottom:0.3em;">✅ <%= line %></li>
+  <% end %>
+</ul>
+
+<h2>Aanwezigheid lopers</h2>
+<% actieve_lopers = @training_session.group&.users&.select { |u| u.has_role?(:trainer) == false && User.alleen_actieve_lopers.include?(u) } || [] %>
+<% aanwezig_count = actieve_lopers.count { |u| @training_session.attendances.find_by(user: u)&.status == 'aanwezig' } %>
+<% afwezig_count = actieve_lopers.count { |u| @training_session.attendances.find_by(user: u)&.status == 'afwezig' } %>
+<% totaal_lopers = actieve_lopers.count %>
+<p style="margin-bottom:1.2em;"><strong>Lopers:</strong> <%= totaal_lopers %> | <strong>Aanwezig:</strong> <%= aanwezig_count %> | <strong>Afwezig:</strong> <%= afwezig_count %></p>
+
+<table class="schema-table" style="width:100%;max-width:700px;margin-bottom:2rem;">
+  <thead>
+    <tr>
+      <th>Loper</th>
+      <th>Status</th>
+      <th>Reden (optioneel)</th>
+      <th>Actie</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% gesorteerde_users.each do |user| %>
+      <% attendance = @training_session.attendances.find_by(user: user) %>
+      <% status_text = attendance&.status ? attendance.status.capitalize : 'Onbekend' %>
+      <% dot_color = case attendance&.status when 'aanwezig' then '#34c759' when 'afwezig' then '#e74c3c' else '#888' end %>
+      <tr>
+        <td style="white-space:nowrap;">
+          <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:<%= dot_color %>;margin-right:0.5em;"></span>
+          <strong><%= user.name %></strong>
+        </td>
+        <td><%= status_text %></td>
+        <td><%= attendance&.note.presence || '-' %></td>
+        <td>
+          <% if user == current_user || current_user.admin? || (current_user.has_role?(:trainer) && (@training_session.group&.hoofdtrainer_id == current_user.id || @training_session.group&.medetrainer_id == current_user.id)) %>
+            <div style="display:flex;gap:0.3em;">
+              <%= form_with url: attendances_path, method: :post, local: true, style: 'display:inline;' do |f| %>
+                <%= f.hidden_field :user_id, value: user.id %>
+                <%= f.hidden_field :training_session_id, value: @training_session.id %>
+                <%= f.hidden_field :status, value: 'aanwezig' %>
+                <button type="submit" class="theme-btn" style="background:#34c759; color:#fff; padding:0.2em 0.6em; font-size:0.9em; opacity:<%= (attendance&.status == 'aanwezig') ? '1' : '0.35' %>;">✔</button>
+              <% end %>
+              <%= form_with url: attendances_path, method: :post, local: true, style: 'display:inline;' do |f| %>
+                <%= f.hidden_field :user_id, value: user.id %>
+                <%= f.hidden_field :training_session_id, value: @training_session.id %>
+                <%= f.hidden_field :status, value: 'afwezig' %>
+                <button type="submit" class="theme-btn" style="background:#e74c3c; color:#fff; padding:0.2em 0.6em; font-size:0.9em; opacity:<%= (attendance&.status == 'afwezig') ? '1' : '0.35' %>;">✘</button>
+              <% end %>
+            </div>
+            <% if attendance&.afwezig? %>
+              <div style="margin-top:0.4em;">
+                <%= form_with model: attendance, url: attendance_path(attendance), method: :patch, local: true do |f| %>
+                  <%= f.label :note, 'Reden:' %><br>
+                  <%= f.text_field :note, style: 'width:200px;' %>
+                <% end %>
+              </div>
+            <% end %>
+          <% else %>
+            -
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<div style="margin-top:2rem;">
+  <h3>Niet aangemeld</h3>
+  <ul id="not_signed_up_list">
+    <% users_na = User.alleen_actieve_lopers.order(:name).to_a %>
+    <% users_na.unshift(users_na.delete(current_user)) if users_na.include?(current_user) %>
+    <% users_na.each do |user| %>
+      <% attendance = @training_session.attendances.find_by(user: user) %>
+      <% if attendance.nil? %>
+        <li><%= user.name %></li>
+      <% end %>
     <% end %>
   </ul>
+</div>
+
+<% if @training_session.group && @training_session.group.hoofdtrainer_id %>
+  <% trainers = [@training_session.group.hoofdtrainer] %>
+  <% trainers << @training_session.group.medetrainer if @training_session.group.medetrainer_id && @training_session.group.medetrainer_id != @training_session.group.hoofdtrainer_id %>
+  <% afwezige_trainers = trainers.compact.select { |trainer| (att = @training_session.attendances.find_by(user_id: trainer.id)) && att.status == 'afwezig' } %>
+  <% if afwezige_trainers.any? %>
+    <div style="margin-top:2em;">
+      <h3>Afwezige trainers</h3>
+      <ul style="list-style:none;padding:0;">
+        <% afwezige_trainers.each do |trainer| %>
+          <% attendance = @training_session.attendances.find_by(user_id: trainer.id) %>
+          <li style="margin-bottom:1em;">
+            <strong><%= trainer.name %></strong>
+            <span style="color:#e74c3c;">(afwezig)</span>
+            <% if attendance.note.present? %>
+              <span style="margin-left:0.5em;color:#888;font-style:italic;">- <%= attendance.note %></span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+<% end %>
+
+<% if current_user&.admin? || current_user&.has_role?(:trainer) %>
+  <div style="margin-top:1.2em;">
+    <%= link_to 'Log aanwezige lopers', log_attendance_training_session_path(@training_session), class:'theme-btn', style:'background:#34c759;color:#fff;' %>
+  </div>
+<% end %>
+
+<% if current_user&.admin? || (current_user&.has_role?(:trainer) && (@training_session.group&.hoofdtrainer_id == current_user.id || @training_session.group&.medetrainer_id == current_user.id)) %>
+  <div style="margin-bottom:1.5em;">
+    <%= link_to 'Bewerken', edit_training_session_path(@training_session), class: 'theme-btn', style: 'background:#1976d2;' %>
+  </div>
 <% end %> 

@@ -1,0 +1,5 @@
+<% users = User.alleen_actieve_lopers.order(:name).to_a %>
+<% aanwezig_count = training_session.attendances.where(user_id: users.map(&:id), status: 'aanwezig').count %>
+<% afwezig_count = training_session.attendances.where(user_id: users.map(&:id), status: 'afwezig').count %>
+<% misschien_count = training_session.attendances.where(user_id: users.map(&:id), status: 'onbekend').count %>
+<strong>Aanwezig:</strong> <%= aanwezig_count %> | <strong>Afwezig:</strong> <%= afwezig_count %> | <strong>Misschien:</strong> <%= misschien_count %> 

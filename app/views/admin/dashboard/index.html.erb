@@ -1,4 +1,7 @@
 <h1 style="margin-bottom: 2rem;">Admin Dashboard</h1>
+<div style="position:sticky;top:70px;z-index:200;background:#181f1b;padding:1rem 0 1rem 0;margin-bottom:1.5rem;text-align:center;box-shadow:0 2px 12px #6ee75a;">
+  <%= link_to 'Groep koppelen aan bestaand schema', admin_schemas_koppelen_path, class: 'theme-btn', style: 'background:#6ee75a;color:#222;font-weight:bold;font-size:1.25rem;padding:1em 2em;' %>
+</div>
 <div class="theme-cards">
   <div class="theme-card">
     <div class="theme-card-icon">👤</div>
@@ -24,9 +27,32 @@
     <p>Bekijk het volledige trainingsschema en het weekschema.</p>
     <a href="/schema" class="theme-btn">Naar schema</a>
   </div>
+  <div class="theme-card">
+    <div class="theme-card-icon">📝</div>
+    <h2>Nieuw schema</h2>
+    <p>Maak een nieuw trainingsschema aan en koppel aan een groep.</p>
+    <a href="#nieuw-trainingsschema" class="theme-btn">Nieuw schema toevoegen</a>
+  </div>
+  <div class="theme-card">
+    <div class="theme-card-icon">🔗</div>
+    <h2>Groep koppelen aan schema</h2>
+    <p>Koppel een bestaande groep aan een bestaand trainingsschema.</p>
+    <%= link_to 'Koppelen', admin_schemas_koppelen_path, class: 'theme-btn' %>
+  </div>
+  <div class="theme-card">
+    <div class="theme-card-icon">🧩</div>
+    <h2>Tegels per rol</h2>
+    <p>Beheer welke tegels zichtbaar zijn voor welke rol.</p>
+    <a href="/admin/tiles" class="theme-btn">Tegels beheren</a>
+  </div>
 </div>
 <hr style="margin:2rem 0;">
 <h2>Nieuwe prestatie toevoegen</h2>
 <div style="max-width: 500px;">
   <%= render 'performances/form', performance: Performance.new %>
+</div>
+<hr style="margin:2rem 0;">
+<h2 id="nieuw-trainingsschema">Nieuw trainingsschema toevoegen</h2>
+<div style="max-width: 500px;">
+  <%= render 'admin/dashboard/training_schema_form', training_schema: TrainingSchema.new, groups: Group.all %>
 </div> 

@@ -27,4 +27,50 @@
   background: $color-bg-alt;
   transform: translateY(-2px) scale(1.07);
   text-decoration: underline;
+}
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropdown-toggle::after {
+  content: " ▼";
+  font-size: 0.8em;
+}
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  background: $color-bg-alt;
+  min-width: 170px;
+  box-shadow: 0 4px 16px $color-card-shadow;
+  border-radius: 0 0 $radius $radius;
+  z-index: 10;
+  margin-top: 0.2em;
+  left: 0;
+}
+.dropdown:hover .dropdown-menu,
+.dropdown:focus-within .dropdown-menu {
+  display: block;
+}
+.dropdown-item {
+  color: $color-primary;
+  padding: 0.7em 1.2em;
+  display: block;
+  text-transform: none;
+  font-size: $font-size-base;
+  background: none;
+  border: none;
+  border-radius: 0;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  transition: background 0.18s, color 0.18s;
+}
+.dropdown-item:hover, .dropdown-item:focus {
+  background: $color-accent-light;
+  color: $color-primary;
+  text-decoration: underline;
+}
+.dropdown-menu:hover,
+.dropdown-menu:focus {
+  display: block;
 } 

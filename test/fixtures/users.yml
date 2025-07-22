@@ -37,3 +37,14 @@ engelen_caja:
   emergency_contact: "0615831415"
   injury: "Knee sensitivity, irritated heel/Achilles"
   group_id: 1
+
+virgil:
+  id: 100
+  name: Virgil
+  email: virgil@virgilhomemade.nl
+  phone: '0612345678'
+  emergency_contact: '0612345678'
+  birthday: 1980-01-01
+  injury: ''
+  photo_permission: true
+  password_digest: "$2a$12$L811aWESnBWTO8cev30ppeTkD503Gnlvr7ov/9W25MLbTgy1V7ahK"

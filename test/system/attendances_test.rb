@@ -15,7 +15,7 @@ class AttendancesTest < ApplicationSystemTestCase
     click_on "New attendance"
 
     fill_in "Status", with: @attendance.status
-    fill_in "Training", with: @attendance.training_id
+    fill_in "Training", with: @attendance.training_session_id
     fill_in "User", with: @attendance.user_id
     click_on "Create Attendance"
 
@@ -28,7 +28,7 @@ class AttendancesTest < ApplicationSystemTestCase
     click_on "Edit this attendance", match: :first
 
     fill_in "Status", with: @attendance.status
-    fill_in "Training", with: @attendance.training_id
+    fill_in "Training", with: @attendance.training_session_id
     fill_in "User", with: @attendance.user_id
     click_on "Update Attendance"
 

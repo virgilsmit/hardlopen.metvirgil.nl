@@ -1,9 +1,10 @@
 <p style="color: green"><%= notice %></p>
 
 <h1>Lopers</h1>
+<p style="color:#8f8; font-size:1.2em; margin-top:-0.7em; margin-bottom:1.2em;"><strong>Actieve lopers:</strong> <%= @actieve_lopers_count %></p>
 
 <div id="lopers">
-  <table>
+  <table class="schema-table">
     <thead>
       <tr>
         <th>Name</th>
@@ -18,15 +19,18 @@
     <tbody>
       <% @users.each do |user| %>
         <tr>
-          <td><%= user.name %></td>
-          <td><%= user.email %></td>
-          <td><%= user.groups.first&.name || 'No group assigned' %></td>
-          <td><%= user.groups.first&.hoofdtrainer&.email || 'Geen hoofdtrainer' %></td>
-          <td><%= user.groups.first&.medetrainer&.email || 'Geen medetrainer' %></td>
-          <td><%= user.status&.name || '-' %></td>
-          <td>
-            <%= link_to 'Show', user_path(user) %>
-            <%= link_to 'Edit', edit_user_path(user) %>
+          <td data-label="Name"><%= user.name %></td>
+          <td data-label="Email"><%= user.email %></td>
+          <td data-label="Group"><%= user.groups.first&.name || 'No group assigned' %></td>
+          <td data-label="Hoofdtrainer"><%= user.groups.first&.hoofdtrainer&.email || 'Geen hoofdtrainer' %></td>
+          <td data-label="Medetrainer"><%= user.groups.first&.medetrainer&.email || 'Geen medetrainer' %></td>
+          <td data-label="Status">
+            <%= form_with model: user, local: true do |f| %>
+              <%= f.select :status_id, Status.all.collect { |s| [s.name, s.id] }, { include_blank: '-' }, { onchange: 'this.form.submit();' } %>
+            <% end %>
+          </td>
+          <td data-label="Actions">
+            <%= link_to 'Show', profile_path(id: user.id), class: 'theme-btn', style: 'background:#1976d2; color:#fff; padding:0.2em 0.7em; font-size:0.95em; margin-right:0.5em;' %> Edit
             <%= link_to 'Delete', user_path(user), method: :delete, data: { confirm: 'Are you sure?' } %>
           </td>
         </tr>

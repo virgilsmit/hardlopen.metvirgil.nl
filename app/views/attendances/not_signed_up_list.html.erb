@@ -1,0 +1,8 @@
+<% users_na = User.alleen_actieve_lopers.order(:name).to_a %>
+<% users_na.unshift(users_na.delete(current_user)) if users_na.include?(current_user) %>
+<% users_na.each do |user| %>
+  <% attendance = training_session.attendances.find_by(user: user) %>
+  <% if attendance.nil? %>
+    <li><%= user.name %> (<%= user.email %>)</li>
+  <% end %>
+<% end %> 
