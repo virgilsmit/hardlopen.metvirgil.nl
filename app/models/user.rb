@@ -93,6 +93,19 @@ class User < ApplicationRecord
     seconden_naar_tijd((waardes.sum / waardes.size.to_f).round)
   end
 
+  # Gemiddelde 10 km-prognose (op basis van prestaties)
+  # Berekend met Riegel (exponent 1,06) en geaverageerd over alle prestaties
+  def gemiddelde_prognose_10km
+    vals = performances.map do |p|
+      tijd = tijd_naar_seconden(p.value)
+      afstand = p.distance.to_f
+      next if tijd.zero? || afstand.zero?
+      tijd * (10000.0 / afstand) ** 1.06
+    end.compact
+    return '' if vals.empty?
+    seconden_naar_tijd((vals.sum / vals.size).round)
+  end
+
   # --- Hulpfuncties voor conditie ---
   def tijd_naar_seconden(tijd)
     return 0 unless tijd
