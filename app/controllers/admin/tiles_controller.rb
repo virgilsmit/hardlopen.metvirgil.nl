@@ -19,6 +19,7 @@ class Admin::TilesController < ApplicationController
       { key: 'vandaag', label: 'Vandaag afmelden', url: '/training_sessions/vandaag' },
       { key: 'trainers_overzicht', label: 'Trainers Overzicht', url: '/trainers/overzicht' },
       { key: 'ad_gemiddelden', label: 'Gemiddelde AD Lopers', url: '/trainers/ad_gemiddelden' },
+      { key: 'log_bulk', label: 'Aanwezig loggen', url: '/schema/dezeweek' },
       { key: 'tiles', label: 'Tegels beheren', url: '/admin/tiles' }
     ]
     @tile_assignments = TileAssignment.all.group_by { |ta| [ta.role, ta.tile_key] }
