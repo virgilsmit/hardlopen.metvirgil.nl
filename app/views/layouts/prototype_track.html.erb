@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Hardlopen met Virgil · Track Thema</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "application", media: "all", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "theme", media: "all", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "prototype_track", media: "all", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
+  </head>
+
+  <body class="prototype-track-body">
+    <div class="prototype-track-shell">
+      <nav class="prototype-track-nav">
+        <div class="prototype-track-logo">
+          <span>Virgil</span>
+          <small>Track</small>
+        </div>
+        <div class="prototype-track-nav__links">
+          <%= link_to "Originele site", root_path %>
+          <%= link_to "Schema", prototype_info_path %>
+          <%= link_to "Track thema", prototype_track_path, class: "active" %>
+          <%= link_to "Login", login_path, class: "prototype-track-nav__cta" %>
+        </div>
+      </nav>
+
+      <main class="prototype-track-main">
+        <%= yield %>
+      </main>
+
+      <footer class="prototype-track-footer">
+        <span>Coaching since 2014</span>
+        <div>
+          <%= link_to "Contact", "mailto:info@virgilsmit.com" %>
+          <%= link_to "Ga naar schema", schema_path %>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
+

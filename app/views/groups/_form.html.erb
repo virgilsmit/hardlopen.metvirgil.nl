@@ -1,6 +1,6 @@
 <%= form_with(model: group) do |form| %>
   <% if group.errors.any? %>
-    <div style="color: red">
+    <div class="app-card" style="background: #f8d7da; border-color: #f5c6cb; color: #721c24;">
       <h2><%= pluralize(group.errors.count, "error") %> prohibited this group from being saved:</h2>
 
       <ul>
@@ -11,22 +11,22 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :name, style: "display: block" %>
-    <%= form.text_field :name %>
+  <div class="app-form-group">
+    <%= form.label :name, class: "app-form-label" %>
+    <%= form.text_field :name, class: "app-form-input" %>
   </div>
 
-  <div>
-    <%= form.label :hoofdtrainer_id, 'Hoofdtrainer', style: 'display: block' %>
-    <%= form.collection_select :hoofdtrainer_id, User.where(role: [:trainer, :admin]), :id, :email, prompt: 'Kies hoofdtrainer' %>
+  <div class="app-form-group">
+    <%= form.label :hoofdtrainer_id, 'Hoofdtrainer', class: 'app-form-label' %>
+    <%= form.collection_select :hoofdtrainer_id, User.where(role: [:trainer, :admin]), :id, :email, { prompt: 'Kies hoofdtrainer' }, { class: 'app-form-input' } %>
   </div>
 
-  <div>
-    <%= form.label :medetrainer_id, 'Medetrainer', style: 'display: block' %>
-    <%= form.collection_select :medetrainer_id, User.where(role: [:trainer, :admin]), :id, :email, prompt: 'Kies medetrainer (optioneel)' %>
+  <div class="app-form-group">
+    <%= form.label :medetrainer_id, 'Medetrainer', class: 'app-form-label' %>
+    <%= form.collection_select :medetrainer_id, User.where(role: [:trainer, :admin]), :id, :email, { prompt: 'Kies medetrainer (optioneel)' }, { class: 'app-form-input' } %>
   </div>
 
-  <div>
-    <%= form.submit %>
+  <div class="app-form-group">
+    <%= form.submit class: "app-btn" %>
   </div>
 <% end %>

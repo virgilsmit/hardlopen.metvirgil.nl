@@ -51,4 +51,25 @@ document.addEventListener("turbo:load", function() {
       setTimeout(function() { window.location.reload(); }, 500);
     });
   });
+  
+  // Handle afwezig button clicks to show/hide note field
+  document.querySelectorAll(".afwezig-btn").forEach(function(btn) {
+    btn.addEventListener("click", function(e) {
+      var form = btn.closest("form");
+      var sessionId = btn.getAttribute("data-session-id");
+      var noteField = document.getElementById("afwezig-note-" + sessionId);
+      if (noteField) {
+        noteField.style.display = "block";
+      }
+    });
+  });
+  
+  // Show note field if status is already afwezig
+  document.querySelectorAll(".afwezig-submit").forEach(function(btn) {
+    var sessionId = btn.getAttribute("data-session-id");
+    var noteField = document.getElementById("afwezig-note-" + sessionId);
+    if (noteField) {
+      noteField.style.display = "block";
+    }
+  });
 }); 

@@ -1,0 +1,144 @@
+<div class="prototype-page">
+  <section class="prototype-hero">
+    <div class="prototype-hero__content">
+      <p class="prototype-eyebrow">Loopgroep Hardlopen met Virgil</p>
+      <h1>Persoonlijke loopbegeleiding die professioneler aanvoelt dan elke tracking-app.</h1>
+      <p class="prototype-lead">
+        Train slimmer met een coach die je tempozones, belasting en motivatie bewaakt.
+        Geen generieke schema’s, maar begeleiding die jou door elke trainingsfase loodst.
+      </p>
+
+      <div class="prototype-hero__ctas">
+        <%= link_to 'Start intake', register_path, class: 'app-btn prototype-btn--primary' %>
+        <%= link_to 'Bekijk trainingsaanpak', login_path, class: 'app-btn app-btn--secondary prototype-btn--secondary' %>
+      </div>
+
+      <div class="prototype-hero__proof">
+        <% @proof_stats.each do |stat| %>
+          <div class="prototype-proof-chip">
+            <span class="prototype-proof-chip__value"><%= stat[:value] %></span>
+            <span class="prototype-proof-chip__label"><%= stat[:label] %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="prototype-hero__panel">
+      <p class="prototype-panel__eyebrow">Volgende sessie</p>
+      <h3>Tempo-intervallen op de hei</h3>
+      <ul>
+        <li>Fase: Voorjaarsblok</li>
+        <li>Locatie: Hoorneboegse Heide</li>
+        <li>Kern: 4 × (1000m @ 10km-tempo + 400m herstel)</li>
+      </ul>
+      <%= link_to 'Log in voor details', login_path, class: 'app-btn app-btn--secondary prototype-panel__cta' %>
+    </div>
+  </section>
+
+  <section class="prototype-section prototype-benefits" id="voordelen">
+    <div class="prototype-section__header">
+      <p class="prototype-eyebrow">Waarom trainen met Virgil</p>
+      <h2>Hoogwaardige coaching, directe feedback en een gedreven loopgroep.</h2>
+      <p>Alle voordelen van Strava-data, maar dan met menselijke begeleiding die jouw prestaties sneller laat groeien.</p>
+    </div>
+    <div class="prototype-grid">
+      <% @benefits.each_with_index do |benefit, index| %>
+        <article class="prototype-card">
+          <div class="prototype-card__icon"><span><%= (index + 1).to_s.rjust(2, '0') %></span></div>
+          <h3><%= benefit[:title] %></h3>
+          <p><%= benefit[:body] %></p>
+        </article>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="prototype-section prototype-coach">
+    <div class="prototype-coach__content">
+      <p class="prototype-eyebrow">Coach Virgil</p>
+      <h2>Geen algoritme, maar een coach die meeloopt, meet en motiveert.</h2>
+      <p>
+        Kies voor coaching die verder kijkt dan kilometertellingen. Virgil analyseert belastbaarheid,
+        techniek en mindset zodat elke training exact weet wat de volgende stap is.
+      </p>
+      <ul class="prototype-list">
+        <li>12+ jaar ervaring met recreanten tot wedstrijdlopers</li>
+        <li>Combinatie van schema’s, loopscholing en community accountability</li>
+        <li>Directe feedback in de app na elke sessie</li>
+      </ul>
+      <%= link_to 'Leer Virgil kennen', login_path, class: 'app-btn prototype-btn--primary' %>
+    </div>
+    <div class="prototype-coach__card">
+      <p>“De focus ligt op duurzame progressie. Iedere loper krijgt een plan dat past bij werk, gezin en ambities.”</p>
+      <span>— Virgil, coach & trainer</span>
+    </div>
+  </section>
+
+  <section class="prototype-section prototype-programmes" id="programma">
+    <div class="prototype-section__header">
+      <p class="prototype-eyebrow">Programma&apos;s</p>
+      <h2>Flexibele vormen voor elke loper.</h2>
+    </div>
+    <div class="prototype-grid prototype-grid--programmes">
+      <% @programmes.each do |programme| %>
+        <article class="prototype-plan-card">
+          <div class="prototype-plan-card__header">
+            <h3><%= programme[:title] %></h3>
+            <span class="prototype-plan-card__price"><%= programme[:price] %></span>
+          </div>
+          <ul>
+            <% programme[:features].each do |feature| %>
+              <li><%= feature %></li>
+            <% end %>
+          </ul>
+          <%= link_to 'Aanmelden', register_path, class: 'app-btn prototype-btn--primary' %>
+        </article>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="prototype-section prototype-timeline" id="aanpak">
+    <div class="prototype-section__header">
+      <p class="prototype-eyebrow">Aanpak</p>
+      <h2>Heldere flow van intake tot evaluatie.</h2>
+    </div>
+    <div class="prototype-timeline__grid">
+      <% @timeline_steps.each_with_index do |step, index| %>
+        <article class="prototype-timeline__item">
+          <span class="prototype-timeline__step"><%= index + 1 %></span>
+          <h3><%= step[:title] %></h3>
+          <p><%= step[:body] %></p>
+        </article>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="prototype-section prototype-testimonials">
+    <div class="prototype-section__header">
+      <p class="prototype-eyebrow">Ervaringen</p>
+      <h2>Resultaten waar we trots op zijn.</h2>
+    </div>
+    <div class="prototype-grid prototype-grid--testimonials">
+      <% @testimonials.each do |testimonial| %>
+        <article class="prototype-quote-card">
+          <p class="prototype-quote-card__quote"><%= testimonial[:quote] %></p>
+          <span class="prototype-quote-card__name"><%= testimonial[:name] %></span>
+        </article>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="prototype-section prototype-cta">
+    <div>
+      <p class="prototype-eyebrow">Klaar om mee te lopen?</p>
+      <h2>Sluit je aan bij de loopgroep en ervaar coaching die je scherp houdt.</h2>
+      <p>Plan een intake of meld je aan voor de eerstvolgende sessie. Je houdt toegang tot alle bestaande functionaliteit.</p>
+    </div>
+    <div class="prototype-cta__actions">
+      <%= link_to 'Start intake', register_path, class: 'app-btn prototype-btn--primary' %>
+      <%= link_to 'Bekijk trainingsschema', schema_path, class: 'app-btn app-btn--secondary prototype-btn--secondary' %>
+    </div>
+  </section>
+
+  <%= link_to 'Start intake', register_path, class: 'app-btn prototype-floating-cta' %>
+</div>
+

@@ -1,0 +1,126 @@
+<div class="admin-intake-show surface-dark">
+  <h1 class="page-heading">Intake van <%= @intake.full_name %></h1>
+  <p class="section-subtitle">Ingestuurd op <%= @intake.created_at.strftime('%d-%m-%Y %H:%M') %></p>
+
+  <div class="profile-header-row">
+    <div class="card-surface">
+      <h2>Gegevens uit intake</h2>
+      <p><strong>E-mail:</strong> <%= @intake.email %></p>
+      <p><strong>Geboortedatum:</strong> <%= @intake.birthdate&.strftime('%d-%m-%Y') %></p>
+      <p><strong>Gender:</strong> <%= @intake.gender&.humanize %></p>
+      <p><strong>Noodnummer:</strong> <%= @intake.emergency_number %></p>
+      <p><strong>Loopervaring:</strong><br><%= simple_format(@intake.loop_experience.presence || '–') %></p>
+      <p><strong>Gewenste pace:</strong> <%= @intake.desired_pace.presence || '–' %></p>
+      <p><strong>Coopertest:</strong> <%= @intake.cooper_test_meters.present? ? "#{@intake.cooper_test_meters} meter" : '–' %></p>
+      <p><strong>Doel 2025:</strong><br><%= simple_format(@intake.goal_2025.presence || '–') %></p>
+      <p><strong>Shirtmaat:</strong> <%= @intake.shirt_size %></p>
+      <p><strong>Blessures:</strong><br><%= simple_format(@intake.injuries.presence || 'Geen') %></p>
+      <p><strong>Opmerkingen:</strong><br><%= simple_format(@intake.comments.presence || 'Geen') %></p>
+    </div>
+
+    <div class="card-surface">
+      <% if @intake.processed? %>
+        <h2>Intake is verwerkt</h2>
+        <p>Deze intake is verwerkt op <%= @intake.processed_at.strftime('%d-%m-%Y %H:%M') %> door <%= @intake.processed_by&.name || 'onbekend' %>.</p>
+        <% if @intake.created_user %>
+          <p>
+            Loper: <%= link_to @intake.created_user.name, profile_path(id: @intake.created_user_id), class: 'theme-btn track-btn--outline' %>
+          </p>
+        <% end %>
+      <% else %>
+        <h2>Nieuwe loper aanmaken</h2>
+        <%= form_with model: @user, scope: :user, url: convert_admin_intake_path(@intake), method: :post, local: true do |form| %>
+          <% if @user.errors.any? %>
+            <div class="alert-card alert-danger">
+              <p><strong>Er traden fouten op:</strong></p>
+              <ul>
+                <% @user.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+          <div class="form-group">
+            <%= form.label :name, 'Naam' %>
+            <%= form.text_field :name, value: @user.name, required: true %>
+          </div>
+
+          <div class="form-group">
+            <%= form.label :email, 'E-mail' %>
+            <%= form.email_field :email, value: @user.email, required: true %>
+          </div>
+
+          <div class="form-group">
+            <%= form.label :phone, 'Telefoonnummer' %>
+            <%= form.text_field :phone, value: @user.phone %>
+          </div>
+
+          <div class="form-group">
+            <%= form.label :emergency_contact, 'Noodcontact' %>
+            <%= form.text_field :emergency_contact, value: @user.emergency_contact %>
+          </div>
+
+          <div class="form-group">
+            <%= form.label :birthday, 'Geboortedatum' %>
+            <%= form.date_field :birthday, value: @user.birthday %>
+          </div>
+
+          <div class="form-group">
+            <%= form.label :injury, 'Blessures' %>
+            <%= form.text_area :injury, value: @user.injury, rows: 2 %>
+          </div>
+
+          <div class="form-group">
+            <%= form.label :training_days, 'Trainingsdagen' %><br>
+            <input type="hidden" name="user[training_days][]" value="">
+            <% %w[Dinsdag Zaterdag].each do |day| %>
+              <label class="checkbox-inline">
+                <%= check_box_tag 'user[training_days][]', day, Array(@user.training_days).include?(day) %>
+                <span><%= day %></span>
+              </label>
+            <% end %>
+          </div>
+
+          <div class="form-group">
+            <%= form.label :status_id, 'Status' %>
+            <%= form.select :status_id, @statuses.map { |s| [s.name.titleize, s.id] }, {}, { selected: @user.status_id || @default_status&.id } %>
+          </div>
+
+          <div class="form-group">
+            <%= form.label :group_id, 'Groep' %>
+            <%= form.select :group_id, @groups.map { |g| [g.name, g.id] }, {}, { selected: @selected_group_id } %>
+          </div>
+
+          <div class="form-group">
+            <%= form.label :password, 'Tijdelijk wachtwoord' %>
+            <%= form.text_field :password, value: @generated_password, required: true %>
+            <small>Dit wachtwoord wordt verstuurd in de welkomstmail.</small>
+          </div>
+
+          <hr>
+          <h3>Welkomstmail</h3>
+
+          <div class="form-group">
+            <%= label_tag :welcome_subject, 'Onderwerp' %>
+            <%= text_field_tag :welcome_subject, @welcome_subject, required: true %>
+          </div>
+
+          <div class="form-group">
+            <%= label_tag :welcome_message, 'Bericht' %>
+            <%= text_area_tag :welcome_message, @welcome_message, rows: 10, required: true %>
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-inline">
+              <%= check_box_tag :send_welcome_email, '1', true %>
+              <span>Verstuur welkomstmail naar de loper</span>
+            </label>
+          </div>
+
+          <%= form.submit 'Maak nieuwe loper aan', class: 'theme-btn track-btn--glow' %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>
+

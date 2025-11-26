@@ -1,4 +1,7 @@
 <h1>Trainingsschema's</h1>
+<% if @schema_name %>
+  <p class="schema-subtitle">Mijn schema: <strong><%= @schema_name %></strong></p>
+<% end %>
 <table style="width:100%; border-collapse:collapse; margin-top:1rem;">
   <thead>
     <tr>
@@ -55,9 +58,17 @@
 <%= render partial: 'week_overview' %>
 
 <!-- ALLE AANKOMENDE TRAININGEN -->
-<% if @upcoming_sessions.present? %>
+<% if @schema_name.present? %>
+  <p style="color:#888;">Schema: <strong><%= @schema_name %></strong></p>
   <p style="color:#888;">Aantal aankomende trainingen vanaf vandaag: <%= @upcoming_sessions.size %></p>
   <h2 style="margin-top:2.5em;">Alle aankomende trainingen vanaf vandaag</h2>
+<% elsif @upcoming_sessions.empty? %>
+  <div class="alert alert-info" style="padding: 1rem; background: #e3f2fd; border-left: 4px solid #2196f3; margin: 1rem 0;">
+    <p><strong>Geen trainingsschema ingesteld</strong></p>
+    <p>Je hebt nog geen persoonlijk trainingsschema gekozen. Ga naar je <a href="<%= profile_path %>">profiel</a> om een standaard schema te selecteren.</p>
+  </div>
+<% end %>
+<% if @upcoming_sessions.present? %>
   <table style="width:100%; border-collapse:collapse; margin-top:1rem;">
     <thead>
       <tr>

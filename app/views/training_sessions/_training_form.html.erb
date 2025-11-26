@@ -18,7 +18,9 @@
   <% end %>
 
   <div id="export-btn-wrapper" style="margin-top:1rem;">
-    <button class="app-btn" style="background:#2196f3; color:#fff;">Download voor Apple Watch / iPhone</button>
+    <% if show_apple_watch_download?(current_user) %>
+      <button class="app-btn" style="background:#2196f3; color:#fff;">Download voor Apple Watch / iPhone</button>
+    <% end %>
   </div>
 </div>
 

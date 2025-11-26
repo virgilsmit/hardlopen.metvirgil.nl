@@ -4,11 +4,17 @@ class Admin::TilesController < ApplicationController
   def index
     @roles = %w[user trainer admin]
     @tiles = [
+      { key: 'home', label: 'Home', url: '/', desc: 'Homepagina' },
+      { key: 'login', label: 'Login', url: '/login', desc: 'Inlogpagina' },
+      { key: 'register', label: 'Registreren', url: '/register', desc: 'Registratiepagina voor nieuwe gebruikers' },
+      { key: 'intake', label: 'Intake', url: '/intake', desc: 'Publiek intake formulier' },
       { key: 'dezeweek', label: 'Deze week', url: '/schema/dezeweek' },
       { key: 'profile', label: 'Mijn Profiel', url: '/profile' },
       { key: 'all_trainings', label: 'Alle trainingen', url: '/schema/alle' },
+      { key: 'my_trainings', label: 'Mijn trainingen', url: '/mijntrainingen', desc: 'Bekijk je eigen trainingen en prestaties' },
       { key: 'groups', label: 'Groepen', url: '/groups' },
       { key: 'users', label: 'Hardlopers', url: '/users' },
+      { key: 'profielen', label: 'Profielen', url: '/users', desc: 'Bekijk alle gebruikersprofielen' },
       { key: 'photos', label: 'Foto\'s', url: '/photos' },
       { key: 'about', label: 'Over Ons', url: '/about' },
       { key: 'schema', label: 'Schema', url: '/schema' },
@@ -19,8 +25,12 @@ class Admin::TilesController < ApplicationController
       { key: 'vandaag', label: 'Vandaag afmelden', url: '/training_sessions/vandaag' },
       { key: 'trainers_overzicht', label: 'Trainers Overzicht', url: '/trainers/overzicht' },
       { key: 'ad_gemiddelden', label: 'Gemiddelde AD Lopers', url: '/trainers/ad_gemiddelden' },
+      { key: 'birthdays', label: 'Alle verjaardagen', url: '/trainers/verjaardagen' },
+      { key: 'birthdays_30', label: 'Komende verjaardagen', url: '/verjaardagen/komende' },
       { key: 'log_bulk', label: 'Aanwezig loggen', url: '/schema/dezeweek' },
-      { key: 'tiles', label: 'Tegels beheren', url: '/admin/tiles' }
+      { key: 'tiles', label: 'Tegels beheren', url: '/admin/tiles' },
+      { key: 'intakes', label: 'Intake-aanvragen', url: '/admin/intakes', desc: 'Bekijk en verwerk nieuwe intake aanvragen' },
+      { key: 'apple_watch_download', label: 'Apple Watch Download', url: '#', desc: 'Toon download knop voor Apple Watch/iPhone' }
     ]
     @tile_assignments = TileAssignment.all.group_by { |ta| [ta.role, ta.tile_key] }
     # In een echte app zou je hier de tegel-instellingen per rol uit de database halen
@@ -68,11 +78,13 @@ class Admin::TilesController < ApplicationController
     tiles.each_with_index do |tile, idx|
       visible = tile[:visible].to_s == '1' || tile[:visible] == true
       show_in_menu = tile[:show_in_menu].to_s == '1' || tile[:show_in_menu] == true || tile[:show_in_menu].nil?
+      show_apple_watch_download = tile[:show_apple_watch_download].to_s == '1' || tile[:show_apple_watch_download] == true
       TileAssignment.create!(
         role: role,
         tile_key: tile[:key],
         visible: visible,
         show_in_menu: show_in_menu,
+        show_apple_watch_download: show_apple_watch_download,
         custom_label: tile[:custom_label],
         position: idx
       )
@@ -82,10 +94,4 @@ class Admin::TilesController < ApplicationController
     render json: { success: false, error: e.message }, status: 422
   end
 
-  private
-  def require_admin
-    unless current_user&.has_role?(:admin)
-      redirect_to root_path, alert: 'Geen toegang.'
-    end
-  end
 end 

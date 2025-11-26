@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Hardlopen met Virgil · Schema</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "application", media: "all", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "prototype_info", media: "all", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
+  </head>
+
+  <body class="prototype-info-body">
+    <div class="prototype-info-shell">
+      <nav class="prototype-info-nav">
+        <div>
+          <span class="prototype-info-logo">Virgil</span>
+          <span class="prototype-info-tagline">Loopgroep</span>
+        </div>
+        <div class="prototype-info-nav__links">
+          <%= link_to "Originele site", root_path %>
+          <%= link_to "Schema", prototype_info_path, class: "active" %>
+          <%= link_to "Track thema", prototype_track_path %>
+          <%= link_to "Login", login_path, class: "prototype-info-nav__cta" %>
+        </div>
+      </nav>
+
+      <main class="prototype-info-main">
+        <%= yield %>
+      </main>
+
+      <footer class="prototype-info-footer">
+        <span>Hardlopen met Virgil · 2025</span>
+        <div>
+          <%= link_to "Contact", "mailto:info@virgilsmit.com" %>
+          <%= link_to "Ga naar schema", schema_path %>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
+

@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&family=Space+Grotesk:wght@400;500;600&display=swap');
+
+body.prototype-track-body {
+  background: radial-gradient(circle at top, #111a2b 0%, #05060a 60%);
+  min-height: 100vh;
+  margin: 0;
+  color: #f8fafc;
+  font-family: 'Space Grotesk', 'Antonio', sans-serif;
+}
+
+.prototype-track-shell {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  gap: 2rem;
+}
+
+.prototype-track-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+}
+
+.prototype-track-logo {
+  font-family: 'Antonio', sans-serif;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+.prototype-track-logo small {
+  display: block;
+  letter-spacing: 0.4em;
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+
+.prototype-track-nav__links {
+  display: inline-flex;
+  gap: 1.25rem;
+  align-items: center;
+}
+
+.prototype-track-nav__links a {
+  color: #f8fafc;
+  text-decoration: none;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+.prototype-track-nav__links a.active {
+  color: #1ee3cf;
+}
+
+.prototype-track-nav__cta {
+  border-radius: 999px;
+  padding: 0.45rem 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.prototype-track-main {
+  flex: 1;
+}
+
+.prototype-track-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  opacity: 0.8;
+}
+
+.prototype-track-footer a {
+  color: inherit;
+  margin-left: 1rem;
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .prototype-track-shell {
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  .prototype-track-nav {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .prototype-track-nav__links {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .prototype-track-footer {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+

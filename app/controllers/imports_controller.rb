@@ -90,10 +90,4 @@ class ImportsController < ApplicationController
     end
   end
 
-  private
-  def require_admin
-    unless current_user&.role == 'admin'
-      redirect_to root_path, alert: 'Alleen beheerders mogen importeren.'
-    end
-  end
 end 

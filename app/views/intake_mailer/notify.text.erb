@@ -1,0 +1,22 @@
+Nieuwe intake-aanvraag
+======================
+
+Naam: <%= @intake.full_name %>
+E-mail: <%= @intake.email %>
+Geboortedatum: <%= @intake.birthdate&.strftime('%d-%m-%Y') %>
+Gender: <%= @intake.gender&.humanize %>
+Noodnummer: <%= @intake.emergency_number %>
+Loopervaring: <%= @intake.loop_experience.presence || 'Niet ingevuld' %>
+Gewenste pace: <%= @intake.desired_pace.presence || 'Niet ingevuld' %>
+Coopertest: <%= @intake.cooper_test_meters.present? ? "#{@intake.cooper_test_meters} meter" : 'Niet ingevuld' %>
+Doel 2025: <%= @intake.goal_2025.presence || 'Niet ingevuld' %>
+Shirtmaat: <%= @intake.shirt_size %>
+Blessures: <%= @intake.injuries.presence || 'Geen' %>
+Opmerkingen: <%= @intake.comments.presence || 'Geen' %>
+
+Reageer rechtstreeks op het opgegeven e-mailadres om vervolg af te stemmen.
+
+
+
+
+

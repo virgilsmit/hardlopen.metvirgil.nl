@@ -39,8 +39,14 @@ class UsersController < ApplicationController
 
   # PATCH/PUT /users/1 or /users/1.json
   def update
+    update_params = user_params
+    # Alleen admins kunnen default_training_schema_id aanpassen
+    unless current_user&.admin?
+      update_params = update_params.except(:default_training_schema_id)
+    end
+    
     respond_to do |format|
-      if @user.update(user_params)
+      if @user.update(update_params)
         format.html { redirect_to edit_user_path(@user), notice: "User was successfully updated." }
         format.json { render :show, status: :ok, location: @user }
       else
@@ -109,6 +115,6 @@ class UsersController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def user_params
-      params.require(:user).permit(:name, :email, :phone, :emergency_contact, :birthday, :injury, :photo_permission, :password, :password_confirmation, :role, :status_id, :csv_name, training_days: [])
+      params.require(:user).permit(:name, :email, :phone, :emergency_contact, :birthday, :injury, :photo_permission, :password, :password_confirmation, :role, :status_id, :csv_name, :default_training_schema_id, training_days: [], roles: [])
     end
 end

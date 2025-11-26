@@ -5,25 +5,7 @@
 $app-header-height: 60px;
 $app-bottom-nav-height: 60px;
 
-// Force bottom navigation to be visible on mobile
-@media (max-width: 768px) {
-  .app-bottom-nav {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    z-index: 1000 !important;
-    height: 70px !important;
-    background: #232a25 !important;
-    border-top: 2px solid #448923 !important;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1) !important;
-  }
-}
-
-// ---- APP-LIKE LAYOUT ----
+// ---- MOBILE LAYOUT ----
 .app-container {
   min-height: 100vh;
   display: flex;
@@ -35,53 +17,31 @@ $app-bottom-nav-height: 60px;
   padding-right: env(safe-area-inset-right, 0px);
 }
 
-// ---- ENHANCED HEADER ----
-.theme-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  height: $app-header-height;
-  background: var(--color-header);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--color-border);
-  padding: 0;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: env(safe-area-inset-top, 0px);
-  
-  @media (max-width: 768px) {
+// ---- MOBILE HEADER ----
+@media (max-width: 768px) {
+  .theme-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    height: $app-header-height;
+    background: var(--color-header);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--color-border);
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: env(safe-area-inset-top, 0px);
     padding-left: 1rem;
     padding-right: 1rem;
   }
 }
 
-.theme-header__logo-link {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  gap: 0.8rem;
-}
-
-.theme-header__logo {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.theme-header__title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--color-primary);
-  margin: 0;
-}
-
-// ---- BOTTOM NAVIGATION ----
+// ---- MOBILE BOTTOM NAVIGATION ----
 .app-bottom-nav {
   position: fixed;
   bottom: 0;
@@ -137,7 +97,7 @@ $app-bottom-nav-height: 60px;
   color: #ffffff;
 }
 
-// ---- MAIN CONTENT AREA ----
+// ---- MOBILE MAIN CONTENT ----
 .theme-main {
   flex: 1;
   padding-top: calc(#{$app-header-height} + env(safe-area-inset-top, 0px) + 1rem);
@@ -151,10 +111,11 @@ $app-bottom-nav-height: 60px;
   @media (max-width: 768px) {
     padding-left: 0.8rem;
     padding-right: 0.8rem;
+    padding-top: calc(#{$app-header-height} + env(safe-area-inset-top, 0px) + 0.5rem);
   }
 }
 
-// ---- APP-LIKE CARDS ----
+// ---- MOBILE CARDS ----
 .app-card {
   background: var(--color-bg-alt);
   border-radius: 16px;
@@ -172,10 +133,11 @@ $app-bottom-nav-height: 60px;
   @media (max-width: 768px) {
     padding: 1.2rem;
     margin-bottom: 0.8rem;
+    border-radius: 12px;
   }
 }
 
-// ---- TOUCH-FRIENDLY BUTTONS ----
+// ---- MOBILE BUTTONS ----
 .app-btn {
   background: var(--color-primary);
   color: var(--color-bg-alt);
@@ -208,6 +170,8 @@ $app-bottom-nav-height: 60px;
     padding: 0.9rem 1.3rem;
     font-size: 0.95rem;
     min-height: 44px;
+    width: 100%;
+    margin-bottom: 0.5rem;
   }
 }
 
@@ -221,11 +185,20 @@ $app-bottom-nav-height: 60px;
     background: var(--color-primary);
     color: var(--color-bg-alt);
   }
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
 }
 
-// ---- APP-LIKE FORMS ----
+// ---- MOBILE FORMS ----
 .app-form-group {
   margin-bottom: 1.5rem;
+  
+  @media (max-width: 768px) {
+    margin-bottom: 1rem;
+  }
 }
 
 .app-form-label {
@@ -234,6 +207,11 @@ $app-bottom-nav-height: 60px;
   font-weight: 600;
   color: var(--color-text);
   font-size: 0.95rem;
+  
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+  }
 }
 
 .app-form-input {
@@ -254,17 +232,22 @@ $app-bottom-nav-height: 60px;
   
   @media (max-width: 768px) {
     padding: 0.9rem;
-    font-size: 0.95rem;
+    font-size: 16px; // Prevent zoom on iOS
+    border-radius: 8px;
   }
 }
 
-// ---- APP-LIKE LISTS ----
+// ---- MOBILE LISTS ----
 .app-list {
   background: var(--color-bg-alt);
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0,0,0,0.08);
   border: 1px solid var(--color-border);
+  
+  @media (max-width: 768px) {
+    border-radius: 12px;
+  }
 }
 
 .app-list-item {
@@ -285,13 +268,52 @@ $app-bottom-nav-height: 60px;
   }
 }
 
-// ---- LOADING STATES ----
+// ---- MOBILE TABLES ----
+@media (max-width: 768px) {
+  // Force all table content to be visible on mobile
+  table, .schema-table {
+    width: 100%;
+    font-size: 0.9rem;
+    
+    th, td {
+      padding: 0.5rem 0.3rem;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+  }
+  
+  // Ensure table text is always dark on mobile for readability
+  table, table th, table td,
+  .schema-table, .schema-table th, .schema-table td {
+    color: #212529 !important;
+  }
+  
+  // Make sure form elements are visible
+  input, textarea, select, label {
+    color: #ffffff !important;
+    background: #232a25 !important;
+    border: 2px solid #FC4C02 !important;
+  }
+  
+  // Ensure buttons are touch-friendly
+  .app-btn, .app-btn--secondary {
+    min-height: 44px;
+    font-size: 16px;
+    padding: 0.8rem 1rem;
+  }
+}
+
+// ---- MOBILE LOADING ----
 .app-loading {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem;
   color: var(--color-text);
+  
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
 }
 
 .app-loading__spinner {
@@ -301,7 +323,6 @@ $app-bottom-nav-height: 60px;
   border-top: 3px solid var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-right: 0.8rem;
 }
 
 @keyframes spin {
@@ -309,74 +330,28 @@ $app-bottom-nav-height: 60px;
   100% { transform: rotate(360deg); }
 }
 
-// ---- PULL TO REFRESH INDICATOR ----
-.app-pull-refresh {
-  position: fixed;
-  top: calc(#{$app-header-height} + env(safe-area-inset-top, 0px));
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--color-primary);
-  color: var(--color-bg-alt);
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  z-index: 999;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  
-  &.visible {
-    opacity: 1;
+// ---- MOBILE TEXT READABILITY ----
+@media (max-width: 768px) {
+  // Ensure all text is readable on mobile
+  * {
+    color: #ffffff !important;
   }
-}
-
-// Safe area support wordt automatisch toegepast via CSS env() functies
-
-// ---- DARK MODE ENHANCEMENTS ----
-@media (prefers-color-scheme: dark) {
-  .app-card {
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  
+  // But keep specific elements with their intended colors
+  .theme-menu, .theme-menu *,
+  .theme-menu a, .theme-menu .theme-btn {
+    color: #212529 !important;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: #212529 !important;
   }
   
   .app-btn {
-    box-shadow: 0 4px 12px rgba(110, 231, 90, 0.2);
-  }
-}
-
-// ---- HIDE DESKTOP MENU ON MOBILE ----
-@media (max-width: 768px) {
-  .theme-menu {
-    display: none !important;
+    color: #ffffff !important;
   }
   
-  .theme-main {
-    padding-top: calc(#{$app-header-height} + env(safe-area-inset-top, 0px) + 0.5rem);
-  }
-}
-
-// ---- SHOW DESKTOP MENU ON LARGER SCREENS ----
-@media (min-width: 769px) {
-  .theme-menu {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-}
-
-// ---- ALWAYS SHOW MENU ON DESKTOP (FALLBACK) ----
-.theme-menu {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-// ---- TABLET OPTIMIZATIONS ----
-@media (min-width: 769px) and (max-width: 1024px) {
-  .app-bottom-nav {
-    display: none;
-  }
-  
-  .theme-main {
-    padding-bottom: 2rem;
+  .app-btn--secondary {
+    color: #FC4C02 !important;
   }
 } 

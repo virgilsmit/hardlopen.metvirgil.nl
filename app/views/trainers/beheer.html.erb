@@ -2,28 +2,68 @@
 
 <div style="margin-bottom:1.5em;">
   <%= form_with url: promote_trainer_trainers_path, method: :post, local: true do |f| %>
-    <%= select_tag :user_id, options_from_collection_for_select(@promoteable_lopers, :id, :name), prompt: 'Selecteer loper' %>
-    <%= f.submit 'Promoveer tot trainer', class: 'theme-btn', style: 'background:#34c759;color:#222;font-weight:bold;margin-left:1em;' %>
+    <%= select_tag :user_id, options_from_collection_for_select(@promoteable_lopers, :id, :name), prompt: 'Selecteer loper', class: 'app-form-input', style: 'width: auto; margin-right: 1rem; color: #ffffff !important; background: #232a25;' %>
+    <%= f.submit 'Promoveer tot trainer', class: 'app-btn' %>
   <% end %>
 </div>
 
-<table class="schema-table">
-  <thead>
-    <tr>
-      <th>Naam</th>
-      <th>Email</th>
-      <th>Acties</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @trainers.each do |trainer| %>
+<!-- Desktop Table -->
+<div class="desktop-only">
+  <table class="schema-table" style="background: #232a25; color: #ffffff;">
+    <thead>
       <tr>
-        <td><%= trainer.name %></td>
-        <td><%= trainer.email %></td>
-        <td>
-          <%= link_to 'Bewerk', edit_user_path(trainer), class: 'theme-btn', style: 'background:#3498db;color:#fff;margin-right:0.5em;' %>
-        </td>
+        <th style="color: #ffffff !important;">Naam</th>
+        <th style="color: #ffffff !important;">Email</th>
+        <th style="color: #ffffff !important;">Acties</th>
       </tr>
-    <% end %>
-  </tbody>
-</table> 
+    </thead>
+    <tbody>
+      <% @trainers.each do |trainer| %>
+        <tr>
+          <td style="color: #ffffff !important;"><%= trainer.name %></td>
+          <td style="color: #ffffff !important;"><%= trainer.email %></td>
+          <td style="color: #ffffff !important;">
+            <%= link_to 'Bewerk', edit_user_path(trainer), class: 'app-btn app-btn--secondary' %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<!-- Mobile Cards -->
+<div class="mobile-only">
+  <% @trainers.each do |trainer| %>
+    <div class="trainer-card" style="background: #232a25; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; color: #ffffff;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h3 style="color: #448923; margin: 0 0 0.3rem 0; font-size: 1.1rem;"><%= trainer.name %></h3>
+          <div style="font-size: 0.9rem; color: #cccccc;"><%= trainer.email %></div>
+        </div>
+        <div>
+          <%= link_to '✏️ Bewerk', edit_user_path(trainer), class: 'app-btn app-btn--secondary', style: 'padding: 0.5em 1em; font-size: 0.9em;' %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<style>
+  @media (max-width: 768px) {
+    .desktop-only {
+      display: none !important;
+    }
+    .mobile-only {
+      display: block !important;
+    }
+  }
+  
+  @media (min-width: 769px) {
+    .desktop-only {
+      display: block !important;
+    }
+    .mobile-only {
+      display: none !important;
+    }
+  }
+</style> 

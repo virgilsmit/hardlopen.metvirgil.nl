@@ -1,0 +1,46 @@
+<div class="admin-intakes surface-dark">
+  <h1 class="page-heading">Intake-aanvragen</h1>
+  <p class="section-subtitle">Overzicht van alle ingestuurde intakes.</p>
+
+  <div class="card-surface">
+    <table class="schema-table">
+      <thead>
+        <tr>
+          <th>Datum</th>
+          <th>Naam</th>
+          <th>E-mail</th>
+          <th>Status</th>
+          <th>Actie</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @intakes.each do |intake| %>
+          <tr>
+            <td data-label="Datum"><%= intake.created_at.strftime('%d-%m-%Y %H:%M') %></td>
+            <td data-label="Naam"><%= intake.full_name %></td>
+            <td data-label="E-mail"><%= mail_to intake.email %></td>
+            <td data-label="Status">
+              <% if intake.processed? %>
+                Verwerkt op <br><%= intake.processed_at.strftime('%d-%m-%Y %H:%M') %>
+              <% else %>
+                Nog niet verwerkt
+              <% end %>
+            </td>
+            <td data-label="Actie">
+              <% if intake.processed? && intake.created_user %>
+                <%= link_to 'Bekijk loper', profile_path(id: intake.created_user_id), class: 'theme-btn track-btn--outline' %>
+              <% else %>
+                <%= link_to 'Openen', admin_intake_path(intake), class: 'theme-btn track-btn--glow' %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+
+
+

@@ -1,0 +1,25 @@
+<h1>Nieuwe intake-aanvraag</h1>
+
+<p>Er is zojuist een intakeformulier ingevuld via de site. Hieronder vind je de details.</p>
+
+<ul>
+  <li><strong>Naam:</strong> <%= @intake.full_name %></li>
+  <li><strong>E-mail:</strong> <%= @intake.email %></li>
+  <li><strong>Geboortedatum:</strong> <%= @intake.birthdate&.strftime('%d-%m-%Y') %></li>
+  <li><strong>Gender:</strong> <%= @intake.gender&.humanize %></li>
+  <li><strong>Noodnummer:</strong> <%= @intake.emergency_number %></li>
+  <li><strong>Loopervaring:</strong> <%= simple_format(@intake.loop_experience.presence || 'Niet ingevuld') %></li>
+  <li><strong>Gewenste pace:</strong> <%= @intake.desired_pace.presence || 'Niet ingevuld' %></li>
+  <li><strong>Coopertest:</strong> <%= @intake.cooper_test_meters.present? ? "#{@intake.cooper_test_meters} meter" : 'Niet ingevuld' %></li>
+  <li><strong>Doel 2025:</strong> <%= simple_format(@intake.goal_2025.presence || 'Niet ingevuld') %></li>
+  <li><strong>Shirtmaat:</strong> <%= @intake.shirt_size %></li>
+  <li><strong>Blessures:</strong> <%= simple_format(@intake.injuries.presence || 'Geen') %></li>
+  <li><strong>Opmerkingen:</strong> <%= simple_format(@intake.comments.presence || 'Geen') %></li>
+</ul>
+
+<p>Reageer eventueel rechtstreeks op dit e-mailadres om de intake te bevestigen.</p>
+
+
+
+
+

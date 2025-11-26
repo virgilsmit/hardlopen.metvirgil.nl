@@ -1,58 +1,98 @@
-<h1 style="margin-bottom: 2rem;">Admin Dashboard</h1>
+<h1 class="page-heading" style="margin-bottom: 2rem;">Admin Dashboard</h1>
 <div style="position:sticky;top:70px;z-index:200;background:#181f1b;padding:1rem 0 1rem 0;margin-bottom:1.5rem;text-align:center;box-shadow:0 2px 12px #6ee75a;">
   <%= link_to 'Groep koppelen aan bestaand schema', admin_schemas_koppelen_path, class: 'theme-btn', style: 'background:#6ee75a;color:#222;font-weight:bold;font-size:1.25rem;padding:1em 2em;' %>
 </div>
+<style>
+  .theme-cards .theme-card,
+  .theme-cards .theme-card h2,
+  .theme-cards .theme-card p {
+    color: #0c1729 !important;
+  }
+  .theme-cards .theme-card *:not(.theme-card-icon):not(.theme-btn) {
+    color: #0c1729 !important;
+  }
+  .theme-cards .theme-card .theme-btn {
+    background: linear-gradient(135deg, #FC4C02 0%, #FF6B35 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(252, 76, 2, 0.25) !important;
+  }
+  .theme-cards .theme-card .theme-btn:hover {
+    background: linear-gradient(135deg, #E63900 0%, #FC4C02 100%) !important;
+    box-shadow: 0 4px 16px rgba(252, 76, 2, 0.35) !important;
+    transform: translateY(-2px) !important;
+    color: #ffffff !important;
+  }
+</style>
 <div class="theme-cards">
-  <div class="theme-card">
+  <div class="theme-card" style="color: #0c1729 !important;">
     <div class="theme-card-icon">👤</div>
-    <h2>Gebruikersbeheer</h2>
-    <p>Bekijk en beheer alle gebruikers.</p>
+    <h2 style="color: #0c1729 !important;">Gebruikersbeheer</h2>
+    <p style="color: #495057 !important;">Bekijk en beheer alle gebruikers.</p>
     <a href="/admin/users" class="theme-btn">Naar gebruikersbeheer</a>
   </div>
-  <div class="theme-card">
+  <div class="theme-card" style="color: #0c1729 !important;">
     <div class="theme-card-icon">📥</div>
-    <h2>Hardlopers importeren</h2>
-    <p>Importeer snel nieuwe hardlopers via CSV.</p>
+    <h2 style="color: #0c1729 !important;">Hardlopers importeren</h2>
+    <p style="color: #495057 !important;">Importeer snel nieuwe hardlopers via CSV.</p>
     <a href="/import" class="theme-btn">Importeren</a>
   </div>
-  <div class="theme-card">
+  <div class="theme-card" style="color: #0c1729 !important;">
     <div class="theme-card-icon">🔄</div>
-    <h2>Statussen beheren</h2>
-    <p>Bekijk en wijzig de status van alle lopers.</p>
+    <h2 style="color: #0c1729 !important;">Statussen beheren</h2>
+    <p style="color: #495057 !important;">Bekijk en wijzig de status van alle lopers.</p>
     <a href="/statuses" class="theme-btn">Statussen beheren</a>
   </div>
-  <div class="theme-card">
+  <div class="theme-card" style="color: #0c1729 !important;">
     <div class="theme-card-icon">📅</div>
-    <h2>Schema</h2>
-    <p>Bekijk het volledige trainingsschema en het weekschema.</p>
+    <h2 style="color: #0c1729 !important;">Schema</h2>
+    <p style="color: #495057 !important;">Bekijk het volledige trainingsschema en het weekschema.</p>
     <a href="/schema" class="theme-btn">Naar schema</a>
   </div>
-  <div class="theme-card">
+  <div class="theme-card" style="color: #0c1729 !important;">
     <div class="theme-card-icon">📝</div>
-    <h2>Nieuw schema</h2>
-    <p>Maak een nieuw trainingsschema aan en koppel aan een groep.</p>
+    <h2 style="color: #0c1729 !important;">Nieuw schema</h2>
+    <p style="color: #495057 !important;">Maak een nieuw trainingsschema aan en koppel aan een groep.</p>
     <a href="#nieuw-trainingsschema" class="theme-btn">Nieuw schema toevoegen</a>
   </div>
-  <div class="theme-card">
+  <div class="theme-card" style="color: #0c1729 !important;">
     <div class="theme-card-icon">🔗</div>
-    <h2>Groep koppelen aan schema</h2>
-    <p>Koppel een bestaande groep aan een bestaand trainingsschema.</p>
+    <h2 style="color: #0c1729 !important;">Groep koppelen aan schema</h2>
+    <p style="color: #495057 !important;">Koppel een bestaande groep aan een bestaand trainingsschema.</p>
     <%= link_to 'Koppelen', admin_schemas_koppelen_path, class: 'theme-btn' %>
   </div>
-  <div class="theme-card">
+  <div class="theme-card" style="color: #0c1729 !important;">
     <div class="theme-card-icon">🧩</div>
-    <h2>Tegels per rol</h2>
-    <p>Beheer welke tegels zichtbaar zijn voor welke rol.</p>
+    <h2 style="color: #0c1729 !important;">Tegels per rol</h2>
+    <p style="color: #495057 !important;">Beheer welke tegels zichtbaar zijn voor welke rol.</p>
     <a href="/admin/tiles" class="theme-btn">Tegels beheren</a>
   </div>
+  <div class="theme-card" style="color: #0c1729 !important;">
+    <div class="theme-card-icon">✏️</div>
+    <h2 style="color: #0c1729 !important;">Hero Content</h2>
+    <p style="color: #495057 !important;">Pas de tekst op de homepage aan.</p>
+    <%= link_to 'Hero beheren', site_contents_path, class: 'theme-btn' %>
+  </div>
+  <div class="theme-card" style="color: #0c1729 !important;">
+    <div class="theme-card-icon">🎂</div>
+    <h2 style="color: #0c1729 !important;">Alle verjaardagen</h2>
+    <p style="color: #495057 !important;">Bekijk alle komende verjaardagen.</p>
+    <%= link_to 'Verjaardagen', trainers_verjaardagen_path, class: 'theme-btn' %>
+  </div>
+  <div class="theme-card" style="color: #0c1729 !important;">
+    <div class="theme-card-icon">📝</div>
+    <h2 style="color: #0c1729 !important;">Intake-aanvragen</h2>
+    <p style="color: #495057 !important;">Bekijk en verwerk nieuwe intake aanvragen.</p>
+    <%= link_to 'Intake-aanvragen', admin_intakes_path, class: 'theme-btn' %>
+  </div>
 </div>
-<hr style="margin:2rem 0;">
-<h2>Nieuwe prestatie toevoegen</h2>
+<hr style="margin:2rem 0;border-color:rgba(255,255,255,0.1);">
+<h2 style="color:#f4f8ff;margin-bottom:1rem;">Nieuwe prestatie toevoegen</h2>
 <div style="max-width: 500px;">
   <%= render 'performances/form', performance: Performance.new %>
 </div>
-<hr style="margin:2rem 0;">
-<h2 id="nieuw-trainingsschema">Nieuw trainingsschema toevoegen</h2>
+<hr style="margin:2rem 0;border-color:rgba(255,255,255,0.1);">
+<h2 id="nieuw-trainingsschema" style="color:#f4f8ff;margin-bottom:1rem;">Nieuw trainingsschema toevoegen</h2>
 <div style="max-width: 500px;">
   <%= render 'admin/dashboard/training_schema_form', training_schema: TrainingSchema.new, groups: Group.all %>
 </div> 

@@ -1,0 +1,154 @@
+<div class="profile-page surface-dark">
+  <h1 class="profile-title"><%= @user.name %></h1>
+  <p class="profile-stat"><strong>Aanwezige trainingen tot nu toe:</strong> <%= @user.attended_trainings_count_up_to_today %></p>
+
+  <div class="profile-header-row">
+    <div class="profile-left card-surface">
+      <p>Status: <%= @user.status&.name || 'onbekend' %></p>
+      <% user_roles = (@user.roles.presence || [@user.role]) %>
+      <p>Rol: <%= user_roles.compact.map { |r| r.to_s.humanize }.join(', ') %></p>
+      <p>Email: <%= @user.email %></p>
+      <p>Telefoon: <%= @user.phone.presence || '-' %></p>
+      <p>Geboortedatum: <%= @user.birthday.present? ? @user.birthday.strftime('%d-%m-%Y') : '-' %></p>
+      <p>Noodcontact: <%= @user.emergency_contact.presence || '-' %></p>
+      <% primary_role = @user.roles.presence&.first || User.roles.key(@user[:role]) || 'user' %>
+      <% extra_roles = (@user.roles || []).drop(1) %>
+      <% all_roles = [primary_role, *extra_roles].compact.uniq %>
+      <p>Rol(len): <%= all_roles.map { |r| r.to_s.humanize }.join(', ') %></p>
+      <p>Groep: <%= @user.groups.first&.name || 'Geen groep' %></p>
+      <% if current_user&.admin? %>
+        <p>Standaard schema: <%= @user.default_training_schema&.name || 'Geen' %></p>
+      <% end %>
+      <p>Hoofdtrainer: <%= @user.groups.first&.hoofdtrainer&.email || 'Geen hoofdtrainer' %></p>
+      <p>Medetrainer: <%= @user.groups.first&.medetrainer&.email || 'Geen medetrainer' %></p>
+    </div>
+
+    <div class="profile-conditie">
+      <% if @performances.any? %>
+        <% laatste = @performances.order(:date).last %>
+        <% if laatste %>
+          <div class="conditie-blok card-surface">
+            <strong class="conditie-title">Conditie</strong>
+            <strong>Duurloop 85% (gemiddelde):</strong> <%= @user.gemiddelde_dl2_85 %><br>
+            <strong>Intervaltempo (min/km):</strong> <%= @user.gemiddelde_tempo_per_km %><br>
+            <strong>10 km-prognose:</strong> <%= @user.gemiddelde_prognose_10km %><br>
+            <hr class="conditie-hr">
+            <strong class="conditie-highlight">Anaerobe drempel</strong>
+            <span class="conditie-value"><%= @user.gemiddelde_ad %></span><br>
+            <hr class="conditie-hr">
+            <strong class="conditie-highlight">AD Historie</strong><br>
+            <% @performances.reorder(date: :desc).limit(10).each do |p| %>
+              <%= p.date&.strftime('%d-%m-%Y') %>: <%= ad(p) %><br>
+            <% end %>
+          </div>
+
+          <% if FeatureFlags.trainingsconditie_enabled? %>
+            <div class="conditie-blok card-surface">
+              <strong class="conditie-title">Trainingsconditie</strong>
+              <strong>Duurloop 85% (training):</strong> <%= @user.effective_training_tempo('duur').presence || '–' %><br>
+              <strong>Intervaltempo (min/km, training):</strong> <%= @user.effective_training_tempo('interval').presence || '–' %><br>
+              <hr class="conditie-hr">
+              <strong class="conditie-highlight">Anaerobe drempel (training)</strong>
+              <span class="conditie-value"><%= @user.gemiddelde_training_ad.presence || '–' %></span><br>
+              <strong>10 km-prognose (training):</strong> <%= @user.training_prognose_10km.presence || '–' %><br>
+              <% if @user.training_results.any? %>
+                <hr class="conditie-hr">
+                <strong class="conditie-highlight">AD Historie (training)</strong><br>
+                <% valid_trs = @user.training_results.includes(:training_session).select { |tr| @user.ad_training(tr).present? && @user.ad_training(tr) != '00:00' } %>
+                <% grouped = valid_trs.group_by { |tr| (tr.training_session&.date || tr.created_at.to_date) } %>
+                <% grouped.values.map { |arr| arr.first }.sort_by { |tr| tr.training_session&.date || tr.created_at }.reverse.each do |tr| %>
+                  <%= (tr.training_session&.date || tr.created_at).strftime('%d-%m-%Y') %>: <%= @user.ad_training(tr) %><br>
+                <% end %>
+              <% end %>
+              <% unless @user.effective_training_tempo('duur').present? || @user.effective_training_tempo('interval').present? %>
+                <small>Wordt automatisch weergegeven zodra je trainingsregistraties opslaat.</small>
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card-surface profile-callout">
+    <strong>Afmelden voor de training van vandaag?</strong><br>
+    Gebruik deze persoonlijke link om je zonder inloggen af te melden voor de training van vandaag:<br>
+    <code><%= public_afmelden_url(slug: @user.slug, token: @user.public_token) %></code>
+    <small>Let op: deze link is persoonlijk en alleen geldig voor jouw account.</small>
+  </div>
+
+  <h2>Trainingsdagen</h2>
+  <%= form_with url: update_training_days_path, method: :patch, local: true do |f| %>
+    <% if (current_user.admin? || current_user.trainer?) && current_user.id != @user.id %>
+      <%= hidden_field_tag :user_id, @user.id %>
+    <% end %>
+    <div class="training-days">
+      <label>
+        <%= check_box_tag 'user[training_days][]', 'Dinsdag', @user.training_days.present? ? @user.training_days.include?('Dinsdag') : true %>
+        <span>Dinsdag</span>
+      </label>
+      <label>
+        <%= check_box_tag 'user[training_days][]', 'Zaterdag', @user.training_days.present? ? @user.training_days.include?('Zaterdag') : true %>
+        <span>Zaterdag</span>
+      </label>
+    </div>
+    <%= f.submit 'Opslaan', class: 'theme-btn track-btn--glow training-days__submit' %>
+  <% end %>
+
+  <div class="profile-links">
+    <%= link_to '✏️ Profiel', edit_user_path(@user), class: 'theme-btn track-btn--glow' %>
+    <%= link_to 'Terug', users_path, class: 'theme-btn track-btn--outline' %>
+  </div>
+
+  <div class="profile-performances card-surface">
+    <h2>Prestaties</h2>
+    <% if @performances.any? %>
+      <div class="table-wrapper">
+        <table class="prestaties-table schema-table">
+          <thead>
+            <tr>
+              <th>Datum</th>
+              <th>Onderdeel</th>
+              <th>Afstand</th>
+              <th>Tijd</th>
+              <th>Prognose 10 km</th>
+              <th>AD</th>
+              <th>Duurloop 85%</th>
+              <th>km/min</th>
+              <th>Notities</th>
+              <th>Acties</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @performances.each do |performance| %>
+              <tr>
+                <td data-label="Datum"><%= performance.date&.strftime('%d-%m-%Y') %></td>
+                <td data-label="Onderdeel"><%= performance.test_type %></td>
+                <td data-label="Afstand"><%= performance.distance %></td>
+                <td data-label="Tijd"><%= performance.value %></td>
+                <td data-label="Prognose 10 km"><%= prognose_10km(performance) %></td>
+                <td data-label="AD"><%= ad(performance) %></td>
+                <td data-label="Duurloop 85%"><%= dl2_85(performance) %></td>
+                <td data-label="km/min"><%= km_min(performance) %></td>
+                <td data-label="Notities"><%= performance.notes %></td>
+                <% if current_user&.admin? || current_user&.id == performance.user_id %>
+                  <td data-label="Acties" class="performance-actions">
+                    <%= link_to '✏️', edit_performance_path(performance), class: 'theme-btn track-btn--outline' %>
+                    <%= button_to performance_path(performance), method: :delete, data: { confirm: 'Weet je zeker dat je deze prestatie wilt verwijderen?' }, class: 'theme-btn track-btn--outline danger-btn' do %>
+                      🗑️
+                    <% end %>
+                  </td>
+                <% end %>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p>Je hebt nog geen prestaties geregistreerd.</p>
+    <% end %>
+    <h3>Nieuwe tijd/prestatie toevoegen</h3>
+    <%= render 'performances/form', performance: Performance.new(user_id: @user.id) %>
+  </div>
+</div>
+

@@ -1,0 +1,106 @@
+<div class="prototype-page prototype-page--informative">
+  <header class="prototype-info-hero">
+    <div class="prototype-info-hero__meta">
+      <p class="prototype-eyebrow">Loopgroep plan</p>
+      <h1>Najaarsschema 2025</h1>
+      <p class="prototype-lead">
+        Volledig overzicht van week 26 t/m 52, inclusief trainers, loopscholing en wedstrijdfocus.
+        Alles blijft gekoppeld aan de huidige functionaliteit voor aanmelden, schema’s en resultaten.
+      </p>
+      <div class="prototype-info-hero__cta">
+        <%= link_to 'Ga naar huidige site', root_path, class: 'app-btn app-btn--secondary prototype-btn--secondary' %>
+        <%= link_to 'Log in voor details', login_path, class: 'app-btn prototype-btn--primary' %>
+      </div>
+    </div>
+    <aside class="prototype-info-panel">
+      <p class="prototype-panel__eyebrow">Volgende sessies</p>
+      <ul class="prototype-upcoming-list">
+        <% @upcoming_sessions.each do |session| %>
+          <li>
+            <div>
+              <span class="prototype-upcoming-list__date"><%= session.date&.strftime('%a %d %b') %></span>
+              <h4><%= session.training %></h4>
+              <p><%= session.drills %></p>
+            </div>
+            <span class="prototype-tag"><%= session.phase %></span>
+          </li>
+        <% end %>
+      </ul>
+      <%= link_to 'Aanmelden / afmelden', schema_path, class: 'app-btn app-btn--secondary prototype-panel__cta' %>
+    </aside>
+  </header>
+
+  <section class="prototype-section">
+    <div class="prototype-section__header">
+      <p class="prototype-eyebrow">Fases</p>
+      <h2>Overzicht van trainingsblokken</h2>
+      <p>Gebruik de fases om te bepalen welke belasting en intensiteit per periode hoort.</p>
+    </div>
+    <div class="prototype-phase-tags">
+      <% @phases.each do |phase| %>
+        <span class="prototype-tag"><%= phase %></span>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="prototype-section">
+    <div class="prototype-section__header">
+      <p class="prototype-eyebrow">Schema per week</p>
+      <h2>Alle trainingen op een rij</h2>
+    </div>
+    <div class="prototype-week-grid">
+      <% @weeks.each do |week| %>
+        <article class="prototype-week-card">
+          <header>
+            <span class="prototype-week-card__label"><%= week[:label] %></span>
+            <span class="prototype-week-card__dates">
+              <%= week[:dates].compact.min&.strftime('%d %b') %> – <%= week[:dates].compact.max&.strftime('%d %b') %>
+            </span>
+          </header>
+          <table class="prototype-week-card__table">
+            <thead>
+              <tr>
+                <th>Dag</th>
+                <th>Training</th>
+                <th>Loopscholing</th>
+                <th>Trainer</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% week[:entries].each do |entry| %>
+                <tr>
+                  <td><%= entry.day %><br><small><%= entry.date&.strftime('%d-%m') %></small></td>
+                  <td>
+                    <strong><%= entry.training %></strong>
+                    <div class="prototype-week-card__phase"><%= entry.phase %></div>
+                  </td>
+                  <td><%= entry.drills %></td>
+                  <td><%= entry.trainer %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </article>
+      <% end %>
+    </div>
+  </section>
+
+  <% if @races.any? %>
+    <section class="prototype-section">
+      <div class="prototype-section__header">
+        <p class="prototype-eyebrow">Wedstrijden</p>
+        <h2>Aankomende events</h2>
+      </div>
+      <div class="prototype-grid prototype-grid--races">
+        <% @races.each do |race| %>
+          <article class="prototype-race-card">
+            <span class="prototype-race-card__date"><%= race[:date]&.strftime('%d %b %Y') %></span>
+            <h3><%= race[:race] %></h3>
+            <%= link_to 'Bekijk schema', schema_path, class: 'prototype-link' %>
+          </article>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+</div>
+

@@ -1,5 +1,5 @@
 class TrainersController < ApplicationController
-  before_action :require_trainer_or_admin
+  before_action :require_trainer_or_admin, except: [:verjaardagen]
 
   def tijden
     @performance = Performance.new

@@ -1,9 +1,13 @@
-<p style="color: green"><%= notice %></p>
+<% if notice %>
+  <div class="app-card" style="background: #d4edda; border-color: #c3e6cb; color: #155724;">
+    <%= notice %>
+  </div>
+<% end %>
 
 <h1>Groups</h1>
 
 <div id="groups">
-  <table>
+  <table class="schema-table">
     <thead>
       <tr>
         <th>Name</th>
@@ -15,13 +19,13 @@
     <tbody>
       <% @groups.each do |group| %>
         <tr>
-          <td><%= group.name %></td>
-          <td><%= group.hoofdtrainer&.email || 'Geen hoofdtrainer' %></td>
-          <td><%= group.medetrainer&.email || 'Geen medetrainer' %></td>
-          <td>
-            <%= link_to 'Show', group_path(group) %>
-            <%= link_to 'Edit', edit_group_path(group) %>
-            <%= link_to 'Delete', group_path(group), method: :delete, data: { confirm: 'Are you sure?' } %>
+          <td data-label="Name"><%= group.name %></td>
+          <td data-label="Hoofdtrainer"><%= group.hoofdtrainer&.email || 'Geen hoofdtrainer' %></td>
+          <td data-label="Medetrainer"><%= group.medetrainer&.email || 'Geen medetrainer' %></td>
+          <td data-label="Actions">
+            <%= link_to 'Show', group_path(group), class: 'app-btn app-btn--secondary', style: 'padding: 0.2em 0.7em; font-size: 0.95em; margin-right: 0.5em;' %>
+            <%= link_to 'Edit', edit_group_path(group), class: 'app-btn app-btn--secondary', style: 'padding: 0.2em 0.7em; font-size: 0.95em; margin-right: 0.5em;' %>
+            <%= link_to 'Delete', group_path(group), method: :delete, data: { confirm: 'Are you sure?' }, class: 'app-btn', style: 'background: #e74c3c; padding: 0.2em 0.7em; font-size: 0.95em;' %>
           </td>
         </tr>
       <% end %>
@@ -29,4 +33,4 @@
   </table>
 </div>
 
-<%= link_to 'New Group', new_group_path %>
+<%= link_to 'New Group', new_group_path, class: 'app-btn' %>

@@ -1,17 +1,14 @@
 <h1>Alle verjaardagen</h1>
-<table style="width:100%; border-collapse:collapse; max-width:600px;">
-  <thead>
-    <tr style="background:#f0f4f8;">
-      <th style="text-align:left; padding:8px;">Naam</th>
-      <th style="text-align:left; padding:8px;">Datum</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @upcoming_birthdays.each do |user| %>
-      <tr>
-        <td style="text-align:left; padding:8px;"><%= user.name %></td>
-        <td style="text-align:left; padding:8px;"><%= user.birthday.strftime('%d-%m-%Y') %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table> 
+
+<div style="background: #232a25; border-radius: 12px; padding: 1rem; margin: 1rem 0;">
+  <% @upcoming_birthdays.each do |user| %>
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 0; border-bottom: 1px solid #2e3a32; color: #ffffff;">
+      <div style="font-size: 1.1rem; font-weight: 600; color: #ffffff;">
+        🎂 <%= user.name %>
+      </div>
+      <div style="font-size: 1rem; color: #448923; font-weight: 600;">
+        <%= user.birthday.strftime('%d-%m') %>
+      </div>
+    </div>
+  <% end %>
+</div> 

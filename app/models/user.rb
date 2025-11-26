@@ -32,6 +32,10 @@ class User < ApplicationRecord
 
   belongs_to :status, optional: true
 
+  belongs_to :default_training_schema, class_name: 'TrainingSchema', optional: true
+
+  before_validation :sync_roles
+
   # Helper methods
   def member_of?(group)
     groups.include?(group)
@@ -42,11 +46,20 @@ class User < ApplicationRecord
   end
 
   def admin?
-    has_role?(:admin)
+    # Check nieuwe roles array (prioriteit)
+    return true if has_role?(:admin)
+    # Check oude role enum (fallback)
+    return true if role == 'admin' || self[:role] == 2
+    false
   end
 
   def attended_trainings_count_up_to_today
-    attendances.where(status: :aanwezig).joins(:training_session).where('training_sessions.date <= ?', Date.today).count
+    attendances
+      .where(status: :aanwezig)
+      .joins(:training_session)
+      .where('training_sessions.date IS NOT NULL')
+      .where('training_sessions.date < ?', Date.current)
+      .count
   end
 
   scope :actief, -> { joins(:status).where(statuses: { name: 'actief' }) }
@@ -282,9 +295,33 @@ class User < ApplicationRecord
     seconden_naar_tijd((vals.sum / vals.size).round)
   end
 
+  # --- Password reset helpers ---
+  def generate_password_reset_token!
+    token = SecureRandom.hex(16)
+    update!(reset_password_token: token, reset_password_sent_at: Time.current)
+    token
+  end
+
+  def clear_password_reset_token!
+    update_columns(reset_password_token: nil, reset_password_sent_at: nil)
+  end
+
+  def password_reset_expired?
+    reset_password_sent_at && reset_password_sent_at < 2.hours.ago
+  end
+
   before_create :generate_public_token, :generate_slug
 
   private
+
+  def sync_roles
+    selected_roles = (self.roles || []).map(&:to_s).reject(&:blank?)
+    selected_roles = [self[:role].to_s] if selected_roles.empty? && self[:role].present?
+    selected_roles = ['user'] if selected_roles.empty?
+    self.roles = selected_roles
+    primary = selected_roles.first
+    self[:role] = User.roles[primary] if primary && User.roles.key?(primary)
+  end
 
   def generate_public_token
     self.public_token ||= SecureRandom.hex(16)

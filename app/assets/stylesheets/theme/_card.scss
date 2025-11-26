@@ -1,101 +1,196 @@
 @import 'variables';
+
+// Professional card system inspired by Strava/Runkeeper
 .theme-cards {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2.5rem;
-  justify-content: center;
-  align-items: stretch;
-  max-width: 1200px;
-  margin: 3rem auto 0 auto;
-  padding: 0 1.5rem 3rem 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: $spacing-2xl; // Much more space between cards
+  max-width: 1400px; // Wider container
+  margin: $spacing-3xl auto 0 auto;
+  padding: 0 $spacing-2xl $spacing-3xl $spacing-2xl;
 }
+
 .theme-card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 18px $color-card-shadow;
-  padding: 2.2rem 1.5rem 1.7rem 1.5rem;
-  min-width: 260px;
-  max-width: 300px;
-  flex: 1 1 260px;
-  margin-bottom: 2.5rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  border: 1px solid #e3e8ee;
-  transition: box-shadow 0.2s, transform 0.15s;
+  background: #ffffff !important; // Witte achtergrond voor goed contrast
+  border-radius: $radius-xl; // Larger border radius like Strava
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important; // Softer, more professional shadow
+  padding: $spacing-3xl; // Much more padding like professional apps
+  border: 1px solid rgba(0, 0, 0, 0.08) !important; // Subtle border
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #171c2c !important; // Donkere tekst voor goed contrast
+  position: relative;
+  overflow: hidden;
+  text-shadow: none !important;
+  mix-blend-mode: normal !important;
+  filter: none !important;
+  
+  &,
+  *,
+  *::before,
+  *::after {
+    opacity: 1 !important;
+  }
+  
+  // Force alle tekst in theme-card naar donker
+  *:not(.theme-card-icon) {
+    color: #171c2c !important;
+    text-shadow: none !important;
+    mix-blend-mode: normal !important;
+  }
+
+  strong,
+  b {
+    color: #111827 !important;
+    font-weight: 700;
+  }
+  
+  // Modern gradient overlay on hover
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 0;
+  }
+  
+  // Content positioning
+  > * {
+    position: relative;
+    z-index: 1;
+  }
 }
+
 .theme-card:hover {
-  box-shadow: 0 12px 32px $color-card-shadow;
-  transform: translateY(-2px) scale(1.02);
-  background: #f7faff;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+  border-color: var(--color-primary);
+  
+  &::before {
+    opacity: 0.05;
+  }
 }
 .theme-card h2 {
-  color: $color-primary-light;
-  font-size: 1.18rem;
-  font-weight: 700;
-  margin-bottom: 1.1rem;
-  letter-spacing: 0.2px;
-  text-transform: none;
+  color: #0c1729 !important; // High contrast dark text
+  font-size: 1.5rem; // Strava-style title size
+  font-weight: 700; // Bolder like Strava
+  margin-bottom: $spacing-xl; // Much more space like Strava
+  letter-spacing: -0.02em;
+  line-height: 1.3;
 }
+
 .theme-card p {
-  color: $color-text;
-  font-size: 1.03rem;
-  margin: 0.5rem 0 1.2rem 0;
+  color: #1f2a37 !important; // Better contrast than muted text
+  font-size: 1rem; // Standard readable size like Strava
+  margin: 0 0 $spacing-2xl 0; // More space below text
+  line-height: 1.6; // Professional line height
+  font-weight: 400;
+  max-width: 280px; // Limit text width for better readability
 }
+
 .theme-card a.theme-btn {
-  margin-top: 1.1rem;
-  font-size: 1em;
-  padding: 0.7em 1.5em;
-  border-radius: 1.5em;
+  margin-top: 0; // No extra margin, button is at bottom
+  font-size: 0.875rem; // Strava-style button text
+  padding: $spacing-sm $spacing-lg; // Strava-style padding
+  border-radius: $radius;
   min-width: 120px;
+  font-weight: 600;
+  text-transform: uppercase; // Strava-style uppercase
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(252, 76, 2, 0.25) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  
+  &:hover {
+    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%) !important;
+    box-shadow: 0 4px 16px rgba(252, 76, 2, 0.35) !important;
+    transform: translateY(-2px) !important;
+    color: #ffffff !important;
+  }
+  
+  &:active {
+    transform: translateY(0) !important;
+    box-shadow: 0 2px 8px rgba(252, 76, 2, 0.25) !important;
+  }
+  
+  &:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(252, 76, 2, 0.3) !important;
+  }
 }
+
 .theme-card-icon {
-  width: 44px;
-  height: 44px;
-  margin-bottom: 0.7em;
+  width: 64px; // Larger like Strava
+  height: 64px;
+  margin-bottom: $spacing-xl; // More space like Strava
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f7faff;
-  border-radius: 50%;
-  box-shadow: 0 2px 8px $color-card-shadow;
+  background: var(--color-primary); // Solid color like Strava
+  border-radius: $radius-lg;
+  box-shadow: 0 2px 8px rgba(252, 76, 2, 0.15); // Subtle shadow
+  font-size: 1.75rem; // Larger icon
+  color: white !important; // Witte iconen blijven wit
+  transition: transform 0.3s ease;
 }
-@media (max-width: 900px) {
+
+.theme-card:hover .theme-card-icon {
+  transform: scale(1.1) rotate(5deg);
+}
+// Professional responsive design like Strava/Runkeeper
+@media (max-width: 768px) {
   .theme-cards {
-    flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
-    padding: 0 0.5rem 2rem 0.5rem;
+    grid-template-columns: 1fr;
+    gap: $spacing-xl;
+    padding: 0 $spacing-xl $spacing-2xl $spacing-xl;
   }
+  
   .theme-card {
-    max-width: 98vw;
-    min-width: 0;
-    padding: 1.5rem 0.7rem 1.2rem 0.7rem;
-    font-size: 1.01rem;
+    padding: $spacing-2xl; // Maintain professional padding
   }
+  
   .theme-card h2 {
-    font-size: 1.05rem;
+    font-size: 1.375rem; // Slightly smaller but still readable
   }
-  .theme-card a.theme-btn {
-    font-size: 0.97em;
-    padding: 0.7em 1.1em;
+  
+  .theme-card p {
+    font-size: 0.9375rem; // Slightly smaller but still readable
+    max-width: none; // Full width on mobile
+  }
+  
+  .theme-card-icon {
+    width: 56px;
+    height: 56px;
+    font-size: 1.5rem;
   }
 }
-@media (max-width: 600px) {
+
+@media (max-width: 480px) {
   .theme-cards {
-    gap: 1rem;
-    padding: 0 0.2rem 1.5rem 0.2rem;
+    padding: 0 $spacing-lg $spacing-xl $spacing-lg;
   }
+  
   .theme-card {
-    padding: 1.1rem 0.3rem 0.8rem 0.3rem;
-    font-size: 0.98rem;
+    padding: $spacing-xl; // Still professional padding
   }
+  
   .theme-card h2 {
-    font-size: 0.98rem;
+    font-size: 1.25rem; // Keep readable size
   }
+  
+  .theme-card p {
+    font-size: 0.875rem; // Minimum readable size
+    line-height: 1.5; // Slightly tighter on mobile
+  }
+  
   .theme-card a.theme-btn {
-    font-size: 0.93em;
-    padding: 0.6em 0.8em;
+    font-size: 0.75rem; // Smaller but still readable
+    padding: $spacing-sm $spacing-md;
   }
 } 

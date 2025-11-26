@@ -1,25 +1,131 @@
-<% unless current_user %>
-  <div style="text-align: center; margin-top: 2rem; margin-bottom: 2rem;">
-    <a href="/login?refresh=<%= Time.now.to_i %>" class="app-btn">Login</a>
-    <a href="/register" class="app-btn" style="background: linear-gradient(90deg, #00cfff 60%, #1976d2 100%);">Registreren</a>
-  </div>
-<% end %>
-
-<% if current_user %>
-  <div class="theme-cards">
-    <% @tiles.each do |tile| %>
-    <div class="app-card">
-        <div class="theme-card-icon"><%= tile[:icon] %></div>
-        <h2><%= tile[:label] %></h2>
-        <p><%= tile[:desc] %></p>
-        <a href="<%= tile[:url] %>" class="app-btn"><%= tile[:label] %></a>
+<div class="prototype-track home-track">
+  <section class="track-hero">
+    <div class="track-hero__content">
+      <p class="prototype-eyebrow"><%= raw SiteContent.get('hero_eyebrow', 'Loopgroep Virgil') %></p>
+      <h1><%= raw SiteContent.get('hero_title', 'Tempo op de baan, focus op vooruitgang.') %></h1>
+      <div class="hero-description">
+        <%= raw SiteContent.get('hero_description', 'Een track-geïnspireerde coaching experience met dezelfde tools als je gewend bent: schema\'s, aanwezigheden en resultaten blijven exact werken zoals op de oude site.') %>
+      </div>
+      <div class="track-hero__ctas">
+        <% if current_user %>
+          <%= link_to 'Training deze week', user_schema_path(current_user, :dezeweek), class: 'app-btn track-btn--glow' %>
+          <%= link_to 'Mijn schema', user_schema_path(current_user, :schema), class: 'app-btn app-btn--secondary track-btn--outline' %>
+          <%= link_to 'Afmelden vandaag', vandaag_training_session_path, class: 'app-btn track-btn--outline', style: 'border-color: #ff6b35 !important; color: #ff6b35 !important; box-shadow: 0 0 25px rgba(255, 107, 53, 0.25);' %>
+        <% else %>
+          <%= link_to 'Log in', login_path, class: 'app-btn track-btn--glow' %>
+          <%= link_to 'Registreren', register_path, class: 'app-btn app-btn--secondary track-btn--outline' %>
+          <%= link_to 'Intake', intake_path, class: 'app-btn app-btn--secondary track-btn--outline' %>
+        <% end %>
+      </div>
     </div>
-    <% end %>
-  </div>
-<% end %>
 
-<% if current_user&.role == 'admin' %>
-  <div style="text-align: center; margin-top: 1rem;">
-    <a href="/admin" class="app-btn" style="background: linear-gradient(90deg, #ff9800 60%, #ffd699 100%);">Admin dashboard</a>
-  </div>
-<% end %>
+    <div class="track-hero__visual home-track__visual">
+      <% if current_user %>
+        <span class="track-lap-counter">Welkom</span>
+        <p><%= current_user.name %></p>
+        <small>Je hebt <%= @upcoming_birthdays&.count || 0 %> verjaardagen in zicht</small>
+      <% else %>
+        <span class="track-lap-counter">02:47</span>
+        <p>Pacing in progress</p>
+        <small>Word lid van de loopgroep</small>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="prototype-section track-metrics home-track-metrics">
+    <article>
+      <h3>Trainingen</h3>
+      <p>Week 26–52</p>
+      <span>27 weken</span>
+    </article>
+    <article>
+      <h3>Trainers</h3>
+      <p>Virgil & Danny</p>
+      <span>2 hoofdcoaches</span>
+    </article>
+    <article>
+      <h3>Fases</h3>
+      <p>Zomer → Wedstrijd</p>
+      <span>4 blokken</span>
+    </article>
+  </section>
+
+  <% if @upcoming_public_sessions.present? %>
+    <section class="prototype-section track-schedule">
+      <header class="prototype-section__header">
+        <h2>Groepstrainingen</h2>
+      </header>
+      <div class="track-schedule__grid">
+        <% @upcoming_public_sessions.each do |session| %>
+          <article class="track-session-card">
+            <% formatted_date = begin
+              I18n.l(session.date, format: :dutch_short, locale: :nl)
+            rescue
+              session.date&.strftime('%d %b')
+            end %>
+            <span class="track-session-card__date"><%= formatted_date %></span>
+            <h3><%= session.description.presence || 'Training' %></h3>
+            <p><%= session.loopscholing.presence || session.kern.presence || '' %></p>
+            <div class="track-session-card__meta" style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <div class="track-session-card__meta-content" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <span class="prototype-tag track-session-tag" style="background: #0c1730 !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; display: inline-flex; align-items: center; padding: 0.35rem 0.85rem; border-radius: 999px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; width: fit-content;"><%= session.fase.presence || session.week %></span>
+                <span class="track-session-card__trainer" style="color: #c7d7ff !important; font-size: 0.9rem;"><%= session.trainer&.name || session.trainer&.email || 'Trainer volgt' %></span>
+              </div>
+            </div>
+            <div class="track-session-card__actions">
+              <%= link_to 'Bekijk details', training_session_path(session), class: 'app-btn app-btn--secondary track-btn--outline' %>
+            </div>
+          </article>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <% if current_user && @tiles.present? %>
+    <section class="prototype-section home-track-dashboard">
+      <header class="prototype-section__header">
+        <h2>Dashboard</h2>
+      </header>
+      <div class="home-track-dashboard__list">
+        <% @tiles.each do |tile| %>
+          <article class="home-track-dashboard__item">
+            <div>
+              <span class="home-track-dashboard__icon"><%= tile[:icon] %></span>
+              <div>
+                <h3><%= tile[:label] %></h3>
+                <p><%= raw tile[:desc] %></p>
+              </div>
+            </div>
+            <% if tile[:key] == 'birthdays_30' %>
+              <%= link_to 'Verjaardagen', trainers_verjaardagen_path, class: 'app-btn track-btn--outline' %>
+            <% else %>
+              <%= link_to 'Open', tile[:url], class: 'app-btn track-btn--glow' %>
+            <% end %>
+          </article>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <% if current_user&.role == 'admin' %>
+    <section class="prototype-section home-track-admin">
+      <div class="home-track-admin__card">
+        <p class="prototype-eyebrow">Beheer</p>
+        <h3>Admin dashboard</h3>
+        <p>Alle bestaande beheerflows werken zoals altijd, nu met het nieuwe uiterlijk.</p>
+        <%= link_to 'Ga naar admin', admin_path, class: 'app-btn track-btn--glow' %>
+      </div>
+    </section>
+  <% end %>
+
+  <% unless current_user %>
+    <section class="prototype-section home-track-onboarding">
+      <h3>Nieuw bij de loopgroep?</h3>
+      <p>Registreer je en krijg direct toegang tot schema’s, aanwezigheden en community-updates.</p>
+      <div class="track-hero__ctas">
+        <%= link_to 'Registreren', register_path, class: 'app-btn track-btn--glow' %>
+        <%= link_to 'Plan een kennismaking', schema_path, class: 'app-btn app-btn--secondary track-btn--outline' %>
+      </div>
+    </section>
+  <% end %>
+</div>

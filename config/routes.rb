@@ -37,12 +37,23 @@ Rails.application.routes.draw do
   get 'training_sessions/:id/data', to: 'training_sessions#data', as: :training_session_data
   get 'training_sessions/:id/preview_core', to: 'training_sessions#preview_structured_core', as: :preview_core_training_session
   patch '/training_sessions/:id/core', to: 'training_sessions#update_core', as: :update_core_training_session
+  
+  # API endpoints for iOS app
+  get 'api/training_sessions/today', to: 'training_sessions#api_today', as: :api_training_sessions_today
+  get 'api/training_sessions/week', to: 'training_sessions#api_week', as: :api_training_sessions_week
+  get 'api/training_sessions/upcoming', to: 'training_sessions#api_upcoming', as: :api_training_sessions_upcoming
+  get 'api/training_sessions/schedule', to: 'training_sessions#api_schedule', as: :api_training_sessions_schedule
 
   delete 'logout', to: 'sessions#destroy', as: :logout
   get "up" => "rails/health#show", as: :rails_health_check
 
   get 'login', to: 'sessions#new', as: :login
   post 'login', to: 'sessions#create'
+
+  resources :password_resets, only: [:new, :create, :edit, :update]
+
+  resources :intakes, only: [:new, :create]
+  get 'intake', to: 'intakes#new', as: :intake
 
   get 'register', to: 'users#register', as: :register
   post 'register', to: 'users#create_registration'
@@ -71,6 +82,9 @@ Rails.application.routes.draw do
   get 'trainers/ad_gemiddelden', to: 'trainers#ad_gemiddelden', as: :trainers_ad_gemiddelden
 
   namespace :admin do
+    resources :intakes, only: [:index, :show] do
+      post :convert, on: :member
+    end
     resources :users, only: [:index] do
       member do
         patch :update_role
@@ -92,6 +106,13 @@ Rails.application.routes.draw do
     post 'schemas/koppelen', to: 'schemas#koppelen'
     post 'schemas/rename', to: 'schemas#rename', as: :schemas_rename
   end
+  
+  resources :site_contents, only: [:index] do
+    collection do
+      patch :update
+      put :update
+    end
+  end
 
   get '/schema', to: 'training_schemas#index', as: :schema
   get '/schema/volledig', to: 'training_schemas#show', as: :schema_volledig
@@ -107,6 +128,12 @@ Rails.application.routes.draw do
   # Logging actual training results
   get 'training_sessions/:id/log', to: 'training_results#new', as: :log_training_session
   resources :training_results, only: [:create, :edit, :update]
+
+  get '/verjaardagen/komende', to: 'birthdays#index', as: :upcoming_birthdays
+
+  get 'prototype', to: 'home#prototype', as: :prototype
+  get 'prototype-info', to: 'home#prototype_info', as: :prototype_info
+  get 'prototype-track', to: 'home#prototype_track', as: :prototype_track
 
   root "home#index"
 end

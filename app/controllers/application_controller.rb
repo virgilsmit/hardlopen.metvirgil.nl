@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::Base
-  helper_method :current_user, :logged_in?
+  helper_method :current_user, :logged_in?, :is_admin?
 
   private
 
@@ -15,6 +15,23 @@ class ApplicationController < ActionController::Base
     unless logged_in?
       flash[:alert] = "You must be logged in to perform that action."
       redirect_to login_path
+    end
+  end
+  
+  # Consistente check voor admin/beheerder - ondersteunt zowel oude role enum als nieuwe roles array
+  def is_admin?
+    return false unless current_user
+    # Check nieuwe roles array (prioriteit)
+    return true if current_user.has_role?(:admin)
+    # Check oude role enum (fallback)
+    return true if current_user.role == 'admin' || current_user[:role] == 2
+    # Check admin? methode (extra fallback)
+    current_user.admin? rescue false
+  end
+  
+  def require_admin
+    unless is_admin?
+      redirect_to root_path, alert: 'Alleen beheerders mogen dit zien.'
     end
   end
 end

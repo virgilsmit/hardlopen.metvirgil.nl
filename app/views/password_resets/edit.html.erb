@@ -1,0 +1,28 @@
+<h1>Nieuw wachtwoord instellen</h1>
+
+<% if @user.errors.any? %>
+  <div class="alert alert-danger">
+    <p><strong>Er traden fouten op:</strong></p>
+    <ul>
+      <% @user.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<p>Het wachtwoord moet minimaal 6 tekens lang zijn.</p>
+
+<%= form_with model: @user, url: password_reset_path(params[:id]), method: :patch, local: true do |f| %>
+  <div>
+    <%= f.label :password, 'Nieuw wachtwoord' %><br>
+    <%= f.password_field :password, autofocus: true %>
+  </div>
+  <div>
+    <%= f.label :password_confirmation, 'Bevestig wachtwoord' %><br>
+    <%= f.password_field :password_confirmation %>
+  </div>
+  <div>
+    <%= f.submit 'Wijzig wachtwoord' %>
+  </div>
+<% end %> 

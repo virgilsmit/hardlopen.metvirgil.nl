@@ -1,6 +1,6 @@
-<%= form_with(model: user) do |form| %>
+<%= form_with(model: user, html: { class: 'users-form' }) do |form| %>
   <% if user.errors.any? %>
-    <div style="color: red">
+    <div class="app-card" style="background: #f8d7da; border-color: #f5c6cb; color: #721c24;">
       <h2><%= pluralize(user.errors.count, "fout") %> verhinderde dat deze loper werd opgeslagen:</h2>
 
       <ul>
@@ -11,77 +11,94 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :name, "Naam", style: "display: block" %>
-    <%= form.text_field :name %>
+  <div class="app-form-group">
+    <%= form.label :name, "Naam", class: "app-form-label" %>
+    <%= form.text_field :name, class: "app-form-input" %>
   </div>
 
-  <div>
-    <%= form.label :email, "E-mailadres", style: "display: block" %>
-    <%= form.text_field :email %>
+  <div class="app-form-group">
+    <%= form.label :email, "E-mailadres", class: "app-form-label" %>
+    <%= form.text_field :email, class: "app-form-input" %>
   </div>
 
-  <div>
-    <%= form.label :status_id, "Status", style: "display: block" %>
-    <%= form.collection_select :status_id, Status.all, :id, :name, prompt: 'Kies status' %>
+  <div class="app-form-group">
+    <%= form.label :status_id, "Status", class: "app-form-label" %>
+    <%= form.collection_select :status_id, Status.all, :id, :name, { prompt: 'Kies status' }, { class: "app-form-input" } %>
   </div>
 
-  <div>
-    <%= form.label :phone, "Telefoonnummer", style: "display: block" %>
-    <%= form.text_field :phone %>
+  <div class="app-form-group">
+    <%= form.label :phone, "Telefoonnummer", class: "app-form-label" %>
+    <%= form.text_field :phone, class: "app-form-input" %>
   </div>
 
-  <div>
-    <%= form.label :emergency_contact, "Noodcontact", style: "display: block" %>
-    <%= form.text_field :emergency_contact %>
+  <div class="app-form-group">
+    <%= form.label :emergency_contact, "Noodcontact", class: "app-form-label" %>
+    <%= form.text_field :emergency_contact, class: "app-form-input" %>
   </div>
 
-  <div>
-    <%= form.label :birthday, "Geboortedatum", style: "display: block" %>
-    <%= form.date_field :birthday %>
+  <div class="app-form-group">
+    <%= form.label :birthday, "Geboortedatum", class: "app-form-label" %>
+    <%= form.date_field :birthday, class: "app-form-input" %>
   </div>
 
-  <div>
-    <%= form.label :injury, "Blessure(s)", style: "display: block" %>
-    <%= form.text_area :injury %>
+  <div class="app-form-group">
+    <%= form.label :injury, "Blessure(s)", class: "app-form-label" %>
+    <%= form.text_area :injury, class: "app-form-input" %>
   </div>
 
-  <div>
-    <%= form.label :photo_permission, "Toestemming voor foto's", style: "display: block" %>
+  <div class="app-form-group">
+    <%= form.label :photo_permission, "Toestemming voor foto's", class: "app-form-label" %>
     <%= form.check_box :photo_permission %>
   </div>
 
-  <div>
-    <%= form.label :role, "Rol", style: "display: block" %>
-    <%= form.select :role, User.roles.keys.map { |r| [r.titleize, r] }, prompt: "Kies rol" %>
+  <div class="app-form-group">
+    <%= form.label :roles, "Rollen", class: "app-form-label" %>
+    <div class="roles-checkboxes">
+      <%= hidden_field_tag 'user[roles][]', '' %>
+      <% User.roles.keys.each do |role_key| %>
+        <label class="roles-checkboxes__item">
+          <%= check_box_tag 'user[roles][]', role_key, (user.roles || []).include?(role_key), id: "user_roles_#{role_key}" %>
+          <span><%= role_key.titleize %></span>
+        </label>
+      <% end %>
+    </div>
   </div>
 
-  <div>
-    <%= form.label :password, "Wachtwoord", style: "display: block" %>
-    <%= form.password_field :password, autocomplete: "new-password" %>
+  <% if current_user&.admin? %>
+    <div class="app-form-group">
+      <%= form.label :default_training_schema_id, "Standaard schema", class: "app-form-label" %>
+      <%= form.collection_select :default_training_schema_id, TrainingSchema.order(:name), :id, :name, { include_blank: 'Geen schema' }, { class: "app-form-input" } %>
+    </div>
+  <% end %>
+
+  <div class="app-form-group">
+    <%= form.label :password, "Wachtwoord", class: "app-form-label" %>
+    <%= form.password_field :password, autocomplete: "new-password", class: "app-form-input" %>
   </div>
 
-  <div>
-    <%= form.label :password_confirmation, "Bevestig wachtwoord", style: "display: block" %>
-    <%= form.password_field :password_confirmation, autocomplete: "new-password" %>
+  <div class="app-form-group">
+    <%= form.label :password_confirmation, "Bevestig wachtwoord", class: "app-form-label" %>
+    <%= form.password_field :password_confirmation, autocomplete: "new-password", class: "app-form-input" %>
   </div>
 
-  <div>
-    <%= form.label :csv_name, "CSV-naam (voor koppeling met historie)", style: "display: block" %>
-    <%= form.text_field :csv_name %>
+  <div class="app-form-group">
+    <%= form.label :csv_name, "CSV-naam (voor koppeling met historie)", class: "app-form-label" %>
+    <%= form.text_field :csv_name, class: "app-form-input" %>
   </div>
 
-  <div>
-    <label style="display:block; font-weight:bold; margin-top:1em;">Trainingsdagen</label>
-    <label style="margin-right:1.5em;">
-      <%= check_box_tag 'user[training_days][]', 'Dinsdag', user.training_days.present? ? user.training_days.include?('Dinsdag') : true %> Dinsdag
-    </label>
-    <label>
-      <%= check_box_tag 'user[training_days][]', 'Zaterdag', user.training_days.present? ? user.training_days.include?('Zaterdag') : true %> Zaterdag
-    </label>
+  <div class="app-form-group">
+    <label class="app-form-label">Trainingsdagen</label>
+    <div style="margin-top: 0.5rem;">
+      <label style="margin-right: 1.5em; display: inline-block;">
+        <%= check_box_tag 'user[training_days][]', 'Dinsdag', user.training_days.present? ? user.training_days.include?('Dinsdag') : true %> Dinsdag
+      </label>
+      <label style="display: inline-block;">
+        <%= check_box_tag 'user[training_days][]', 'Zaterdag', user.training_days.present? ? user.training_days.include?('Zaterdag') : true %> Zaterdag
+      </label>
+    </div>
   </div>
 
-  <div>
-    <%= form.submit "Opslaan" %>
+  <div class="app-form-group">
+    <%= form.submit "Opslaan", class: "app-btn" %>
   </div>
 <% end %>

@@ -1,144 +1,183 @@
-<% # Bepaal het weeknummer van de eerste training van deze week %>
-<% weeknummer = @schemas.flat_map { |schema| schema.training_sessions.map { |sessie| sessie.week } }.uniq.first.presence || '-' %>
-<% # Navigatieknoppen voor weken %>
-<% require 'date' %>
-<% eerste_sessie = @schemas.flat_map { |schema| schema.training_sessions.map { |sessie| [schema.name, sessie] } }.uniq { |schema_name, sessie| [sessie.date, sessie.description] }.first&.last %>
-<% week_start = eerste_sessie&.date ? eerste_sessie.date.beginning_of_week(:monday) : Date.today.beginning_of_week(:monday) %>
-<% weeknummer = week_start.cweek %>
-<% jaar = week_start.cwyear %>
-<% huidige_index = @beschikbare_weken.index { |h| h[:jaar] == @weekjaar.to_i && h[:week] == @weeknummer.to_i } %>
-<% vorige_week = @beschikbare_weken[huidige_index - 1] if huidige_index && huidige_index > 0 %>
-<% volgende_week = @beschikbare_weken[huidige_index + 1] if huidige_index && huidige_index < @beschikbare_weken.size - 1 %>
-<% huidige_week = @beschikbare_weken.find { |h| h[:jaar] == Date.today.cwyear && h[:week] == Date.today.cweek } %>
-<h1>Overzicht trainingen week <%= @weeknummer %> - <%= @weekjaar %></h1>
-<table class="schema-table" style="width:100%; border-collapse:collapse; margin-bottom:2rem;">
-  <thead>
-    <tr>
-      <th class="schema-table__th">Datum</th>
-      <th class="schema-table__th">Dag</th>
-      <th class="schema-table__th">Training</th>
-      <th class="schema-table__th">Loopscholing</th>
-      <th class="schema-table__th">Trainer</th>
-      <th class="schema-table__th">Locatie</th>
-      <th class="schema-table__th">Fase</th>
-      <th class="schema-table__th">Wedstrijd</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @trainings_this_week.sort_by(&:date).each do |sessie| %>
-      <tr class="schema-table__row" onclick="window.location='/training_sessions/<%= sessie.id %>'" style="cursor:pointer;">
-        <td style="padding:8px; white-space:nowrap;"><%= l(sessie.date) %></td>
-        <td style="padding:8px;">
-          <% if sessie.dag.to_s.downcase == 'zaterdag' %>
-            Zaterdag 08:45
-          <% elsif sessie.dag.to_s.downcase == 'dinsdag' %>
-            Dinsdag 18:45
-          <% else %>
-            <%= sessie.dag %>
-          <% end %>
-        </td>
-        <td style="padding:8px;"><%= sessie.description %></td>
-        <td style="padding:8px;"><%= sessie.loopscholing %></td>
-        <td style="padding:8px;">
-          <% if sessie.dag.to_s.downcase == 'donderdag' || sessie.dag.to_s.downcase == 'zondag' %>
-            Zelf
-          <% else %>
-            <%= sessie.trainer&.name || '-' %>
-          <% end %>
-        </td>
-        <td style="padding:8px;">GAC</td>
-        <td style="padding:8px;"><%= sessie.fase %></td>
-        <td style="padding:8px;"><%= sessie.wedstrijd %></td>
-      </tr>
-      <% if current_user && (sessie.group_id.nil? || current_user.groups.pluck(:id).include?(sessie.group_id)) %>
-        <% my_attendance = sessie.attendances.find { |a| a.user_id == current_user.id } %>
-        <tr>
-          <td colspan="8" style="background:transparent; padding:8px 16px;">
-            <div style="display:flex;align-items:center;gap:1.5em;">
-              <form id="attendance-toggle-form-<%= sessie.id %>" data-attendance-id="<%= my_attendance&.id %>" action="<%= attendances_path %>" method="post" style="margin:0;display:inline-block;">
-                <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
-                <input type="hidden" name="user_id" value="<%= current_user.id %>">
-                <input type="hidden" name="training_session_id" value="<%= sessie.id %>">
-                <input type="hidden" name="status" value="<%= my_attendance ? my_attendance.status : 'aanwezig' %>">
-                <label class="attendance-toggle">
-                  <input type="checkbox" onchange="toggleAttendanceSwitch(this, <%= sessie.id %>)" <%= my_attendance.nil? || my_attendance.status == 'aanwezig' ? 'checked' : '' %>>
-                  <span class="attendance-slider">
-                    <span class="switch-text off">Afwezig</span>
-                    <span class="switch-text on">Aanwezig</span>
-                    <span class="slider-knob"></span>
-                  </span>
-                </label>
-                <% if my_attendance&.status == 'afwezig' && my_attendance.note.present? %>
-                  <span style="color:#888;font-size:0.95em;">Reden: <%= my_attendance.note %></span>
-                <% end %>
-                <% if my_attendance %>
-                  <span style="color:#888;font-size:0.95em;">[DEBUG: status=<%= my_attendance.status.inspect %>]</span>
-                <% else %>
-                  <span style="color:#f88;font-size:0.95em;">[DEBUG: geen attendance-record gevonden voor user_id=<%= current_user.id %>, training_session_id=<%= sessie.id %>]</span>
-                <% end %>
-                <div id="afmeld-note-<%= sessie.id %>" style="display:none;margin-left:1em;">
-                  <input type="text" name="note" placeholder="Reden van afmelding (optioneel)" style="width:220px;padding:0.3em 0.7em;border-radius:8px;border:1px solid #ccc;">
-                  <button type="submit" class="theme-btn" style="padding:0.4em 1.2em;">Bevestig afmelding</button>
-                  <button type="button" onclick="document.getElementById('afmeld-note-<%= sessie.id %>').style.display='none';toggleSwitchBack(<%= sessie.id %>);return false;" style="margin-left:1em;background:#f5f7fa;color:#222;border-radius:6px;padding:0.4em 1.2em;border:none;">Annuleer</button>
-                </div>
-              </form>
-            </div>
-          </td>
-        </tr>
-      <% end %>
-    <% end %>
-  </tbody>
-</table>
-
-<!-- ALLE TRAININGEN -->
-<% if @all_sessions.present? %>
-  <h2 style="margin-top:2.5em;">Alle trainingen vanaf vandaag</h2>
-  <table class="schema-table" style="width:100%; border-collapse:collapse; margin-bottom:2rem;">
-    <thead>
-      <tr>
-        <th class="schema-table__th">Datum</th>
-        <th class="schema-table__th">Dag</th>
-        <th class="schema-table__th">Training</th>
-        <th class="schema-table__th">Loopscholing</th>
-        <th class="schema-table__th">Trainer</th>
-        <th class="schema-table__th">Locatie</th>
-        <th class="schema-table__th">Fase</th>
-        <th class="schema-table__th">Wedstrijd</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @all_sessions.each do |sessie| %>
-        <tr>
-          <td style="padding:8px; white-space:nowrap;"><%= l(sessie.date) %></td>
-          <td style="padding:8px;"><%= sessie.dag %></td>
-          <td style="padding:8px;"><%= sessie.description %></td>
-          <td style="padding:8px;"><%= sessie.loopscholing %></td>
-          <td style="padding:8px;"><%= sessie.trainer&.name || '-' %></td>
-          <td style="padding:8px;">GAC</td>
-          <td style="padding:8px;"><%= sessie.fase %></td>
-          <td style="padding:8px;"><%= sessie.wedstrijd %></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+<% schema_name = @schemas.any? ? @schemas.first.name : nil %>
+<% if schema_name.present? %>
+  <h1>Mijn schema: <%= schema_name %></h1>
+<% else %>
+  <h1>Mijn schema</h1>
 <% end %>
 
-<script>
-function toggleAttendanceSwitch(checkbox, sessieId) {
-  var form = document.getElementById('attendance-toggle-form-' + sessieId);
-  if (!checkbox.checked) {
-    document.getElementById('afmeld-note-' + sessieId).style.display = 'inline-block';
-    form.action = '/attendances';
-    form.querySelector('input[name="status"]').value = 'afwezig';
-  } else {
-    form.action = '/attendances';
-    form.querySelector('input[name="status"]').value = 'aanwezig';
-    form.submit();
-  }
-}
-function toggleSwitchBack(sessieId) {
-  var form = document.getElementById('attendance-toggle-form-' + sessieId);
-  var checkbox = form.querySelector('input[type=checkbox]');
-  checkbox.checked = true;
-}
-</script>
+<% if @upcoming_sessions.present? || @past_sessions.present? %>
+  <!-- KOMMENDE TRAININGEN -->
+  <% if @upcoming_sessions.present? %>
+    <h2 style="margin-top:2em;">Komende trainingen</h2>
+    <table class="schema-table" style="width:100%; border-collapse:collapse; margin-bottom:2rem;">
+      <thead>
+        <tr>
+          <th class="schema-table__th">Datum</th>
+          <th class="schema-table__th">Dag</th>
+          <th class="schema-table__th">Training</th>
+          <th class="schema-table__th">Loopscholing</th>
+          <th class="schema-table__th">Trainer</th>
+          <th class="schema-table__th">Locatie</th>
+          <th class="schema-table__th">Fase</th>
+          <th class="schema-table__th">Wedstrijd</th>
+          <% if current_user %>
+            <th class="schema-table__th">Status</th>
+            <th class="schema-table__th">Aan-/afmelden</th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody>
+        <% @upcoming_sessions.each do |sessie| %>
+          <% if current_user %>
+            <% my_attendance = sessie.attendances.find { |a| a.user_id == current_user.id } %>
+          <% end %>
+          <tr class="schema-table__row" onclick="if(event.target.tagName !== 'BUTTON' && event.target.tagName !== 'INPUT' && !event.target.closest('.attendance-buttons')){window.location='/training_sessions/<%= sessie.id %>'}" style="cursor:pointer;">
+            <td style="padding:8px; white-space:nowrap;"><%= l(sessie.date) %></td>
+            <td style="padding:8px;">
+              <% if sessie.dag.to_s.downcase == 'zaterdag' %>
+                Zaterdag 08:45
+              <% elsif sessie.dag.to_s.downcase == 'dinsdag' %>
+                Dinsdag 18:45
+              <% else %>
+                <%= sessie.dag %>
+              <% end %>
+            </td>
+            <td style="padding:8px;"><%= sessie.description %></td>
+            <td style="padding:8px;"><%= sessie.loopscholing %></td>
+            <td style="padding:8px;">
+              <% if sessie.dag.to_s.downcase == 'donderdag' || sessie.dag.to_s.downcase == 'zondag' %>
+                Zelf
+              <% else %>
+                <%= sessie.trainer&.name || '-' %>
+              <% end %>
+            </td>
+            <td style="padding:8px;"><%= sessie.locatie || 'GAC' %></td>
+            <td style="padding:8px;"><%= sessie.fase %></td>
+            <td style="padding:8px;"><%= sessie.wedstrijd %></td>
+            <% if current_user && (sessie.group_id.nil? || current_user.groups.pluck(:id).include?(sessie.group_id)) %>
+              <td style="padding:8px;">
+                <% if my_attendance&.status == 'aanwezig' %>
+                  <span class="status-dot status-aanwezig"></span>
+                  <span class="status-text status-aanwezig-text">Aanwezig</span>
+                <% elsif my_attendance&.status == 'afwezig' %>
+                  <span class="status-dot status-afwezig"></span>
+                  <span class="status-text status-afwezig-text">Afwezig</span>
+                  <% if my_attendance.note.present? %>
+                    <span class="attendance-note">- <%= my_attendance.note %></span>
+                  <% end %>
+                <% else %>
+                  <span class="status-dot status-onbekend"></span>
+                  <span class="status-text status-onbekend-text">Geen status</span>
+                <% end %>
+              </td>
+              <td style="padding:8px;" onclick="event.stopPropagation();">
+                <div class="attendance-buttons">
+                  <%= form_with url: attendances_path, method: :post, local: true, class: 'inline-form' do |f| %>
+                    <%= f.hidden_field :user_id, value: current_user.id %>
+                    <%= f.hidden_field :training_session_id, value: sessie.id %>
+                    <%= f.hidden_field :status, value: 'aanwezig' %>
+                    <button type="submit" class="theme-btn attendance-btn attendance-aanwezig-btn <%= (my_attendance.nil? || my_attendance.status == 'aanwezig') ? 'active' : 'inactive' %>">Aanw.</button>
+                  <% end %>
+                  <%= form_with url: attendances_path, method: :post, local: true, html: { class: 'afwezig-form', data: { session_id: sessie.id } }, class: 'inline-form' do |f| %>
+                    <%= f.hidden_field :user_id, value: current_user.id %>
+                    <%= f.hidden_field :training_session_id, value: sessie.id %>
+                    <%= f.hidden_field :status, value: 'afwezig' %>
+                    <div class="afwezig-container">
+                      <% if my_attendance&.status == 'afwezig' %>
+                        <button type="submit" class="theme-btn afwezig-submit" data-session-id="<%= sessie.id %>">OK</button>
+                      <% else %>
+                        <button type="submit" class="theme-btn afwezig-btn inactive" data-session-id="<%= sessie.id %>">✗</button>
+                      <% end %>
+                      <%# Notitieveld altijd tonen als status afwezig is, anders verborgen %>
+                      <div class="afwezig-note-field" id="afwezig-note-<%= sessie.id %>" class="<%= my_attendance&.status == 'afwezig' ? '' : 'hidden' %>">
+                        <%= f.text_field :note, value: (my_attendance&.status == 'afwezig' ? my_attendance&.note : nil), placeholder: 'Notitie (optioneel)', class: 'note-input-full' %>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              </td>
+            <% elsif current_user %>
+              <td style="padding:8px;">-</td>
+              <td style="padding:8px;">-</td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+
+  <!-- VERLEDEN TRAININGEN -->
+  <% if @past_sessions.present? %>
+    <h2 style="margin-top:2.5em;">Verleden trainingen</h2>
+    <table class="schema-table" style="width:100%; border-collapse:collapse; margin-bottom:2rem;">
+      <thead>
+        <tr>
+          <th class="schema-table__th">Datum</th>
+          <th class="schema-table__th">Dag</th>
+          <th class="schema-table__th">Training</th>
+          <th class="schema-table__th">Loopscholing</th>
+          <th class="schema-table__th">Trainer</th>
+          <th class="schema-table__th">Locatie</th>
+          <th class="schema-table__th">Fase</th>
+          <th class="schema-table__th">Wedstrijd</th>
+          <% if current_user %>
+            <th class="schema-table__th">Status</th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody>
+        <% @past_sessions.each do |sessie| %>
+          <% if current_user %>
+            <% my_attendance = sessie.attendances.find { |a| a.user_id == current_user.id } %>
+          <% end %>
+          <tr class="schema-table__row" onclick="if(event.target.tagName !== 'BUTTON' && event.target.tagName !== 'INPUT' && !event.target.closest('.attendance-buttons')){window.location='/training_sessions/<%= sessie.id %>'}" style="cursor:pointer;">
+            <td style="padding:8px; white-space:nowrap;"><%= l(sessie.date) %></td>
+            <td style="padding:8px;">
+              <% if sessie.dag.to_s.downcase == 'zaterdag' %>
+                Zaterdag 08:45
+              <% elsif sessie.dag.to_s.downcase == 'dinsdag' %>
+                Dinsdag 18:45
+              <% else %>
+                <%= sessie.dag %>
+              <% end %>
+            </td>
+            <td style="padding:8px;"><%= sessie.description %></td>
+            <td style="padding:8px;"><%= sessie.loopscholing %></td>
+            <td style="padding:8px;">
+              <% if sessie.dag.to_s.downcase == 'donderdag' || sessie.dag.to_s.downcase == 'zondag' %>
+                Zelf
+              <% else %>
+                <%= sessie.trainer&.name || '-' %>
+              <% end %>
+            </td>
+            <td style="padding:8px;"><%= sessie.locatie || 'GAC' %></td>
+            <td style="padding:8px;"><%= sessie.fase %></td>
+            <td style="padding:8px;"><%= sessie.wedstrijd %></td>
+            <% if current_user %>
+              <td style="padding:8px;">
+                <% if my_attendance&.status == 'aanwezig' %>
+                  <span class="status-dot status-aanwezig"></span>
+                  <span class="status-text status-aanwezig-text">Aanwezig</span>
+                <% elsif my_attendance&.status == 'afwezig' %>
+                  <span class="status-dot status-afwezig"></span>
+                  <span class="status-text status-afwezig-text">Afwezig</span>
+                  <% if my_attendance.note.present? %>
+                    <span class="attendance-note">- <%= my_attendance.note %></span>
+                  <% end %>
+                <% else %>
+                  <span class="status-dot status-onbekend"></span>
+                  <span class="status-text status-onbekend-text">Geen status</span>
+                <% end %>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+<% else %>
+  <div class="alert alert-info" style="padding: 1rem; background: #e3f2fd; border-left: 4px solid #2196f3; margin: 1rem 0;">
+    <p><strong>Geen trainingsschema ingesteld</strong></p>
+    <p>Je hebt nog geen persoonlijk trainingsschema gekozen. Ga naar je <a href="<%= profile_path %>">profiel</a> om een standaard schema te selecteren.</p>
+  </div>
+<% end %>

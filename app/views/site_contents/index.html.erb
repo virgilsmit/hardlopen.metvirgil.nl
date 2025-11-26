@@ -1,0 +1,44 @@
+<div class="prototype-track">
+  <section class="prototype-section">
+    <header class="prototype-section__header">
+      <p class="prototype-eyebrow">Beheer</p>
+      <h1>Hero Content Beheren</h1>
+      <p>Pas de tekst op de homepage aan.</p>
+    </header>
+    
+    <%= form_with url: site_contents_path, method: :patch, local: true, class: 'users-form' do |form| %>
+      <div class="app-form-group">
+        <%= form.label :hero_eyebrow, "Eyebrow tekst (kleine tekst boven de titel)", class: "app-form-label" %>
+        <%= form.text_field :hero_eyebrow, value: @hero_eyebrow, class: "app-form-input" %>
+        <small style="color: #666; font-size: 0.875rem; margin-top: 0.25rem; display: block;">HTML is toegestaan</small>
+      </div>
+      
+      <div class="app-form-group">
+        <%= form.label :hero_title, "Hoofdtitel (H1)", class: "app-form-label" %>
+        <%= form.text_field :hero_title, value: @hero_title, class: "app-form-input" %>
+        <small style="color: #666; font-size: 0.875rem; margin-top: 0.25rem; display: block;">HTML is toegestaan</small>
+      </div>
+      
+      <div class="app-form-group">
+        <%= form.label :hero_description, "Beschrijving (paragraaf tekst)", class: "app-form-label" %>
+        <%= form.text_area :hero_description, value: @hero_description, class: "app-form-input", rows: 4 %>
+        <small style="color: #666; font-size: 0.875rem; margin-top: 0.25rem; display: block;">HTML is toegestaan (bijv. &lt;br&gt; voor nieuwe regel, &lt;strong&gt; voor vet)</small>
+      </div>
+      
+      <div class="app-form-group">
+        <%= form.submit "Opslaan", class: "app-btn track-btn--glow" %>
+        <%= link_to "Annuleren", admin_dashboard_path, class: "app-btn app-btn--secondary track-btn--outline" %>
+      </div>
+    <% end %>
+    
+    <div style="margin-top: 2rem; padding: 1rem; background: #f0f0f0; border-radius: 8px;">
+      <h3>Preview</h3>
+      <div style="background: #1a2332; padding: 2rem; border-radius: 8px; margin-top: 1rem;">
+        <p style="color: #a7c4ff; text-transform: uppercase; font-size: 0.875rem; letter-spacing: 0.05em; margin-bottom: 0.5rem;"><%= raw @hero_eyebrow %></p>
+        <h1 style="color: #ffffff; font-size: 2.5rem; margin-bottom: 1rem;"><%= raw @hero_title %></h1>
+        <p style="color: #d7def5; font-size: 1.125rem; line-height: 1.6;"><%= raw @hero_description %></p>
+      </div>
+    </div>
+  </section>
+</div>
+

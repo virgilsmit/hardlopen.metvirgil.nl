@@ -1,0 +1,16 @@
+nl:
+  date:
+    formats:
+      dutch_short: "%^a %d %b"
+    day_names: [zondag, maandag, dinsdag, woensdag, donderdag, vrijdag, zaterdag]
+    abbr_day_names: [zo, ma, di, wo, do, vr, za]
+    month_names: [~, januari, februari, maart, april, mei, juni, juli, augustus, september, oktober, november, december]
+    abbr_month_names: [~, jan, feb, mrt, apr, mei, jun, jul, aug, sep, okt, nov, dec]
+  time:
+    formats:
+      dutch_short: "%^a %d %b"
+
+
+
+
+

@@ -1,0 +1,88 @@
+<div class="prototype-track">
+  <section class="track-hero">
+    <div class="track-hero__content">
+      <p class="prototype-eyebrow">Loopgroep Virgil</p>
+      <h1>Tempo op de baan, focus op vooruitgang.</h1>
+      <p>Een visuele stijl die het ritme van de atletiekbaan ademt. Alle bestaande functies blijven actief.</p>
+      <div class="track-hero__ctas">
+        <%= link_to 'Originele site', root_path, class: 'app-btn app-btn--secondary track-btn--outline' %>
+        <%= link_to 'Log in', login_path, class: 'app-btn track-btn--glow' %>
+      </div>
+    </div>
+    <div class="track-hero__visual">
+      <span class="track-lap-counter">02:47</span>
+      <p>Pacing in progress</p>
+    </div>
+  </section>
+
+  <section class="prototype-section track-metrics">
+    <article>
+      <h3>Trainingen</h3>
+      <p>Week 26–52</p>
+      <span>27 weken</span>
+    </article>
+    <article>
+      <h3>Trainers</h3>
+      <p>Virgil & Danny</p>
+      <span>2 hoofdcoaches</span>
+    </article>
+    <article>
+      <h3>Fases</h3>
+      <p>Zomer → Wedstrijd</p>
+      <span><%= @phases.count %> blokken</span>
+    </article>
+  </section>
+
+  <section class="prototype-section track-schedule">
+    <header class="prototype-section__header">
+      <p class="prototype-eyebrow">Schema Highlights</p>
+      <h2>Volgende sessies</h2>
+    </header>
+    <div class="track-schedule__grid">
+      <% @upcoming_sessions.each do |session| %>
+        <article class="track-session-card">
+          <span class="track-session-card__date"><%= session.date&.strftime('%a %d %b') %></span>
+          <h3><%= session.training %></h3>
+          <p><%= session.drills %></p>
+          <div class="track-session-card__meta">
+            <span class="prototype-tag"><%= session.phase %></span>
+            <span><%= session.trainer %></span>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="prototype-section track-week-grid">
+    <header class="prototype-section__header">
+      <p class="prototype-eyebrow">Volledige planning</p>
+      <h2>Week voor week</h2>
+    </header>
+    <div class="track-week-grid__inner">
+      <% @weeks.each do |week| %>
+        <article class="track-week-card">
+          <header>
+            <span>Week <%= week[:week] %></span>
+            <small><%= week[:dates].compact.min&.strftime('%d %b') %> – <%= week[:dates].compact.max&.strftime('%d %b') %></small>
+          </header>
+          <ul>
+            <% week[:entries].each do |entry| %>
+              <li>
+                <div>
+                  <strong><%= entry.day %></strong>
+                  <span><%= entry.date&.strftime('%d-%m') %></span>
+                </div>
+                <div>
+                  <h4><%= entry.training %></h4>
+                  <p><%= entry.drills %></p>
+                  <span class="track-trainer"><%= entry.trainer %></span>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        </article>
+      <% end %>
+    </div>
+  </section>
+</div>
+

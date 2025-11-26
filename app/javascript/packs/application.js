@@ -19,3 +19,4 @@ console.log('Hello World from Webpacker')
 
 // Import mobile app functionality
 import '../mobile_app'
+import '../dropdown_menu'

@@ -1,0 +1,139 @@
+<div class="intake-page surface-dark">
+  <div class="intake-hero card-surface">
+    <p class="prototype-eyebrow">Intake Loopgroep Virgil</p>
+    <h1>Meld je aan voor een proeftraining</h1>
+    <p>Met dit formulier leren we je loopervaring, doelen en eventuele aandachtspunten kennen. Na verzending nemen we contact op voor de eerstvolgende kennismaking.</p>
+    <ul>
+      <li>Vul alle verplichte velden (<span aria-hidden="true">*</span>) in.</li>
+      <li>We mailen een bevestiging naar het opgegeven adres.</li>
+      <li>Je gegevens worden enkel gebruikt voor de intake.</li>
+    </ul>
+  </div>
+
+  <% if notice.present? %>
+    <div class="alert-card alert-success"><%= notice %></div>
+  <% end %>
+  <% if alert.present? %>
+    <div class="alert-card alert-danger"><%= alert %></div>
+  <% end %>
+  <% if @intake.errors.any? %>
+    <div class="alert-card alert-danger">
+      <p><strong>We konden het formulier niet verzenden.</strong></p>
+      <ul>
+        <% @intake.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with model: @intake, url: intakes_path, local: true, class: 'intake-form card-surface' do |f| %>
+    <section class="form-section">
+      <div class="form-section__header">
+        <span class="badge">Stap 1</span>
+        <div>
+          <h3>Persoonlijke gegevens</h3>
+          <p>We gebruiken deze informatie om contact te houden en te bepalen welke training het beste bij je past.</p>
+        </div>
+      </div>
+      <div class="form-grid form-grid--two">
+        <div class="form-group">
+          <label for="intake_first_name" style="display:block;width:100%;margin-bottom:0.5rem;">Voornaam*</label>
+          <%= f.text_field :first_name, required: true, id: 'intake_first_name', style: 'display:block;width:100%;box-sizing:border-box;padding:0.75rem 1rem;margin:0;' %>
+        </div>
+        <div class="form-group">
+          <label for="intake_last_name" style="display:block;width:100%;margin-bottom:0.5rem;">Achternaam*</label>
+          <%= f.text_field :last_name, required: true, id: 'intake_last_name', style: 'display:block;width:100%;box-sizing:border-box;padding:0.75rem 1rem;margin:0;' %>
+        </div>
+        <div class="form-group">
+          <label for="intake_email" style="display:block;width:100%;margin-bottom:0.5rem;">E-mail*</label>
+          <%= f.email_field :email, required: true, autocomplete: 'email', id: 'intake_email', style: 'display:block;width:100%;box-sizing:border-box;padding:0.75rem 1rem;margin:0;' %>
+        </div>
+        <div class="form-group">
+          <label for="intake_birthdate" style="display:block;width:100%;margin-bottom:0.5rem;">Geboortedatum*</label>
+          <%= f.date_field :birthdate, required: true, id: 'intake_birthdate', style: 'display:block;width:100%;box-sizing:border-box;padding:0.75rem 1rem;margin:0;' %>
+        </div>
+        <div class="form-group">
+          <label style="display:block;width:100%;margin-bottom:0.5rem;">Gender*</label>
+          <div class="choice-grid" role="radiogroup">
+            <% Intake.genders.each_key do |value| %>
+              <label>
+                <%= f.radio_button :gender, value, required: true %>
+                <span><%= value.humanize %></span>
+              </label>
+            <% end %>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="intake_emergency_number" style="display:block;width:100%;margin-bottom:0.5rem;">Noodnummer*</label>
+          <%= f.telephone_field :emergency_number, required: true, placeholder: '+31 6 12345678', id: 'intake_emergency_number', style: 'display:block;width:100%;box-sizing:border-box;padding:0.75rem 1rem;margin:0;' %>
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="form-section__header">
+        <span class="badge">Stap 2</span>
+        <div>
+          <h3>Training & doelen</h3>
+          <p>Vertel iets over je ervaring, gewenste tempo en doelen zodat we de juiste intensiteit kunnen bepalen.</p>
+        </div>
+      </div>
+      <div class="form-grid form-grid--two">
+        <div class="form-group form-group--wide">
+          <label for="intake_loop_experience" style="display:block;width:100%;margin-bottom:0.5rem;">Loopervaring</label>
+          <%= f.text_area :loop_experience, rows: 3, placeholder: 'Bijv. 3 jaar recreatief, 10 km in 55 min', id: 'intake_loop_experience', style: 'display:block;width:100%;box-sizing:border-box;padding:0.75rem 1rem;margin:0;' %>
+        </div>
+        <div class="form-group">
+          <label for="intake_desired_pace" style="display:block;width:100%;margin-bottom:0.5rem;">Gewenste pace (min/km of km/u)</label>
+          <%= f.text_field :desired_pace, placeholder: 'Bijv. 5:15 min/km', id: 'intake_desired_pace', style: 'display:block;width:100%;box-sizing:border-box;padding:0.75rem 1rem;margin:0;' %>
+        </div>
+        <div class="form-group">
+          <label for="intake_cooper_test_meters" style="display:block;width:100%;margin-bottom:0.5rem;">Coopertest (meters)</label>
+          <%= f.number_field :cooper_test_meters, min: 0, step: 10, placeholder: 'Bijv. 2800', id: 'intake_cooper_test_meters', style: 'display:block;width:100%;box-sizing:border-box;padding:0.75rem 1rem;margin:0;' %>
+        </div>
+        <div class="form-group form-group--wide">
+          <label for="intake_goal_2025" style="display:block;width:100%;margin-bottom:0.5rem;">Doel 2025</label>
+          <%= f.text_area :goal_2025, rows: 3, placeholder: 'Bijv. 10 km onder de 50 minuten, blessurevrij blijven', id: 'intake_goal_2025', style: 'display:block;width:100%;box-sizing:border-box;padding:0.75rem 1rem;margin:0;' %>
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="form-section__header">
+        <span class="badge">Stap 3</span>
+        <div>
+          <h3>Praktisch & bijzonderheden</h3>
+          <p>Laat ons weten welke maat we moeten reserveren en waar we rekening mee moeten houden.</p>
+        </div>
+      </div>
+      <div class="form-grid form-grid--two">
+        <div class="form-group">
+          <label style="display:block;width:100%;margin-bottom:0.5rem;">Shirtmaat*</label>
+          <div class="choice-grid" role="radiogroup">
+            <% ['XS', 'S', 'M', 'L', 'XL'].each do |size| %>
+              <label>
+                <%= f.radio_button :shirt_size, size, required: true %>
+                <span><%= size %></span>
+              </label>
+            <% end %>
+          </div>
+        </div>
+        <div class="form-group form-group--wide">
+          <label for="intake_injuries" style="display:block;width:100%;margin-bottom:0.5rem;">Onderliggende/bekende blessures</label>
+          <%= f.text_area :injuries, rows: 3, placeholder: 'Bijv. achillespeesklachten, knieblessure, etc.', id: 'intake_injuries', style: 'display:block;width:100%;box-sizing:border-box;padding:0.75rem 1rem;margin:0;' %>
+        </div>
+        <div class="form-group form-group--wide">
+          <label for="intake_comments" style="display:block;width:100%;margin-bottom:0.5rem;">Opmerkingen / bijzonderheden</label>
+          <%= f.text_area :comments, rows: 3, placeholder: 'Extra informatie of vragen', id: 'intake_comments', style: 'display:block;width:100%;box-sizing:border-box;padding:0.75rem 1rem;margin:0;' %>
+        </div>
+      </div>
+    </section>
+
+    <div class="form-actions">
+      <p>Door te verzenden ga je akkoord met verwerking van je gegevens voor intake en trainingsplanning.</p>
+      <%= f.submit 'Verzend intake', class: 'theme-btn track-btn--glow' %>
+    </div>
+  <% end %>
+</div>
+

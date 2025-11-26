@@ -1,0 +1,11 @@
+Hallo <%= @user.name.presence || @user.email %>,
+
+Je hebt aangegeven je wachtwoord te willen resetten.
+Klik op de onderstaande link om een nieuw wachtwoord in te stellen:
+
+<%= edit_password_reset_url(@token) %>
+
+Deze link verloopt over 2 uur.
+
+Met sportieve groet,
+Hardlopen Met Virgil 

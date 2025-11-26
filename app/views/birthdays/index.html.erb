@@ -1,0 +1,16 @@
+<h1>Komende verjaardagen (30 dagen)</h1>
+
+<div style="background: #232a25; border-radius: 12px; padding: 1rem; margin: 1rem 0;">
+  <% @upcoming_birthdays.each do |user| %>
+    <% bday = user.birthday.change(year: Date.today.year) %>
+    <% bday += 1.year if bday < Date.today %>
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 0; border-bottom: 1px solid #2e3a32; color: #ffffff;">
+      <div style="font-size: 1.1rem; font-weight: 600; color: #ffffff;">
+        🎂 <%= user.name %>
+      </div>
+      <div style="font-size: 1rem; color: #448923; font-weight: 600;">
+        <%= bday.strftime('%d-%m') %>
+      </div>
+    </div>
+  <% end %>
+</div> 

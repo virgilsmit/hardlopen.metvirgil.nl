@@ -1,0 +1,11 @@
+<h1>Wachtwoord vergeten</h1>
+
+<%= form_with url: password_resets_path, local: true do |f| %>
+  <div>
+    <%= f.label :email, 'E-mailadres' %><br>
+    <%= f.email_field :email, autofocus: true %>
+  </div>
+  <div>
+    <%= f.submit 'Stuur reset link' %>
+  </div>
+<% end %> 

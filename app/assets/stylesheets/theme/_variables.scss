@@ -1,20 +1,66 @@
-$color-primary: #448923;
-$color-primary-light: #6ee75a;
-$color-accent: #448923;
-$color-accent-light: #b6f7a5;
-$color-bg: #fff;
-$color-bg-alt: #f5f7fa;
-$color-link: #448923;
-$color-link-hover: #6ee75a;
-$color-text: #222;
-$color-card-shadow: rgba(25, 118, 210, 0.11);
-$color-btn-shadow: rgba(25, 118, 210, 0.13);
-$radius: 22px;
-$font-main: 'Montserrat', Arial, sans-serif;
-$font-size-base: 1.09rem;
-$font-size-lg: 2.5rem;
-$font-size-md: 1.45rem;
-$font-size-sm: 1.13rem;
-$spacing: 2.2rem;
-$spacing-lg: 2.7rem;
-$spacing-sm: 1.1rem; 
+// Modern fitness app color palette inspired by Strava/Runkeeper
+$color-primary: #FC4C02; // Strava orange
+$color-primary-light: #FF6B35; // Lighter orange
+$color-primary-dark: #E63900; // Darker orange
+$color-secondary: #00B4DB; // Modern blue
+$color-accent: #FFD23F; // Energetic yellow
+$color-accent-light: #FFF3CD; // Light yellow background
+$color-success: #28A745; // Success green
+$color-warning: #FFC107; // Warning yellow
+$color-danger: #DC3545; // Danger red
+$color-info: #17A2B8; // Info blue
+
+// Background colors
+$color-bg: #FFFFFF; // Pure white
+$color-bg-alt: #F8F9FA; // Light gray
+$color-bg-dark: #121212; // Dark mode background
+$color-bg-card: #FFFFFF; // Card background
+$color-bg-header: #FFFFFF; // Header background
+
+// Text colors
+$color-text: #212529; // Dark gray for readability
+$color-text-muted: #6C757D; // Muted text
+$color-text-light: #FFFFFF; // White text
+$color-text-dark: #000000; // Black text
+
+// Border and shadow colors
+$color-border: #E9ECEF; // Light border
+$color-border-dark: #DEE2E6; // Darker border
+$color-card-shadow: rgba(0, 0, 0, 0.08); // Subtle shadow
+$color-btn-shadow: rgba(252, 76, 2, 0.25); // Orange shadow
+
+// Link colors
+$color-link: $color-primary;
+$color-link-hover: $color-primary-dark;
+
+// Modern design tokens
+$radius: 12px; // More modern border radius
+$radius-lg: 16px; // Large radius for cards
+$radius-xl: 24px; // Extra large radius
+$font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+$font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+// Typography scale
+$font-size-xs: 0.75rem; // 12px
+$font-size-sm: 0.875rem; // 14px
+$font-size-base: 1rem; // 16px
+$font-size-lg: 1.125rem; // 18px
+$font-size-xl: 1.25rem; // 20px
+$font-size-2xl: 1.5rem; // 24px
+$font-size-3xl: 1.875rem; // 30px
+$font-size-4xl: 2.25rem; // 36px
+
+// Spacing scale
+$spacing-xs: 0.25rem; // 4px
+$spacing-sm: 0.5rem; // 8px
+$spacing-md: 1rem; // 16px
+$spacing-lg: 1.5rem; // 24px
+$spacing-xl: 2rem; // 32px
+$spacing-2xl: 3rem; // 48px
+$spacing-3xl: 4rem; // 64px
+
+// Legacy variables for compatibility
+$font-size-sm: $font-size-lg;
+$spacing: $spacing-xl;
+$spacing-lg: $spacing-2xl;
+$spacing-sm: $spacing-lg; 
