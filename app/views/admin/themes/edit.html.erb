@@ -1,0 +1,552 @@
+<style>
+  /* Theme Manager Styling */
+  .theme-manager {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: #f8f9fa;
+  }
+  
+  .theme-manager-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .theme-manager-header h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+    color: white !important;
+  }
+  
+  .theme-manager-header p {
+    margin: 0;
+    opacity: 0.9;
+    color: white !important;
+  }
+  
+  .info-banner {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+  }
+  
+  .info-banner strong {
+    color: #92400e !important;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  
+  .info-banner p {
+    color: #78350f !important;
+    margin: 0.25rem 0;
+  }
+  
+  .theme-tabs {
+    display: flex;
+    gap: 0.5rem;
+    background: white;
+    padding: 1rem;
+    border-radius: 12px 12px 0 0;
+    border-bottom: 2px solid #e5e7eb;
+    margin-bottom: 0;
+  }
+  
+  .theme-tab {
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #6b7280;
+    transition: all 0.2s;
+  }
+  
+  .theme-tab:hover {
+    background: #f3f4f6;
+    color: #374151;
+  }
+  
+  .theme-tab.active {
+    background: #667eea;
+    color: white;
+  }
+  
+  .theme-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+  
+  .theme-tab-panel {
+    display: none;
+  }
+  
+  .theme-tab-panel.active {
+    display: block;
+  }
+  
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .theme-field {
+    background: #f9fafb;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 2px solid #e5e7eb;
+  }
+  
+  .theme-field label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #374151 !important;
+    font-size: 0.95rem;
+  }
+  
+  .theme-field input[type="text"],
+  .theme-field input[type="color"],
+  .theme-field textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: white !important;
+    color: #1f2937 !important;
+  }
+  
+  .theme-field input:focus,
+  .theme-field textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+  
+  .color-picker-group {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .color-picker-visual {
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+    border: 3px solid #e5e7eb;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .color-picker-visual::before {
+    content: '🎨';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 32px;
+    opacity: 0.2;
+    pointer-events: none;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  }
+  
+  .color-picker-visual:hover {
+    transform: scale(1.05);
+    border-color: #667eea;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .color-picker-visual:hover::before {
+    opacity: 0.4;
+  }
+  
+  .color-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 1;
+  }
+  
+  .color-inputs input {
+    width: 100% !important;
+  }
+  
+  input[type="color"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 50px;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 4px;
+    background: white;
+  }
+  
+  input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+  
+  input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 6px;
+  }
+  
+  input[type="color"]::-moz-color-swatch {
+    border: none;
+    border-radius: 6px;
+  }
+  
+  input[type="color"]:hover {
+    border-color: #667eea;
+  }
+  
+  .css-editor {
+    background: #1e1e1e !important;
+    color: #d4d4d4 !important;
+    font-family: 'Fira Code', 'Monaco', 'Menlo', monospace !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    padding: 1.5rem !important;
+    border-radius: 12px !important;
+    border: 2px solid #374151 !important;
+    min-height: 500px !important;
+    resize: vertical !important;
+  }
+  
+  .css-editor::placeholder {
+    color: #6b7280 !important;
+  }
+  
+  .theme-actions {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    padding: 1.5rem;
+    border-top: 2px solid #e5e7eb;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+    border-radius: 0 0 12px 12px;
+    margin-top: 2rem;
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white !important;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  }
+  
+  .btn-secondary {
+    background: #6b7280;
+    color: white !important;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  .css-tips {
+    background: #dbeafe;
+    border-left: 4px solid #3b82f6;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .css-tips strong {
+    color: #1e3a8a !important;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  
+  .css-tips p {
+    color: #1e40af !important;
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+  }
+  
+  .css-tips code {
+    background: #1e3a8a;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.85rem;
+  }
+</style>
+
+<div class="theme-manager">
+  <div class="theme-manager-header">
+    <h1>🎨 Themabeheer</h1>
+    <p>Pas de kleuren, styling en custom CSS van je applicatie aan</p>
+  </div>
+
+  <div class="info-banner">
+    <strong>ℹ️ Belangrijk om te weten:</strong>
+    <p>De meeste kleuren op de website zijn momenteel <strong>hardcoded in de SCSS bestanden</strong>.</p>
+    <p>Om kleuren aan te passen gebruik je de <strong>Custom CSS tab</strong> om specifieke elementen te overschrijven.</p>
+    <p>Hieronder kun je de huidige thema kleuren zien en aanpassen voor toekomstige integratie.</p>
+  </div>
+
+  <%= form_with model: [:admin, @theme], local: true do |form| %>
+    <div class="theme-tabs">
+      <button type="button" class="theme-tab active" data-tab="css">💻 Custom CSS (Actief)</button>
+      <button type="button" class="theme-tab" data-tab="colors">🎨 Thema Kleuren</button>
+      <button type="button" class="theme-tab" data-tab="basic">⚙️ Basis</button>
+      <button type="button" class="theme-tab" data-tab="typography">🔤 Typografie</button>
+    </div>
+
+    <div class="theme-content">
+      <!-- Tab 1: Custom CSS (nu eerst!) -->
+      <div class="theme-tab-panel active" data-panel="css">
+        <h2 style="color: #1f2937 !important; margin-bottom: 1rem;">💻 Custom CSS Editor</h2>
+        
+        <div class="css-tips">
+          <strong>💡 Tips voor Custom CSS:</strong>
+          <p>• Gebruik <code>!important</code> om hardcoded styling te overschrijven</p>
+          <p>• Voorbeelden: dropdown menu, knoppen, kleuren</p>
+          <p>• Wijzigingen worden direct toegepast na het opslaan</p>
+          <p>• Test altijd in verschillende browsers</p>
+        </div>
+
+        <div class="theme-field" style="background: transparent; border: none; padding: 0;">
+          <%= form.label :custom_css, "Aangepaste CSS Code", style: "color: #374151 !important; font-size: 1.1rem; margin-bottom: 1rem;" %>
+          <%= form.text_area :custom_css, 
+              class: 'css-editor',
+              placeholder: "/* Voorbeeld: Verander dropdown kleuren */\n.dropdown-menu {\n  background: #1a2847 !important;\n}\n\n.dropdown-item:hover {\n  background: rgba(30, 227, 207, 0.25) !important;\n}\n\n/* Verander primaire kleur */\n.theme-btn {\n  background: #FF6B35 !important;\n}" %>
+          <small style="display: block; margin-top: 1rem; padding: 1rem; background: #f3f4f6; border-radius: 8px; color: #374151 !important;">
+            <strong style="color: #1f2937 !important;">Huidige dropdown styling:</strong><br>
+            De donkerblauwe dropdown met witte tekst is momenteel actief via deze Custom CSS.
+          </small>
+        </div>
+      </div>
+
+      <!-- Tab 2: Kleuren -->
+      <div class="theme-tab-panel" data-panel="colors">
+        <h2 style="color: #1f2937 !important; margin-bottom: 1rem;">🎨 Thema Kleuren</h2>
+        
+        <div class="info-banner">
+          <strong>⚠️ Let op:</strong>
+          <p>Deze kleuren zijn voor <strong>toekomstig gebruik</strong>. De website gebruikt momenteel hardcoded kleuren.</p>
+          <p>Om kleuren NU aan te passen, gebruik de <strong>Custom CSS tab</strong>.</p>
+        </div>
+        
+        <div class="theme-grid">
+          <% [
+            [:primary_color, 'Primaire Kleur', '#FC4C02', 'Hoofdkleur voor knoppen en links'],
+            [:secondary_color, 'Secundaire Kleur', '#00B4DB', 'Tweede accent kleur'],
+            [:accent_color, 'Accent Kleur', '#FFD23F', 'Extra accent voor highlights'],
+            [:success_color, 'Succes Kleur', '#28A745', 'Voor succes meldingen'],
+            [:warning_color, 'Waarschuwing Kleur', '#FFC107', 'Voor waarschuwingen'],
+            [:danger_color, 'Fout Kleur', '#DC3545', 'Voor errors en verwijderen'],
+            [:background_color, 'Achtergrond', '#FFFFFF', 'Hoofd achtergrond'],
+            [:header_background, 'Header Achtergrond', '#0a152b', 'Donkere header'],
+            [:text_color_light, 'Tekst (Licht)', '#0c1729', 'Tekst op lichte achtergrond'],
+            [:text_color_dark, 'Tekst (Donker)', '#f4f8ff', 'Tekst op donkere achtergrond']
+          ].each do |field, label, default, desc| %>
+            <% current_value = (@theme.send(field) || default).to_s.upcase %>
+            <div class="theme-field">
+              <%= form.label field, label %>
+              <small style="color: #6b7280; display: block; margin-bottom: 0.75rem;"><%= desc %></small>
+              <div class="color-picker-group">
+                <div class="color-picker-visual" 
+                     style="background-color: <%= current_value %> !important;" 
+                     data-field="<%= field %>" 
+                     onclick="document.getElementById('theme_<%= field %>_color').click()"
+                     title="Klik om <%= label.downcase %> te kiezen"></div>
+                <div class="color-inputs">
+                  <%= form.color_field field, 
+                      value: current_value, 
+                      id: "theme_#{field}_color", 
+                      style: "height: 50px;" %>
+                  <%= form.text_field field, 
+                      value: current_value, 
+                      id: "theme_#{field}_text", 
+                      placeholder: default,
+                      maxlength: 7,
+                      pattern: "#[0-9A-Fa-f]{6}",
+                      class: "color-text-input",
+                      style: "font-family: 'Monaco', monospace; text-transform: uppercase; letter-spacing: 1px; font-size: 16px; font-weight: 600; text-align: center;" %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Tab 3: Basis -->
+      <div class="theme-tab-panel" data-panel="basic">
+        <h2 style="color: #1f2937 !important; margin-bottom: 1.5rem;">⚙️ Basis Instellingen</h2>
+        <div class="theme-grid">
+          <div class="theme-field">
+            <%= form.label :name, "Thema Naam" %>
+            <%= form.text_field :name, placeholder: "Bijvoorbeeld: Dark Mode Theme" %>
+          </div>
+          <div class="theme-field">
+            <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
+              <%= form.check_box :activate, { checked: @theme.active?, style: "width: 24px; height: 24px; cursor: pointer;" }, '1', '0' %>
+              <span style="font-weight: 600;">Direct activeren na opslaan</span>
+            </label>
+            <small style="color: #6b7280; display: block; margin-top: 0.5rem;">Als je dit aanvinkt wordt dit thema meteen actief na het opslaan.</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Typografie -->
+      <div class="theme-tab-panel" data-panel="typography">
+        <h2 style="color: #1f2937 !important; margin-bottom: 1.5rem;">🔤 Typografie Instellingen</h2>
+        <div class="theme-grid">
+          <div class="theme-field" style="grid-column: 1 / -1;">
+            <%= form.label :font_family, "Primair Lettertype" %>
+            <%= form.text_field :font_family, placeholder: "Inter, -apple-system, sans-serif" %>
+          </div>
+          <div class="theme-field">
+            <%= form.label :font_size_base, "Basis Fontgrootte" %>
+            <%= form.text_field :font_size_base, placeholder: "1rem" %>
+          </div>
+          <div class="theme-field">
+            <%= form.label :font_weight_normal, "Normaal Gewicht" %>
+            <%= form.text_field :font_weight_normal, placeholder: "400" %>
+          </div>
+          <div class="theme-field">
+            <%= form.label :font_weight_bold, "Vet Gewicht" %>
+            <%= form.text_field :font_weight_bold, placeholder: "700" %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="theme-actions">
+      <div>
+        <small style="color: #6b7280;">Laatst bijgewerkt: <%= @theme.updated_at.strftime('%d-%m-%Y om %H:%M') if @theme.updated_at %></small>
+      </div>
+      <div style="display: flex; gap: 1rem;">
+        <%= link_to 'Annuleren', admin_themes_path, class: 'btn-secondary' %>
+        <%= form.submit '💾 Opslaan & Toepassen', class: 'btn-primary' %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<script>
+  // Tab switching
+  document.querySelectorAll('.theme-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      const targetTab = this.dataset.tab;
+      
+      // Update tabs
+      document.querySelectorAll('.theme-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      
+      // Update panels
+      document.querySelectorAll('.theme-tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelector(`[data-panel="${targetTab}"]`).classList.add('active');
+    });
+  });
+  
+  // Color picker sync with visual and text input
+  document.querySelectorAll('input[type="color"]').forEach(input => {
+    input.addEventListener('input', function() {
+      const fieldId = this.id.replace('_color', '');
+      const fieldName = fieldId.replace('theme_', '');
+      const visual = document.querySelector(`.color-picker-visual[data-field="${fieldName}"]`);
+      const textInput = document.getElementById(fieldId + '_text');
+      
+      const colorValue = this.value.toUpperCase();
+      
+      if (visual) {
+        visual.style.setProperty('background-color', colorValue, 'important');
+        visual.setAttribute('title', 'Klik om kleur te kiezen (huidige: ' + colorValue + ')');
+      }
+      if (textInput) {
+        textInput.value = colorValue;
+      }
+    });
+  });
+  
+  // Text input sync with color picker and visual
+  document.querySelectorAll('.color-text-input').forEach(input => {
+    input.addEventListener('input', function() {
+      let value = this.value.trim().toUpperCase();
+      
+      // Auto-add # if missing
+      if (value.length > 0 && !value.startsWith('#')) {
+        value = '#' + value;
+        this.value = value;
+      }
+      
+      const fieldId = this.id.replace('_text', '');
+      const fieldName = fieldId.replace('theme_', '');
+      const colorInput = document.getElementById(fieldId + '_color');
+      const visual = document.querySelector(`.color-picker-visual[data-field="${fieldName}"]`);
+      
+      // Validate hex color (full 6 digits)
+      if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+        if (colorInput) {
+          colorInput.value = value;
+        }
+        if (visual) {
+          visual.style.setProperty('background-color', value, 'important');
+          visual.setAttribute('title', 'Klik om kleur te kiezen (huidige: ' + value + ')');
+        }
+        this.style.borderColor = '#10b981';
+        this.style.background = 'white';
+      } else if (value.length > 1) {
+        this.style.borderColor = '#ef4444';
+        this.style.background = '#fee';
+      }
+    });
+    
+    // Uppercase transformation
+    input.addEventListener('blur', function() {
+      this.value = this.value.toUpperCase();
+    });
+  });
+  
+  // Auto-save warning
+  let hasChanges = false;
+  document.querySelectorAll('input, textarea').forEach(field => {
+    field.addEventListener('change', () => hasChanges = true);
+  });
+  
+  window.addEventListener('beforeunload', function(e) {
+    if (hasChanges) {
+      e.preventDefault();
+      e.returnValue = 'Je hebt onopgeslagen wijzigingen. Weet je zeker dat je wilt vertrekken?';
+    }
+  });
+  
+  // Reset changes flag on submit
+  document.querySelector('form').addEventListener('submit', () => hasChanges = false);
+</script>

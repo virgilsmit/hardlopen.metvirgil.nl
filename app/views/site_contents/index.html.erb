@@ -3,9 +3,11 @@
     <header class="prototype-section__header">
       <p class="prototype-eyebrow">Beheer</p>
       <h1>Hero Content Beheren</h1>
-      <p>Pas de tekst op de homepage aan.</p>
+      <p>Pas de tekst en knoppen op de homepage aan.</p>
     </header>
     
+    <!-- Hero Tekst -->
+    <h2 style="margin-top: 2rem; margin-bottom: 1rem; color: #1a2332;">Hero Tekst</h2>
     <%= form_with url: site_contents_path, method: :patch, local: true, class: 'users-form' do |form| %>
       <div class="app-form-group">
         <%= form.label :hero_eyebrow, "Eyebrow tekst (kleine tekst boven de titel)", class: "app-form-label" %>
@@ -26,19 +28,171 @@
       </div>
       
       <div class="app-form-group">
-        <%= form.submit "Opslaan", class: "app-btn track-btn--glow" %>
-        <%= link_to "Annuleren", admin_dashboard_path, class: "app-btn app-btn--secondary track-btn--outline" %>
+        <%= form.submit "Tekst Opslaan", class: "app-btn track-btn--glow" %>
       </div>
     <% end %>
     
-    <div style="margin-top: 2rem; padding: 1rem; background: #f0f0f0; border-radius: 8px;">
-      <h3>Preview</h3>
-      <div style="background: #1a2332; padding: 2rem; border-radius: 8px; margin-top: 1rem;">
-        <p style="color: #a7c4ff; text-transform: uppercase; font-size: 0.875rem; letter-spacing: 0.05em; margin-bottom: 0.5rem;"><%= raw @hero_eyebrow %></p>
-        <h1 style="color: #ffffff; font-size: 2.5rem; margin-bottom: 1rem;"><%= raw @hero_title %></h1>
-        <p style="color: #d7def5; font-size: 1.125rem; line-height: 1.6;"><%= raw @hero_description %></p>
+    <!-- Hero Knoppen -->
+    <h2 style="margin-top: 3rem; margin-bottom: 1rem; color: #1a2332;">Hero Knoppen</h2>
+    <p style="color: #666; margin-bottom: 1.5rem;">Beheer de knoppen die verschijnen in de hero sectie. Je kunt verschillende knoppen instellen voor ingelogde en niet-ingelogde gebruikers.</p>
+    
+    <!-- Tabs voor guest/logged_in -->
+    <div style="display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 2px solid #e5e7eb;">
+      <button onclick="showTab('guest')" id="tab-guest" class="tab-button active" style="padding: 1rem 1.5rem; background: none; border: none; border-bottom: 3px solid #FC4C02; font-weight: 700; color: #1a2332; cursor: pointer;">
+        👥 Niet-ingelogd (<%= @hero_buttons.for_guests.count %>)
+      </button>
+      <button onclick="showTab('logged_in')" id="tab-logged_in" class="tab-button" style="padding: 1rem 1.5rem; background: none; border: none; border-bottom: 3px solid transparent; font-weight: 600; color: #6b7280; cursor: pointer;">
+        🔐 Ingelogd (<%= @hero_buttons.for_logged_in.count %>)
+      </button>
+    </div>
+    
+    <!-- Guest buttons -->
+    <div id="content-guest" class="tab-content">
+      <h3 style="margin-bottom: 1rem; color: #1a2332;">Knoppen voor niet-ingelogde gebruikers</h3>
+      <%= render partial: 'button_list', locals: { buttons: @hero_buttons.for_guests.ordered, user_type: 'guest' } %>
+    </div>
+    
+    <!-- Logged in buttons -->
+    <div id="content-logged_in" class="tab-content" style="display: none;">
+      <h3 style="margin-bottom: 1rem; color: #1a2332;">Knoppen voor ingelogde gebruikers</h3>
+      <%= render partial: 'button_list', locals: { buttons: @hero_buttons.for_logged_in.ordered, user_type: 'logged_in' } %>
+    </div>
+    
+    <!-- Preview -->
+    <div style="margin-top: 3rem; padding: 1rem; background: #f0f0f0; border-radius: 8px;">
+      <h3 style="margin-bottom: 1rem; color: #1a2332;">👁️ Preview</h3>
+      
+      <!-- Guest preview -->
+      <div style="margin-bottom: 2rem;">
+        <h4 style="color: #666; font-size: 0.875rem; margin-bottom: 0.5rem;">Niet-ingelogd:</h4>
+        <div style="background: #1a2332; padding: 2rem; border-radius: 8px;">
+          <p style="color: #a7c4ff; text-transform: uppercase; font-size: 0.875rem; letter-spacing: 0.05em; margin-bottom: 0.5rem;"><%= raw @hero_eyebrow %></p>
+          <h1 style="color: #ffffff; font-size: 2.5rem; margin-bottom: 1rem;"><%= raw @hero_title %></h1>
+          <p style="color: #d7def5; font-size: 1.125rem; line-height: 1.6; margin-bottom: 1.5rem;"><%= raw @hero_description %></p>
+          
+          <% guest_buttons = @hero_buttons.for_guests.visible %>
+          <% if guest_buttons.any? %>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+              <% guest_buttons.each do |button| %>
+                <a href="<%= button.url %>" class="sport-btn <%= button.style_class %>" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                  <% if button.icon.present? %>
+                    <span><%= button.icon %></span>
+                  <% end %>
+                  <span><%= button.label %></span>
+                </a>
+              <% end %>
+            </div>
+          <% else %>
+            <p style="color: #9ca3af; font-style: italic;">Geen zichtbare knoppen</p>
+          <% end %>
+        </div>
       </div>
+      
+      <!-- Logged in preview -->
+      <div>
+        <h4 style="color: #666; font-size: 0.875rem; margin-bottom: 0.5rem;">Ingelogd:</h4>
+        <div style="background: #1a2332; padding: 2rem; border-radius: 8px;">
+          <p style="color: #a7c4ff; text-transform: uppercase; font-size: 0.875rem; letter-spacing: 0.05em; margin-bottom: 0.5rem;"><%= raw @hero_eyebrow %></p>
+          <h1 style="color: #ffffff; font-size: 2.5rem; margin-bottom: 1rem;"><%= raw @hero_title %></h1>
+          <p style="color: #d7def5; font-size: 1.125rem; line-height: 1.6; margin-bottom: 1.5rem;"><%= raw @hero_description %></p>
+          
+          <% logged_in_buttons = @hero_buttons.for_logged_in.visible %>
+          <% if logged_in_buttons.any? %>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+              <% logged_in_buttons.each do |button| %>
+                <a href="<%= button.url %>" class="sport-btn <%= button.style_class %>" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                  <% if button.icon.present? %>
+                    <span><%= button.icon %></span>
+                  <% end %>
+                  <span><%= button.label %></span>
+                </a>
+              <% end %>
+            </div>
+          <% else %>
+            <p style="color: #9ca3af; font-style: italic;">Geen zichtbare knoppen</p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    
+    <div style="margin-top: 2rem;">
+      <%= link_to "← Terug naar Dashboard", admin_dashboard_path, class: "app-btn app-btn--secondary track-btn--outline" %>
     </div>
   </section>
 </div>
 
+<script>
+function showTab(type) {
+  // Hide all tabs
+  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.tab-button').forEach(el => {
+    el.style.borderBottomColor = 'transparent';
+    el.style.color = '#6b7280';
+    el.style.fontWeight = '600';
+    el.classList.remove('active');
+  });
+  
+  // Show selected tab
+  document.getElementById('content-' + type).style.display = 'block';
+  const tabButton = document.getElementById('tab-' + type);
+  tabButton.style.borderBottomColor = '#FC4C02';
+  tabButton.style.color = '#1a2332';
+  tabButton.style.fontWeight = '700';
+  tabButton.classList.add('active');
+}
+
+function editButton(id) {
+  document.getElementById('edit-form-' + id).style.display = 'block';
+  event.target.closest('.edit-button').style.display = 'none';
+}
+
+function cancelEdit(id) {
+  document.getElementById('edit-form-' + id).style.display = 'none';
+  document.querySelector('[onclick="editButton(' + id + ')"]').closest('.edit-button').style.display = 'block';
+}
+
+function toggleAddForm(type) {
+  const form = document.getElementById('add-form-' + type);
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+</script>
+
+<style>
+.sport-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.sport-btn--primary {
+  background: linear-gradient(135deg, #FC4C02 0%, #FF6B35 100%);
+  color: white;
+  border: none;
+}
+
+.sport-btn--secondary {
+  background: white;
+  color: #1a2332;
+  border: 2px solid #e5e7eb;
+}
+
+.sport-btn--ghost {
+  background: transparent;
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.sport-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.tab-button:hover {
+  color: #1a2332 !important;
+}
+</style>

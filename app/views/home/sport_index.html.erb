@@ -1,0 +1,423 @@
+<!-- Modern Sport Homepage -->
+<div class="sport-page">
+  
+  <!-- Hero Section -->
+  <section class="sport-hero">
+    <div class="sport-hero__content">
+      <div class="sport-hero__eyebrow">
+        <%= raw SiteContent.get('hero_eyebrow', 'Loopgroep Virgil & Danny') %>
+      </div>
+      
+      <h1 class="sport-hero__title">
+        <%= raw SiteContent.get('hero_title', 'Run for Fun — maar dan doordacht') %>
+      </h1>
+      
+      <p class="sport-hero__subtitle">
+        <%= raw SiteContent.get('hero_description', 'Blessurevrij hardlopen begint bij techniek. Train slim met persoonlijke begeleiding, ASM-methodiek en een positieve groepssfeer.') %>
+      </p>
+      
+      <div class="sport-hero__cta">
+        <% if current_user %>
+          <% 
+            # Bepaal de rol van de gebruiker
+            user_role = if current_user.has_role?(:admin)
+              'admin'
+            elsif current_user.has_role?(:trainer)
+              'trainer'
+            else
+              'user'
+            end
+            
+            # Filter buttons op user_type en role
+            hero_buttons = HeroButton.for_logged_in.visible.for_role(user_role)
+            
+            # Check of er een training vandaag is
+            training_today = TrainingSession.where(date: Date.today).first
+            
+            # Filter quick_attendance buttons: alleen tonen als er training vandaag is
+            filtered_buttons = hero_buttons.reject do |button|
+              button.url.include?('quick_attendance') && training_today.nil?
+            end
+            
+            # Update quick_attendance URL's naar de training van vandaag
+            filtered_buttons.each do |button|
+              if button.url.include?('quick_attendance') && training_today
+                button.url = quick_attendance_training_session_path(training_today)
+              end
+            end
+          %>
+          <% if filtered_buttons.any? %>
+            <% filtered_buttons.each do |button| %>
+              <%= link_to button.url, class: "sport-btn #{button.style_class}" do %>
+                <% if button.icon.present? %>
+                  <span><%= button.icon %></span>
+                <% end %>
+                <span><%= button.label %></span>
+              <% end %>
+            <% end %>
+          <% end %>
+          
+          <% # Toon "Geen training vandaag" als er een quick_attendance button is maar geen training vandaag %>
+          <% if hero_buttons.any? { |b| b.url.include?('quick_attendance') } && training_today.nil? %>
+            <div class="sport-btn sport-btn--ghost" style="opacity: 0.6; cursor: not-allowed;">
+              <span>⚠️</span>
+              <span>Geen training vandaag</span>
+            </div>
+          <% end %>
+          
+          <% if filtered_buttons.empty? && !hero_buttons.any? { |b| b.url.include?('quick_attendance') } %>
+            <%# Fallback voor ingelogde gebruikers %>
+            <%= link_to schema_path, class: 'sport-btn sport-btn--primary' do %>
+              <span>📅 Mijn schema</span>
+            <% end %>
+            <%= link_to vandaag_training_session_path, class: 'sport-btn sport-btn--secondary' do %>
+              <span>✓ Aanwezigheden</span>
+            <% end %>
+            <%= link_to schema_path, class: 'sport-btn sport-btn--ghost' do %>
+              <span>📖 Groepschema</span>
+            <% end %>
+          <% end %>
+          
+          <!-- Komende verjaardagen deze maand -->
+          <% if @upcoming_birthdays.present? %>
+            <% current_month_birthdays = @upcoming_birthdays.select do |u|
+              bday = u.birthday.change(year: Date.today.year)
+              bday += 1.year if bday < Date.today
+              bday.month == Date.today.month && bday >= Date.today
+            end %>
+            
+            <% if current_month_birthdays.any? %>
+              <div style="margin-top: 2rem; background: linear-gradient(135deg, rgba(252, 76, 2, 0.1) 0%, rgba(255, 107, 53, 0.1) 100%); border: 2px solid rgba(252, 76, 2, 0.3); border-radius: 16px; padding: 1.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                  <span style="font-size: 2rem;">🎂</span>
+                  <h3 style="color: #FC4C02; font-size: 1.25rem; font-weight: 700; margin: 0;">Verjaardagen deze maand</h3>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                  <% current_month_birthdays.take(5).each do |user| %>
+                    <% bday = user.birthday.change(year: Date.today.year) %>
+                    <% bday += 1.year if bday < Date.today %>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(255, 255, 255, 0.8); border-radius: 8px;">
+                      <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 1.5rem;">🎉</span>
+                        <strong style="color: #1a2332; font-size: 1rem;"><%= user.name %></strong>
+                      </div>
+                      <span style="color: #FC4C02; font-weight: 600; font-size: 0.95rem;">
+                        <%= bday.strftime('%d %b') %>
+                        <% days_until = (bday - Date.today).to_i %>
+                        <% if days_until == 0 %>
+                          <span style="background: #FC4C02; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; margin-left: 0.5rem;">VANDAAG!</span>
+                        <% elsif days_until <= 7 %>
+                          <span style="color: #6b7280; font-size: 0.85rem;">(over <%= days_until %> dag<%= days_until > 1 ? 'en' : '' %>)</span>
+                        <% end %>
+                      </span>
+                    </div>
+                  <% end %>
+                  <% if current_month_birthdays.count > 5 %>
+                    <div style="text-align: center; padding-top: 0.5rem;">
+                      <%= link_to "Bekijk alle #{current_month_birthdays.count} verjaardagen →", '/verjaardagen/komende', style: "color: #FC4C02; font-weight: 600; text-decoration: none; font-size: 0.9rem;" %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+        <% else %>
+          <% hero_buttons = HeroButton.for_guests.visible %>
+          <% if hero_buttons.any? %>
+            <% hero_buttons.each do |button| %>
+              <%= link_to button.url, class: "sport-btn #{button.style_class}" do %>
+                <% if button.icon.present? %>
+                  <span><%= button.icon %></span>
+                <% end %>
+                <span><%= button.label %></span>
+              <% end %>
+            <% end %>
+          <% else %>
+            <%# Fallback voor niet-ingelogde gebruikers %>
+            <%= link_to login_path, class: 'sport-btn sport-btn--primary' do %>
+              <span>🚀 Start nu</span>
+            <% end %>
+            <%= link_to register_path, class: 'sport-btn sport-btn--secondary' do %>
+              <span>📝 Registreren</span>
+            <% end %>
+            <%= link_to intake_path, class: 'sport-btn sport-btn--ghost' do %>
+              <span>📋 Intake</span>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <% if current_user %>
+    <section class="sport-section">
+      <div class="sport-stats">
+        <div class="sport-stat">
+          <div class="sport-stat__value">27</div>
+          <div class="sport-stat__label">Weken Training</div>
+        </div>
+        <div class="sport-stat">
+          <div class="sport-stat__value">2</div>
+          <div class="sport-stat__label">Hoofdcoaches</div>
+        </div>
+        <div class="sport-stat">
+          <div class="sport-stat__value">4</div>
+          <div class="sport-stat__label">Trainingsblokken</div>
+        </div>
+        <% if @upcoming_birthdays %>
+          <div class="sport-stat">
+            <div class="sport-stat__value"><%= @upcoming_birthdays.count %></div>
+            <div class="sport-stat__label">Verjaardagen</div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <!-- Features Section -->
+  <section class="sport-section sport-section--alt">
+    <div class="sport-section__header">
+      <div class="sport-section__icon">🎯</div>
+      <h2 class="sport-section__title">Waarom Run for Fun?</h2>
+      <p class="sport-section__description">
+        Persoonlijke begeleiding die verder gaat dan alleen een schema
+      </p>
+    </div>
+    
+    <div class="sport-grid">
+      <div class="sport-card">
+        <div class="sport-card__icon">👟</div>
+        <h3 class="sport-card__title">Blessurevrij Lopen</h3>
+        <p class="sport-card__description">
+          Focus op techniek en loophouding. We starten met de basis: een goede loopvorm voorkomt blessures en maakt je sneller.
+        </p>
+      </div>
+      
+      <div class="sport-card">
+        <div class="sport-card__icon">📊</div>
+        <h3 class="sport-card__title">ASM-Methodiek</h3>
+        <p class="sport-card__description">
+          Gestructureerde opbouw met aandacht voor duurloop, snelheid en herstel. Persoonlijke zones op basis van jouw anaerobe drempel.
+        </p>
+      </div>
+      
+      <div class="sport-card">
+        <div class="sport-card__icon">❤️</div>
+        <h3 class="sport-card__title">Positieve Sfeer</h3>
+        <p class="sport-card__description">
+          Een hechte groep waar iedereen welkom is. We trainen samen, motiveren elkaar en vieren elke vooruitgang.
+        </p>
+      </div>
+      
+      <div class="sport-card">
+        <div class="sport-card__icon">⏱️</div>
+        <h3 class="sport-card__title">Persoonlijke Begeleiding</h3>
+        <p class="sport-card__description">
+          Geen generieke schema's. We kijken naar jouw doelen, niveau en beschikbaarheid voor een plan dat bij jou past.
+        </p>
+      </div>
+      
+      <div class="sport-card">
+        <div class="sport-card__icon">📱</div>
+        <h3 class="sport-card__title">Digitaal Platform</h3>
+        <p class="sport-card__description">
+          Inzicht in je trainingen, schema's en voortgang. Alles overzichtelijk in één systeem, altijd bij de hand.
+        </p>
+      </div>
+      
+      <div class="sport-card">
+        <div class="sport-card__icon">🏆</div>
+        <h3 class="sport-card__title">Doelgericht Trainen</h3>
+        <p class="sport-card__description">
+          Of je nu een 5K wilt lopen of een marathon: we bouwen samen aan jouw doel met realistische planning.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Upcoming Trainings -->
+  <% if @upcoming_public_sessions.present? %>
+    <section class="sport-section">
+      <div class="sport-section__header">
+        <div class="sport-section__icon">📅</div>
+        <h2 class="sport-section__title">Komende Groepstrainingen</h2>
+        <p class="sport-section__description">
+          Sluit je aan bij onze volgende trainingen
+        </p>
+      </div>
+      
+      <div class="sport-grid">
+        <% @upcoming_public_sessions.take(6).each do |session| %>
+          <div class="sport-card">
+            <% formatted_date = begin
+              I18n.l(session.date, format: :dutch_short, locale: :nl)
+            rescue
+              session.date&.strftime('%d %b')
+            end %>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <span style="display: inline-block; padding: 4px 12px; background: var(--sport-orange-gradient); border-radius: 999px; font-size: 12px; font-weight: 600;">
+                <%= formatted_date %>
+              </span>
+              <span style="color: var(--sport-text-muted); font-size: 14px;">
+                <%= session.fase.presence || session.week %>
+              </span>
+            </div>
+            
+            <h3 class="sport-card__title" style="font-size: 18px;">
+              <%= session.description.presence || 'Training' %>
+            </h3>
+            
+            <p class="sport-card__description" style="margin-bottom: 16px;">
+              <%= session.loopscholing.presence || session.kern.presence || 'Details volgen' %>
+            </p>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid var(--sport-border);">
+              <span style="color: var(--sport-text-muted); font-size: 14px;">
+                <%= session.trainer&.name || 'Trainer volgt' %>
+              </span>
+              <%= link_to 'Details →', training_session_path(session), class: 'sport-btn sport-btn--ghost', style: 'padding: 8px 16px; font-size: 14px;' %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <!-- Dashboard Tiles (for logged in users) -->
+  <% if current_user && @tiles.present? %>
+    <section class="sport-section sport-section--alt">
+      <div class="sport-section__header">
+        <div class="sport-section__icon">🎯</div>
+        <h2 class="sport-section__title">Jouw Dashboard</h2>
+        <p class="sport-section__description">
+          Snel toegang tot belangrijke functies
+        </p>
+      </div>
+      
+      <div class="sport-grid">
+        <% @tiles.take(6).each do |tile| %>
+          <div class="sport-card">
+            <div class="sport-card__icon"><%= tile[:icon] %></div>
+            <h3 class="sport-card__title"><%= tile[:label] %></h3>
+            <p class="sport-card__description"><%= raw tile[:desc] %></p>
+            <% if tile[:key] == 'birthdays_30' %>
+              <%= link_to 'Bekijk →', trainers_verjaardagen_path, class: 'sport-btn sport-btn--ghost', style: 'margin-top: 16px; padding: 8px 16px; font-size: 14px; width: 100%;' %>
+            <% else %>
+              <%= link_to 'Open →', tile[:url], class: 'sport-btn sport-btn--ghost', style: 'margin-top: 16px; padding: 8px 16px; font-size: 14px; width: 100%;' %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <!-- CTA Section -->
+  <% unless current_user %>
+    <section class="sport-section" style="text-align: center;">
+      <div style="max-width: 700px; margin: 0 auto;">
+        <div class="sport-section__icon">🚀</div>
+        <h2 class="sport-section__title">Klaar om te starten?</h2>
+        <p class="sport-section__description" style="margin-bottom: 32px;">
+          Word lid van onze loopgroep en ontdek hoe leuk en effectief hardlopen kan zijn met de juiste begeleiding.
+        </p>
+        <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+          <% hero_buttons_cta = HeroButton.for_guests.visible.limit(2) %>
+          <% if hero_buttons_cta.any? %>
+            <% hero_buttons_cta.each do |button| %>
+              <%= link_to button.url, class: "sport-btn #{button.style_class}" do %>
+                <% if button.icon.present? %>
+                  <span><%= button.icon %></span>
+                <% end %>
+                <span><%= button.label %></span>
+              <% end %>
+            <% end %>
+          <% else %>
+            <%= link_to register_path, class: 'sport-btn sport-btn--primary' do %>
+              <span>📝 Registreren</span>
+            <% end %>
+            <%= link_to intake_path, class: 'sport-btn sport-btn--secondary' do %>
+              <span>📋 Intake</span>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </section>
+  <% end %>
+
+</div>
+
+<style>
+/* Page-specific overrides */
+.sport-page {
+  background: var(--sport-bg-primary);
+  min-height: 100vh;
+}
+
+/* Smooth transitions for all interactive elements */
+.sport-card,
+.sport-btn,
+.sport-stat {
+  will-change: transform;
+}
+
+/* Performance optimization */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+
+<script>
+// Smooth scroll for internal links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function (e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  });
+});
+
+// Add scrolled class to header
+window.addEventListener('scroll', function() {
+  const header = document.querySelector('.sport-header');
+  if (header) {
+    if (window.scrollY > 50) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  }
+});
+
+// Intersection Observer for fade-in animations
+if ('IntersectionObserver' in window) {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, {
+    threshold: 0.1
+  });
+
+  document.querySelectorAll('.sport-card, .sport-stat').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(30px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
+}
+</script>
+

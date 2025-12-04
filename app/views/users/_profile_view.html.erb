@@ -70,73 +70,155 @@
     </div>
   </div>
 
-  <div class="card-surface profile-callout">
-    <strong>Afmelden voor de training van vandaag?</strong><br>
-    Gebruik deze persoonlijke link om je zonder inloggen af te melden voor de training van vandaag:<br>
-    <code><%= public_afmelden_url(slug: @user.slug, token: @user.public_token) %></code>
-    <small>Let op: deze link is persoonlijk en alleen geldig voor jouw account.</small>
+  <div class="card-surface profile-callout" style="background: linear-gradient(135deg, rgba(252, 76, 2, 0.1) 0%, rgba(255, 107, 53, 0.1) 100%); border: 2px solid rgba(252, 76, 2, 0.3); padding: 20px; border-radius: 12px;">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+      <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #FC4C02 0%, #FF6B35 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(252, 76, 2, 0.3);">
+        🏃
+      </div>
+      <strong style="font-size: 18px; color: #FC4C02;">Snel Afmelden</strong>
+    </div>
+    
+    <p style="margin-bottom: 12px; color: #f4f8ff;">
+      Gebruik deze persoonlijke link om je <strong>zonder inloggen</strong> af te melden voor de training van vandaag:
+    </p>
+    
+    <div style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 16px; border: 1px solid rgba(255, 255, 255, 0.2);">
+      <code style="font-size: 12px; color: #1ee3cf; word-break: break-all; display: block;">
+        <%= public_afmelden_url(slug: @user.slug, token: @user.public_token) %>
+      </code>
+    </div>
+    
+    <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+      <a href="<%= public_afmelden_path(slug: @user.slug, token: @user.public_token) %>" 
+         class="afmelden-test-btn"
+         style="display: inline-block; background: linear-gradient(135deg, #FC4C02 0%, #FF6B35 100%); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; box-shadow: 0 4px 12px rgba(252, 76, 2, 0.3); flex: 1; text-align: center;">
+        🏃 Open afmeldpagina
+      </a>
+      
+      <button onclick="copyToClipboard('<%= public_afmelden_url(slug: @user.slug, token: @user.public_token) %>')"
+              style="background: rgba(30, 227, 207, 0.2); color: #1ee3cf; padding: 12px 20px; border: 1px solid #1ee3cf; border-radius: 8px; font-weight: 600; cursor: pointer;">
+        📋 Kopieer
+      </button>
+    </div>
+    
+    <!-- Mobile Home Screen Instructies - Prominent -->
+    <a href="<%= public_afmelden_path(slug: @user.slug, token: @user.public_token) %>" 
+       style="display: block; background: linear-gradient(135deg, #1ee3cf 0%, #34c759 100%); border-radius: 16px; padding: 24px; margin-bottom: 16px; text-decoration: none; box-shadow: 0 8px 24px rgba(30, 227, 207, 0.4); border: 3px solid rgba(30, 227, 207, 0.2);">
+      <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+        <div style="font-size: 56px; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));">📱</div>
+        <div style="flex: 1;">
+          <div style="color: #0c1730; font-weight: 800; font-size: 20px; margin-bottom: 4px;">
+            Zet op Beginscherm
+          </div>
+          <div style="color: rgba(12, 23, 48, 0.8); font-size: 14px; line-height: 1.4;">
+            Eén-klik afmelden zonder inloggen
+          </div>
+        </div>
+        <div style="font-size: 32px; color: #0c1730;">→</div>
+      </div>
+      
+      <div style="background: rgba(255, 255, 255, 0.3); border-radius: 12px; padding: 16px;">
+        <div style="color: #0c1730; font-size: 13px; line-height: 1.6; font-weight: 600;">
+          <div style="margin-bottom: 8px;">🍎 <strong>iPhone:</strong> Deel → "Zet op beginscherm"</div>
+          <div>🤖 <strong>Android:</strong> Menu → "Toevoegen aan startscherm"</div>
+        </div>
+      </div>
+    </a>
+    
+    <small style="display: block; text-align: center; padding: 12px; background: rgba(30, 227, 207, 0.1); border-radius: 8px; margin-bottom: 16px;">
+      <span style="color: #1ee3cf; font-weight: 700;">💡 Pro Tip:</span><br>
+      <span style="color: rgba(244, 248, 255, 0.8); font-size: 13px;">
+        Tik op de groene knop hierboven voor stap-voor-stap instructies op je telefoon!
+      </span>
+    </small>
+    
+    <small style="display: block; margin-top: 8px; color: rgba(244, 248, 255, 0.7); font-size: 12px;">
+      💡 <strong>Voordeel:</strong> Eén klik afmelden zonder inloggen - ideaal voor onderweg!
+    </small>
+    
+    <small style="display: block; margin-top: 12px; color: rgba(244, 248, 255, 0.6); font-size: 12px;">
+      ⚠️ Let op: deze link is persoonlijk en alleen geldig voor jouw account. Deel deze link niet met anderen.
+    </small>
   </div>
 
-  <h2>Trainingsdagen</h2>
+  <script>
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(function() {
+        alert('✓ Link gekopieerd! Je kunt deze nu delen of opslaan.');
+      }, function(err) {
+        // Fallback voor oudere browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert('✓ Link gekopieerd!');
+      });
+    }
+  </script>
+
+  <h2 style="color: #ffffff !important; font-weight: 700 !important;">Trainingsdagen</h2>
   <%= form_with url: update_training_days_path, method: :patch, local: true do |f| %>
     <% if (current_user.admin? || current_user.trainer?) && current_user.id != @user.id %>
       <%= hidden_field_tag :user_id, @user.id %>
     <% end %>
     <div class="training-days">
-      <label>
-        <%= check_box_tag 'user[training_days][]', 'Dinsdag', @user.training_days.present? ? @user.training_days.include?('Dinsdag') : true %>
-        <span>Dinsdag</span>
-      </label>
-      <label>
-        <%= check_box_tag 'user[training_days][]', 'Zaterdag', @user.training_days.present? ? @user.training_days.include?('Zaterdag') : true %>
-        <span>Zaterdag</span>
-      </label>
+      <% %w[Maandag Dinsdag Woensdag Donderdag Vrijdag Zaterdag Zondag].each do |day| %>
+        <label>
+          <%= check_box_tag 'user[training_days][]', day, @user.training_days.present? ? @user.training_days.include?(day) : false %>
+          <span><%= day %></span>
+        </label>
+      <% end %>
     </div>
     <%= f.submit 'Opslaan', class: 'theme-btn track-btn--glow training-days__submit' %>
   <% end %>
 
   <div class="profile-links">
     <%= link_to '✏️ Profiel', edit_user_path(@user), class: 'theme-btn track-btn--glow' %>
+    <% if current_user == @user || current_user&.has_role?(:trainer) || current_user&.has_role?(:admin) %>
+      <% zones_tile = visible_tiles_for_menu(current_user).find { |t| t[:key] == 'zones' } %>
+      <% if zones_tile %>
+        <%= link_to "💓 #{zones_tile[:label]}", zones_tile[:url], class: 'theme-btn track-btn--glow' %>
+      <% end %>
+    <% end %>
     <%= link_to 'Terug', users_path, class: 'theme-btn track-btn--outline' %>
   </div>
 
-  <div class="profile-performances card-surface">
+  <div class="card-surface">
     <h2>Prestaties</h2>
     <% if @performances.any? %>
-      <div class="table-wrapper">
-        <table class="prestaties-table schema-table">
+      <p style="color: #9ca3af; font-size: 0.9rem; margin-bottom: 1rem;">Klik op een prestatie om de volledige statistieken te bekijken</p>
+      <div class="performances-table-wrapper">
+        <table class="schema-table performances-table">
           <thead>
             <tr>
               <th>Datum</th>
               <th>Onderdeel</th>
               <th>Afstand</th>
               <th>Tijd</th>
-              <th>Prognose 10 km</th>
-              <th>AD</th>
-              <th>Duurloop 85%</th>
+              <th>Gem. Hartslag</th>
               <th>km/min</th>
               <th>Notities</th>
-              <th>Acties</th>
+              <% if current_user&.admin? || current_user&.id == @user.id %>
+<th>Acties</th>
+              <% end %>
             </tr>
           </thead>
           <tbody>
             <% @performances.each do |performance| %>
-              <tr>
+              <tr class="performance-row clickable-row" data-performance-id="<%= performance.id %>">
                 <td data-label="Datum"><%= performance.date&.strftime('%d-%m-%Y') %></td>
                 <td data-label="Onderdeel"><%= performance.test_type %></td>
                 <td data-label="Afstand"><%= performance.distance %></td>
                 <td data-label="Tijd"><%= performance.value %></td>
-                <td data-label="Prognose 10 km"><%= prognose_10km(performance) %></td>
-                <td data-label="AD"><%= ad(performance) %></td>
-                <td data-label="Duurloop 85%"><%= dl2_85(performance) %></td>
+                <td data-label="Gem. Hartslag"><%= performance.core_heart_rate ? "#{performance.core_heart_rate} bpm" : '-' %></td>
                 <td data-label="km/min"><%= km_min(performance) %></td>
                 <td data-label="Notities"><%= performance.notes %></td>
                 <% if current_user&.admin? || current_user&.id == performance.user_id %>
-                  <td data-label="Acties" class="performance-actions">
-                    <%= link_to '✏️', edit_performance_path(performance), class: 'theme-btn track-btn--outline' %>
-                    <%= button_to performance_path(performance), method: :delete, data: { confirm: 'Weet je zeker dat je deze prestatie wilt verwijderen?' }, class: 'theme-btn track-btn--outline danger-btn' do %>
-                      🗑️
-                    <% end %>
+                  <td data-label="Acties" class="performance-actions" onclick="event.stopPropagation();">
+                    <%= link_to '✏️', edit_performance_path(performance), class: 'theme-btn track-btn--outline', style: 'padding: 0.5rem 1rem; font-size: 1rem;' %>
+                    <%= button_to '🗑️', performance_path(performance), method: :delete, data: { confirm: 'Weet je zeker dat je deze prestatie wilt verwijderen?' }, class: 'theme-btn track-btn--outline danger-btn', style: 'padding: 0.5rem 1rem; font-size: 1rem; background: #ef4444; color: white; border: none;' %>
                   </td>
                 <% end %>
               </tr>
@@ -151,4 +233,23 @@
     <%= render 'performances/form', performance: Performance.new(user_id: @user.id) %>
   </div>
 </div>
+
+<script>
+  // Handle clickable rows for performance viewing
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.performance-row.clickable-row').forEach(function(row) {
+      row.addEventListener('click', function(e) {
+        // Voorkom navigatie als er op een button of link wordt geklikt
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('.performance-actions')) {
+          return;
+        }
+        
+        const performanceId = this.dataset.performanceId;
+        if (performanceId) {
+          window.location.href = `/performances/${performanceId}`;
+        }
+      });
+    });
+  });
+</script>
 

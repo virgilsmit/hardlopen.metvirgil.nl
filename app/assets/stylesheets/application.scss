@@ -1,6 +1,30 @@
+// CONTRAST SYSTEM - WCAG AA Compliant (MUST BE FIRST!)
+@import 'contrast-system';
+
+// MODERN SPORT THEME - Strava/Runkeeper geïnspireerd (NIEUW!)
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Rubik:wght@400;500;600;700;800&display=swap');
+@import 'modern_sport_theme';
+@import 'mobile_sport_app';
+
+// LEESBAARHEID EERST - Optimaal leesbare styling
+@import 'readable_theme';
+
+// Daarna de andere thema's (worden overschreven waar nodig)
 @import 'theme';
 @import 'mobile_app';
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+// LEESBAARHEID OVERRIDES - Forceert leesbaarheid overal
+@import 'readability_overrides';
+
+// PROFESSIONEEL THEMA MET CSS-VARIABELEN - Overschrijft alles voor consistentie
+@import 'professional_theme';
+
+// WCAG AA COMPLIANCE OVERRIDES
+@import 'wcag-compliance-overrides';
+
+// ULTRA HIGH CONTRAST - MUST BE LAST!
+@import 'ultra-high-contrast';
 
 // Plaats hier eventueel extra globale CSS of imports. 
 

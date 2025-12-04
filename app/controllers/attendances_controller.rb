@@ -22,34 +22,62 @@ class AttendancesController < ApplicationController
 
   # POST /attendances or /attendances.json
   def create
-    Rails.logger.info "[DEBUG] Attendance create params: #{params.inspect}"
+    Rails.logger.info "[DEBUG] Attendance create RAW params: #{params.inspect}"
     begin
-      user_id = current_user.admin? ? (params[:attendance] ? params[:attendance][:user_id] : params[:user_id]) : current_user.id
-      training_session_id = params[:attendance] ? params[:attendance][:training_session_id] : params[:training_session_id]
-      Rails.logger.info "[DEBUG] Attendance create params: #{params.inspect} | user_id: #{user_id}, training_session_id: #{training_session_id}"
-      @attendance = Attendance.find_or_initialize_by(user_id: user_id, training_session_id: training_session_id)
-      if @attendance.new_record?
-        Rails.logger.info "[DEBUG] Attendance wordt nieuw aangemaakt voor user_id=#{user_id}, training_session_id=#{training_session_id}"
+      # Flexibel parameters ophalen - zowel genest als niet-genest
+      att_params = params[:attendance] || params
+      
+      # User ID bepalen - admin kan andere users aanmelden, anders current_user
+      user_id = if current_user.admin? || current_user.has_role?(:trainer)
+        att_params[:user_id].to_i
       else
-        Rails.logger.info "[DEBUG] Attendance wordt opgehaald voor user_id=#{user_id}, training_session_id=#{training_session_id} (id: #{@attendance.id})"
+        current_user.id
       end
-      Rails.logger.info "[DEBUG] Attendance status voor opslaan: #{@attendance.status.inspect} (params: #{params[:status]})"
-      status_map = { '0' => :aanwezig, '1' => :afwezig, 0 => :aanwezig, 1 => :afwezig, 'aanwezig' => :aanwezig, 'afwezig' => :afwezig, 'onbekend' => :onbekend }
-      status_param = params[:attendance] ? params[:attendance][:status] : params[:status]
-      @attendance.status = status_map[status_param]
-      @attendance.note = params[:note]
+      
+      training_session_id = att_params[:training_session_id].to_i
+      
+      Rails.logger.info "[DEBUG] Extracted: user_id=#{user_id}, training_session_id=#{training_session_id}"
+      
+      # Valideer dat user en training session bestaan
+      unless User.exists?(user_id) && TrainingSession.exists?(training_session_id)
+        Rails.logger.error "[ERROR] User (#{user_id}) or TrainingSession (#{training_session_id}) niet gevonden"
+        render plain: "Fout: Gebruiker of training niet gevonden", status: 422
+        return
+      end
+      
+      @attendance = Attendance.find_or_initialize_by(user_id: user_id, training_session_id: training_session_id)
+      
+      if @attendance.new_record?
+        Rails.logger.info "[DEBUG] Nieuwe attendance voor user_id=#{user_id}, training_session_id=#{training_session_id}"
+      else
+        Rails.logger.info "[DEBUG] Bestaande attendance (id: #{@attendance.id})"
+      end
+      
+      # Status bepalen
+      status_map = { '0' => 'aanwezig', '1' => 'afwezig', 0 => 'aanwezig', 1 => 'afwezig', 'aanwezig' => 'aanwezig', 'afwezig' => 'afwezig', 'onbekend' => 'onbekend' }
+      status_param = att_params[:status].to_s
+      mapped_status = status_map[status_param] || status_param
+      
+      Rails.logger.info "[DEBUG] Status param: '#{status_param}' -> mapped: '#{mapped_status}'"
+      
+      @attendance.status = mapped_status
+      @attendance.note = att_params[:note].to_s if att_params[:note].present?
+      
+      Rails.logger.info "[DEBUG] Voor opslaan - status: #{@attendance.status.inspect}, note: #{@attendance.note.inspect}"
+      
       if @attendance.save
-        Rails.logger.info "[DEBUG] Attendance status na opslaan: #{@attendance.status.inspect} (id: #{@attendance.id})"
+        Rails.logger.info "[DEBUG] Attendance opgeslagen! (id: #{@attendance.id}, status: #{@attendance.status})"
         AttendanceMailer.notify_change(@attendance, @attendance.status == 'afwezig' ? 'afgemeld' : 'aangemeld').deliver_later
         respond_to do |format|
-          format.html { redirect_back fallback_location: schema_path, notice: "Aanwezigheid bijgewerkt." }
+          format.html { redirect_back fallback_location: schema_path, notice: "Status bijgewerkt." }
           format.js   { render :create }
         end
       else
         Rails.logger.error "[ERROR] Attendance save failed: #{@attendance.errors.full_messages.join(", ")}"
-        week = params[:week] || @attendance.training_session&.week
-        year = @attendance.training_session&.date&.cwyear || Date.today.cwyear
-        render plain: "Fout bij opslaan aanwezigheid: #{@attendance.errors.full_messages.join(", ")}", status: 422
+        respond_to do |format|
+          format.html { render plain: "Fout bij opslaan aanwezigheid: #{@attendance.errors.full_messages.join(", ")}", status: 422 }
+          format.js   { render js: "alert('Fout: #{@attendance.errors.full_messages.join(", ")}');" }
+        end
       end
     rescue => e
       Rails.logger.error "[EXCEPTION] Attendance create: #{e.message}\n#{e.backtrace.join("\n")}"
@@ -60,11 +88,19 @@ class AttendancesController < ApplicationController
   # PATCH/PUT /attendances/1 or /attendances/1.json
   def update
     @attendance = Attendance.find(params[:id])
-    @attendance.update(status: params[:status], note: params[:note])
-    AttendanceMailer.notify_change(@attendance, @attendance.status == 'afwezig' ? 'afgemeld' : 'aangemeld').deliver_later
-    respond_to do |format|
-      format.html { redirect_back fallback_location: trainings_path, notice: "Status bijgewerkt." }
-      format.js   { render :update }
+    status_param = params[:attendance] ? params[:attendance][:status] : params[:status]
+    note_param = params[:attendance] ? params[:attendance][:note] : params[:note]
+    if @attendance.update(status: status_param, note: note_param)
+      AttendanceMailer.notify_change(@attendance, @attendance.status == 'afwezig' ? 'afgemeld' : 'aangemeld').deliver_later
+      respond_to do |format|
+        format.html { redirect_back fallback_location: trainings_path, notice: "Status bijgewerkt." }
+        format.js   { render :update }
+      end
+    else
+      respond_to do |format|
+        format.html { redirect_back fallback_location: trainings_path, alert: "Fout: #{@attendance.errors.full_messages.join(', ')}" }
+        format.js   { render js: "alert('Fout: #{@attendance.errors.full_messages.join(', ')}');" }
+      end
     end
   end
 

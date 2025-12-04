@@ -1,0 +1,191 @@
+<div class="container-fluid py-4 bg-dark">
+  <div class="row mb-4">
+    <div class="col-12">
+      <%= link_to '← Terug naar overzicht', admin_error_logs_path, class: 'btn btn-sm mb-3', style: 'background: rgba(255,255,255,0.1); color: #f4f8ff !important; border: none; font-weight: 700;' %>
+      
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+        <div>
+          <h1 class="display-5" style="color: #f4f8ff !important; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+            🐛 Error Details
+          </h1>
+          <code style="background: rgba(252, 76, 2, 0.2); padding: 0.5rem 1rem; border-radius: 6px; color: #FC4C02; font-weight: 700; font-size: 1.1rem;">
+            <%= @error_log.code %>
+          </code>
+        </div>
+        
+        <div class="d-flex gap-2 flex-wrap">
+          <% if @error_log.resolved? %>
+            <%= button_to 'Heropenen', reopen_admin_error_log_path(@error_log), method: :post, class: 'btn btn-warning', style: 'font-weight: 600;' %>
+          <% else %>
+            <%= button_to '✓ Markeer als Opgelost', resolve_admin_error_log_path(@error_log), method: :post, class: 'btn btn-success', style: 'font-weight: 600;' %>
+          <% end %>
+          
+          <%= button_to '🗑️ Verwijderen', admin_error_log_path(@error_log), method: :delete, 
+            class: 'btn btn-danger', 
+            style: 'font-weight: 600;',
+            data: { confirm: 'Weet je zeker dat je deze error log wilt verwijderen?' }
+          %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Badge -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <% if @error_log.resolved? %>
+        <div style="background: rgba(40, 167, 69, 0.1); border: 2px solid rgba(40, 167, 69, 0.3); padding: 1rem; border-radius: 8px;">
+          <strong style="color: #28a745;">✓ Opgelost</strong> door <%= @error_log.resolver&.name || 'Onbekend' %> op <%= @error_log.resolved_at&.strftime('%d-%m-%Y om %H:%M') %>
+        </div>
+      <% else %>
+        <div style="background: rgba(220, 53, 69, 0.1); border: 2px solid rgba(220, 53, 69, 0.3); padding: 1rem; border-radius: 8px;">
+          <strong style="color: #dc3545;">⚠ Deze fout is nog niet opgelost</strong>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Linkerkant: Error Details -->
+    <div class="col-lg-8 mb-4">
+      <!-- Error Informatie -->
+      <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+        <h4 style="color: #FC4C02; margin-bottom: 1.5rem; font-weight: 700;">📋 Error Informatie</h4>
+        
+        <div class="mb-3">
+          <label style="color: rgba(244, 248, 255, 0.7); font-size: 0.85rem; margin-bottom: 0.5rem; display: block;">Fout Type</label>
+          <code style="background: rgba(30, 227, 207, 0.1); color: #1ee3cf; padding: 0.5rem; border-radius: 4px; display: block; font-size: 0.95rem;">
+            <%= @error_log.error_class %>
+          </code>
+        </div>
+        
+        <div class="mb-3">
+          <label style="color: rgba(244, 248, 255, 0.7); font-size: 0.85rem; margin-bottom: 0.5rem; display: block;">Foutmelding</label>
+          <div style="background: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 6px; border-left: 4px solid #dc3545; color: #f4f8ff; font-family: monospace; font-size: 0.9rem; white-space: pre-wrap; word-break: break-word;">
+<%= @error_log.error_message %>
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <label style="color: rgba(244, 248, 255, 0.7); font-size: 0.85rem; margin-bottom: 0.5rem; display: block;">URL</label>
+          <code style="background: rgba(0, 0, 0, 0.3); padding: 0.75rem; border-radius: 4px; display: block; font-size: 0.85rem; word-break: break-all; color: #1ee3cf;">
+            <%= @error_log.request_method %> <%= @error_log.url %>
+          </code>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label style="color: rgba(244, 248, 255, 0.7); font-size: 0.85rem; margin-bottom: 0.5rem; display: block;">Tijdstip</label>
+            <div style="color: #f4f8ff; font-weight: 600;">
+              <%= @error_log.created_at.strftime('%d-%m-%Y om %H:%M:%S') %>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label style="color: rgba(244, 248, 255, 0.7); font-size: 0.85rem; margin-bottom: 0.5rem; display: block;">IP Adres</label>
+            <code style="background: rgba(0, 0, 0, 0.3); color: #f4f8ff; padding: 0.5rem; border-radius: 4px; display: inline-block;">
+              <%= @error_log.ip_address || 'Onbekend' %>
+            </code>
+          </div>
+        </div>
+      </div>
+
+      <!-- Backtrace -->
+      <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+        <h4 style="color: #FC4C02; margin-bottom: 1rem; font-weight: 700;">🔍 Stack Trace</h4>
+        <div style="background: rgba(0, 0, 0, 0.5); padding: 1rem; border-radius: 6px; max-height: 500px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 0.85rem; color: #1ee3cf;">
+          <% if @error_log.backtrace_lines.any? %>
+            <% @error_log.backtrace_lines.each_with_index do |line, index| %>
+              <div style="padding: 0.25rem 0; <%= 'color: #FC4C02; font-weight: 700;' if index == 0 %>">
+                <span style="color: rgba(244, 248, 255, 0.5); margin-right: 0.5rem;"><%= "%3d" % (index + 1) %></span>
+                <%= line %>
+              </div>
+            <% end %>
+          <% else %>
+            <div style="color: rgba(244, 248, 255, 0.5);">Geen stack trace beschikbaar</div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Request Parameters -->
+      <% if @error_log.params.present? %>
+        <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+          <h4 style="color: #FC4C02; margin-bottom: 1rem; font-weight: 700;">📦 Request Parameters</h4>
+          <pre style="background: rgba(0, 0, 0, 0.5); padding: 1rem; border-radius: 6px; color: #f4f8ff; margin: 0; max-height: 300px; overflow-y: auto; font-size: 0.85rem;"><%= JSON.pretty_generate(JSON.parse(@error_log.params)) rescue @error_log.params %></pre>
+        </div>
+      <% end %>
+      
+      <!-- Session Data -->
+      <% if @error_log.session_data.present? %>
+        <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+          <h4 style="color: #FC4C02; margin-bottom: 1rem; font-weight: 700;">🔐 Session Data</h4>
+          <pre style="background: rgba(0, 0, 0, 0.5); padding: 1rem; border-radius: 6px; color: #f4f8ff; margin: 0; max-height: 300px; overflow-y: auto; font-size: 0.85rem;"><%= JSON.pretty_generate(JSON.parse(@error_log.session_data)) rescue @error_log.session_data %></pre>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Rechterkant: Context & Notities -->
+    <div class="col-lg-4 mb-4">
+      <!-- Gebruiker Info -->
+      <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+        <h4 style="color: #1ee3cf; margin-bottom: 1rem; font-weight: 700;">👤 Gebruiker</h4>
+        <% if @error_log.user %>
+          <div class="mb-2">
+            <strong style="color: #f4f8ff;"><%= @error_log.user.name %></strong>
+          </div>
+          <div style="color: rgba(244, 248, 255, 0.7); font-size: 0.9rem;">
+            ID: <%= @error_log.user.id %><br>
+            Email: <%= @error_log.user.email %><br>
+            Rol: <%= @error_log.user.roles.join(', ') rescue 'Onbekend' %>
+          </div>
+        <% else %>
+          <div style="color: rgba(244, 248, 255, 0.5);">Geen gebruiker (gast)</div>
+        <% end %>
+      </div>
+
+      <!-- Browser Info -->
+      <% if @error_log.user_agent.present? %>
+        <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+          <h4 style="color: #1ee3cf; margin-bottom: 1rem; font-weight: 700;">🌐 Browser</h4>
+          <div style="color: rgba(244, 248, 255, 0.8); font-size: 0.85rem; word-break: break-word;">
+            <%= @error_log.user_agent %>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Notities -->
+      <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 1.5rem; border-radius: 12px;">
+        <h4 style="color: #1ee3cf; margin-bottom: 1rem; font-weight: 700;">📝 Notities</h4>
+        
+        <%= form_with url: update_notes_admin_error_log_path(@error_log), method: :patch, local: true do %>
+          <%= text_area_tag :notes, @error_log.notes, 
+            rows: 6,
+            placeholder: 'Voeg notities toe over deze fout...',
+            style: 'width: 100%; background: rgba(0, 0, 0, 0.3); color: #f4f8ff; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; padding: 0.75rem; font-size: 0.9rem;',
+            class: 'form-control'
+          %>
+          
+          <%= submit_tag 'Notities Opslaan', 
+            class: 'btn w-100 mt-2',
+            style: 'background: linear-gradient(135deg, #1ee3cf 0%, #17c5b3 100%); color: #050912; border: none; font-weight: 600;'
+          %>
+        <% end %>
+        
+        <% if @error_log.notes.present? %>
+          <div style="margin-top: 1rem; padding: 1rem; background: rgba(0, 0, 0, 0.3); border-radius: 6px; color: rgba(244, 248, 255, 0.8); font-size: 0.9rem; white-space: pre-wrap;">
+            <%= @error_log.notes %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .form-control:focus {
+    background: rgba(0, 0, 0, 0.4) !important;
+    border-color: #1ee3cf !important;
+    color: #f4f8ff !important;
+    box-shadow: 0 0 0 0.2rem rgba(30, 227, 207, 0.25) !important;
+  }
+</style>
+

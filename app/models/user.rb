@@ -312,6 +312,269 @@ class User < ApplicationRecord
 
   before_create :generate_public_token, :generate_slug
 
+  # ==========================================================
+  # HARTLAGZONES & DREMPEL FUNCTIONALITEIT
+  # ==========================================================
+
+  # 3.1. Referentieprestatie bepalen
+  def reference_performance_for_threshold
+    # Selecteer alle performances met core_heart_rate niet nil
+    # Filter op afstand tussen 3 km en 25 km
+    # Filter op totale tijd >= 12 minuten (720 seconden) als benadering van een bruikbare kern
+    # Sorteer op datum aflopend
+    # Return de meest recente performance die aan deze criteria voldoet
+    candidates = performances
+      .where.not(core_heart_rate: nil)
+      .where('distance >= ? AND distance <= ?', 3000, 25000)
+      .order(date: :desc, created_at: :desc)
+      .to_a
+    
+    # Filter op tijd >= 12 minuten (720 seconden)
+    candidates.find { |p| p.value && tijd_naar_seconden(p.value) >= 720 }
+  end
+
+  # 3.2. Anaerobe drempel hartslag (LT-HR)
+  def lt_heart_rate
+    ref = reference_performance_for_threshold
+    return nil unless ref&.core_heart_rate
+
+    candidate = ref.core_heart_rate.to_f
+
+    # Smoothing: als er al een eerder bekende LT-HR bestaat
+    # Zoek de vorige referentieprestatie voor smoothing
+    all_candidates = performances
+      .where.not(core_heart_rate: nil)
+      .where('distance >= ? AND distance <= ?', 3000, 25000)
+      .order(date: :desc, created_at: :desc)
+      .to_a
+      .select { |p| p.value && tijd_naar_seconden(p.value) >= 720 }
+
+    previous_ref = all_candidates.find { |p| p.id != ref.id }
+
+    if previous_ref&.core_heart_rate
+      # Smoothing: lt_new = (lt_old * 0.7) + (lt_candidate * 0.3)
+      lt_old = previous_ref.core_heart_rate.to_f
+      lt_new = (lt_old * 0.7 + candidate * 0.3).round
+    else
+      lt_new = candidate.round
+    end
+
+    # HRmax sanity check: gebruik max_heart_rate_observed
+    max_hr_observed = max_heart_rate_observed
+    if max_hr_observed && lt_new > (max_hr_observed - 5)
+      lt_new = max_hr_observed - 5
+    end
+
+    lt_new
+  end
+
+  # Helper: maximale waargenomen hartslag over alle prestaties
+  def max_heart_rate_observed
+    max_hr = performances
+      .where.not(core_heart_rate: nil)
+      .maximum(:core_heart_rate)
+    max_hr || nil
+  end
+
+  # 3.3. Anaerobe drempel-tempo (LT-pace)
+  def lt_pace_seconds_per_km
+    ref = reference_performance_for_threshold
+    return nil unless ref&.value && ref&.distance
+
+    tijd_sec = tijd_naar_seconden(ref.value)
+    afstand_m = ref.distance.to_f
+    return nil if tijd_sec.zero? || afstand_m.zero?
+
+    # tempo = tijd_in_seconden / (afstand_in_meters / 1000)
+    (tijd_sec / (afstand_m / 1000.0)).round
+  end
+
+  def lt_pace_human
+    secs = lt_pace_seconds_per_km
+    return nil unless secs
+
+    minutes = secs / 60
+    seconds = secs % 60
+    format("%02d:%02d/km", minutes, seconds)
+  end
+
+  # 3.4. Hartslagzones (5 zones) - gebaseerd op LT-HR (anaerobe drempel)
+  # Volgens NTB standaard: zones gebaseerd op % van HF-AnD (anaerobe drempel hartslag)
+  def heart_rate_zones
+    lt = lt_heart_rate  # Dit is de anaerobe drempel hartslag (HF-AnD)
+    return nil unless lt
+
+    # NTB indeling op basis van % HF-AnD:
+    # Zone 1: < 85% HF-AnD
+    # Zone 2: 85-93% HF-AnD
+    # Zone 3: 93-100% HF-AnD
+    # Zone 4: 100-103% HF-AnD
+    # Zone 5: > 103% HF-AnD
+    
+    z1_max = (lt * 0.85).round
+    z2_min = z1_max + 1
+    z2_max = (lt * 0.93).round
+    z3_min = z2_max + 1
+    z3_max = lt
+    z4_min = lt + 1
+    z4_max = (lt * 1.03).round
+    z5_min = z4_max + 1
+
+    {
+      z1: { name: "Zone 1 - Herstel",              min: nil,    max: z1_max },
+      z2: { name: "Zone 2 - Extensieve duur",      min: z2_min, max: z2_max },
+      z3: { name: "Zone 3 - Intensieve duur",      min: z3_min, max: z3_max },
+      z4: { name: "Zone 4 - Extensief interval",   min: z4_min, max: z4_max },
+      z5: { name: "Zone 5 - Intensief interval",   min: z5_min, max: nil    }
+    }
+  end
+
+  # 3.5. Tempozones (5 zones) - gebaseerd op LT-pace (anaerobe drempel tempo)
+  # Volgens NTB standaard: zones gebaseerd op % van v-AnD (snelheid bij anaerobe drempel)
+  def pace_zones
+    lt = lt_pace_seconds_per_km  # Dit is het tempo bij de anaerobe drempel
+    return nil unless lt
+
+    # NTB indeling op basis van % v-AnD (aangepast voor hardlopen):
+    # Zone 1: < 85% v-AnD (langzamer dan drempel)
+    # Zone 2: 85-93% v-AnD
+    # Zone 3: 93-98% v-AnD (rond de drempel)
+    # Zone 4: 98-102% v-AnD (net boven drempel)
+    # Zone 5: > 102% v-AnD (ruim boven drempel)
+    
+    # Omrekenen: lagere % = sneller tempo = minder seconden per km
+    # Bijvoorbeeld: 85% van drempeltempo = 1/0.85 = 1.176x langzamer = lt * 1.176
+    
+    z1_max = (lt / 0.85).round  # Langzamer dan 85% van drempel
+    z2_min = z1_max - 1
+    z2_max = (lt / 0.93).round  # Tot 93% van drempel
+    z3_min = z2_max - 1
+    z3_max = (lt / 0.98).round  # Tot 98% van drempel
+    z4_min = z3_max - 1
+    z4_max = (lt / 1.02).round  # Tot 102% van drempel (sneller = minder sec/km)
+    z5_min = z4_max - 1
+
+    {
+      z1: { 
+        name: "Zone 1 - Herstel", 
+        min_sec: z1_max, 
+        max_sec: nil,
+        min_human: format_pace(z1_max),
+        max_human: nil
+      },
+      z2: { 
+        name: "Zone 2 - Extensieve duur", 
+        min_sec: z2_max, 
+        max_sec: z2_min,
+        min_human: format_pace(z2_max),
+        max_human: format_pace(z2_min)
+      },
+      z3: { 
+        name: "Zone 3 - Intensieve duur", 
+        min_sec: z3_max, 
+        max_sec: z3_min,
+        min_human: format_pace(z3_max),
+        max_human: format_pace(z3_min)
+      },
+      z4: { 
+        name: "Zone 4 - Extensief interval", 
+        min_sec: z4_max, 
+        max_sec: z4_min,
+        min_human: format_pace(z4_max),
+        max_human: format_pace(z4_min)
+      },
+      z5: { 
+        name: "Zone 5 - Intensief interval", 
+        min_sec: nil, 
+        max_sec: z5_min,
+        min_human: nil,
+        max_human: format_pace(z5_min)
+      }
+    }
+  end
+
+  # Helper: format pace in mm:ss/km
+  def format_pace(secs)
+    return nil unless secs
+    minutes = secs / 60
+    seconds = secs % 60
+    format("%02d:%02d/km", minutes, seconds)
+  end
+
+  # Helper: format pace range
+  # min = snellere grens (lager aantal seconden per km)
+  # max = langzamere grens (hoger aantal seconden per km)
+  def format_pace_range(min_secs, max_secs)
+    if min_secs.nil? && max_secs
+      # Zone 1: langzamer dan max
+      "langzamer dan #{format_pace(max_secs)}"
+    elsif max_secs.nil? && min_secs
+      # Zone 5: sneller dan min
+      "sneller dan #{format_pace(min_secs)}"
+    elsif min_secs && max_secs
+      # Zones 2-4: bereik van sneller (min) naar langzamer (max)
+      "#{format_pace(min_secs)} - #{format_pace(max_secs)}"
+    else
+      nil
+    end
+  end
+
+  # 3.6. Prognoses (Riegel exponent 1.06)
+  def race_time_predictions
+    ref = reference_performance_for_threshold
+    return nil unless ref && ref.distance.to_f.positive?
+
+    t_ref = tijd_naar_seconden(ref.value).to_f
+    d_ref = ref.distance.to_f
+    return nil if t_ref.zero? || d_ref.zero?
+
+    targets = {
+      "5k"  => 5000.0,
+      "10k" => 10_000.0,
+      "15k" => 15_000.0,
+      "hm"  => 21_097.0
+    }
+
+    predictions = {}
+
+    targets.each do |key, d_target|
+      t_target = (t_ref * (d_target / d_ref)**1.06).round
+      predictions[key] = { seconds: t_target, human: format_time_hms(t_target) }
+    end
+
+    predictions
+  end
+
+  # Helper: format tijd in uu:mm:ss of mm:ss
+  def format_time_hms(secs)
+    hours   = secs / 3600
+    rem     = secs % 3600
+    minutes = rem / 60
+    seconds = rem % 60
+
+    if hours.positive?
+      format("%02d:%02d:%02d", hours, minutes, seconds)
+    else
+      format("%02d:%02d", minutes, seconds)
+    end
+  end
+
+  # Helper: recente prestaties met hartslag
+  def recent_performances_with_heart_rate(limit = 10)
+    performances
+      .where.not(core_heart_rate: nil)
+      .order(date: :desc, created_at: :desc)
+      .limit(limit)
+  end
+
+  # Cache clearing voor threshold-gerelateerde waarden
+  # Als er geen caching is, hoeft deze methode niets te doen
+  def clear_threshold_cache!
+    # Placeholder: als er in de toekomst caching wordt toegevoegd,
+    # kan hier de cache worden geleegd
+    # Voor nu: niets doen, alles wordt on-the-fly berekend
+  end
+
   private
 
   def sync_roles

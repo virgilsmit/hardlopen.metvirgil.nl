@@ -1,5 +1,48 @@
 class HomeController < ApplicationController
   layout :determine_layout
+  def sport_index
+    # Nieuwe moderne sport homepage
+    if current_user && current_user.training_days.present?
+      # Filter op training_days van de gebruiker (Dinsdag/Zaterdag)
+      dag_mapping = {
+        'Dinsdag' => 'Tuesday',
+        'Zaterdag' => 'Saturday'
+      }
+      
+      allowed_days = current_user.training_days.map { |dag| dag_mapping[dag] }.compact
+      
+      @upcoming_public_sessions = TrainingSession
+        .where('date >= ?', Date.current)
+        .select { |session| allowed_days.include?(session.date.strftime('%A')) }
+        .sort_by(&:date)
+        .take(12)
+    else
+      # Toon alle trainingen als er geen training_days zijn ingesteld
+      @upcoming_public_sessions = TrainingSession
+        .where('date >= ?', Date.current)
+        .order(:date)
+        .limit(12)
+    end
+    
+    @upcoming_birthdays = if current_user
+      User.where.not(birthday: nil).select do |u|
+        bday = u.birthday.change(year: Date.today.year)
+        bday += 1.year if bday < Date.today
+        (bday - Date.today).to_i <= 30
+      end.sort_by { |u| u.birthday.change(year: Date.today.year) }
+    else
+      []
+    end
+    
+    @tiles = if current_user
+      helpers.visible_tiles_for_dashboard(current_user)
+    else
+      []
+    end
+    
+    render 'home/sport_index'
+  end
+  
   def index
     if current_user
       today = Date.today

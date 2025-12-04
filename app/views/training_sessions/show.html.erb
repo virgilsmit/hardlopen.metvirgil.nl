@@ -1,6 +1,21 @@
 <div class="training-details-page prototype-track">
 <h1 style="color: #ffffff !important;">Training details</h1>
 
+<% if current_user&.admin? || current_user&.has_role?(:trainer) %>
+  <div style="margin-bottom: 2rem;">
+    <%= link_to quick_attendance_training_session_path(@training_session), class:'theme-btn', style:'width: 100%; background: linear-gradient(135deg, #1ee3cf, #34c759); color: #0c1730; font-weight: 700; padding: 1.25rem 2rem; box-shadow: 0 6px 16px rgba(30, 227, 207, 0.4); text-align: center; border-radius: 12px; font-size: 1.2rem; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.75rem;' do %>
+      <span style="font-size: 1.5rem;">⚡</span>
+      <span>Snelle Presentielijst</span>
+    <% end %>
+    <% if @training_session.date != Date.today %>
+      <p style="color: rgba(244, 248, 255, 0.6); margin: 0.5rem 0 0 0; text-align: center; font-size: 0.9rem;">
+        Training: <%= @training_session.date.strftime('%d-%m-%Y') %> 
+        <%= @training_session.date < Date.today ? '(verleden)' : @training_session.date == Date.today ? '(vandaag)' : '(toekomst)' %>
+      </p>
+    <% end %>
+  </div>
+<% end %>
+
 <% if current_user %>
   <% current_user_attendance = @training_session.attendances.find_by(user_id: current_user.id) %>
   <!-- SECTIE 0: Eigen Status -->
@@ -12,14 +27,14 @@
       <div class="own-status-container own-status-aanwezig" style="flex: 1; background: rgba(30, 227, 207, 0.1); border: 2px solid <%= current_user_attendance&.status.to_s == 'aanwezig' ? 'rgba(30, 227, 207, 0.8)' : 'rgba(30, 227, 207, 0.3)' %>; border-radius: 16px; padding: 1.5rem;">
         <h3 style="color: #1ee3cf !important; font-size: 1.25rem; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(30, 227, 207, 0.3);">Aanwezig</h3>
         <div style="text-align: center;">
-          <%= form_with url: attendances_path, method: :post, local: true, class: 'inline-form' do |f| %>
-            <%= f.hidden_field :user_id, value: current_user.id %>
-            <%= f.hidden_field :training_session_id, value: @training_session.id %>
-            <%= f.hidden_field :status, value: 'aanwezig' %>
-            <button type="submit" class="theme-btn attendance-btn attendance-aanwezig-btn" style="background: #1ee3cf; color: #0c1730; padding: 0.75rem 2rem; font-size: 1rem; font-weight: 600; border-radius: 8px; width: 100%; <%= (current_user_attendance.nil? || current_user_attendance.status.to_s == 'aanwezig') ? 'opacity: 1; box-shadow: 0 0 0 3px rgba(30, 227, 207, 0.5);' : 'opacity: 0.35;' %>">
-              <%= (current_user_attendance&.status.to_s == 'aanwezig') ? '✓ Aanwezig' : 'Markeer als Aanwezig' %>
-            </button>
-          <% end %>
+            <%= form_with url: attendances_path, method: :post, local: false, class: 'inline-form' do |f| %>
+              <%= f.hidden_field :user_id, value: current_user.id %>
+              <%= f.hidden_field :training_session_id, value: @training_session.id %>
+              <%= f.hidden_field :status, value: 'aanwezig' %>
+              <button type="submit" class="theme-btn attendance-btn attendance-aanwezig-btn" style="background: #1ee3cf; color: #0c1730; padding: 0.75rem 2rem; font-size: 1rem; font-weight: 600; border-radius: 8px; width: 100%; <%= (current_user_attendance.nil? || current_user_attendance.status.to_s == 'aanwezig') ? 'opacity: 1; box-shadow: 0 0 0 3px rgba(30, 227, 207, 0.5);' : 'opacity: 0.35;' %>">
+                <%= (current_user_attendance&.status.to_s == 'aanwezig') ? '✓ Aanwezig' : 'Markeer als Aanwezig' %>
+              </button>
+            <% end %>
         </div>
       </div>
 
@@ -29,29 +44,37 @@
         <h3 style="color: #ff6b35 !important; font-size: 1.25rem; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255, 107, 53, 0.3);">Afwezig</h3>
         <div style="text-align: center;">
           <% unless afwezig_active %>
-            <%= form_with url: attendances_path, method: :post, local: true, html: { class: 'afwezig-form', data: { session_id: @training_session.id } }, class: 'inline-form' do |f| %>
+            <%= form_with url: attendances_path, method: :post, local: false, html: { class: 'afwezig-form', data: { session_id: @training_session.id }, id: "afwezig-form-#{@training_session.id}" }, class: 'inline-form' do |f| %>
               <%= f.hidden_field :user_id, value: current_user.id %>
               <%= f.hidden_field :training_session_id, value: @training_session.id %>
               <%= f.hidden_field :status, value: 'afwezig' %>
               <div class="afwezig-container">
-                <button type="submit" class="theme-btn afwezig-btn inactive" data-session-id="<%= @training_session.id %>" style="background: #ff6b35; color: #0c1730; padding: 0.75rem 2rem; font-size: 1rem; font-weight: 600; border-radius: 8px; width: 100%; margin-bottom: 1rem; opacity: 0.35;">Markeer als Afwezig</button>
-                <div class="afwezig-note-field" id="afwezig-note-<%= @training_session.id %>" style="display: none;">
-                  <%= f.text_field :note, value: nil, placeholder: 'Reden (optioneel)', class: 'note-input-full', style: 'width: 100%; padding: 0.75rem; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: #ffffff; background: rgba(255, 255, 255, 0.1); font-size: 0.9rem; margin-bottom: 0.75rem;' %>
+                <div class="afwezig-note-field" id="afwezig-note-<%= @training_session.id %>" style="display: block; margin-bottom: 1rem;">
+                  <label for="attendance_note_<%= @training_session.id %>" style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #ffffff; font-size: 0.9rem; text-align: left;">Reden <span style="color: #ff6b35;">*</span></label>
+                  <%= f.text_field :note, value: nil, placeholder: 'bijv. geen zin, blessure, vakantie...', class: 'note-input-full', id: "attendance_note_#{@training_session.id}", required: true, style: 'width: 100%; padding: 0.75rem; border: 2px solid rgba(255, 107, 53, 0.5); border-radius: 8px; color: #ffffff; background: rgba(255, 255, 255, 0.15); font-size: 0.9rem;' %>
                 </div>
+                <button type="submit" class="theme-btn afwezig-btn inactive" id="afwezig-btn-<%= @training_session.id %>" data-session-id="<%= @training_session.id %>" disabled style="background: #ff6b35; color: #0c1730; padding: 0.75rem 2rem; font-size: 1rem; font-weight: 600; border-radius: 8px; width: 100%; opacity: 0.35; cursor: not-allowed;">Markeer als Afwezig</button>
               </div>
             <% end %>
           <% else %>
             <div class="afwezig-container">
               <button type="button" class="theme-btn afwezig-submit" style="background: #ff6b35; color: #0c1730; padding: 0.75rem 2rem; font-size: 1rem; font-weight: 600; border-radius: 8px; width: 100%; margin-bottom: 1rem;">✓ Afwezig</button>
+              <% if current_user_attendance.note.present? %>
+                <div style="margin-top: 1rem; padding: 1rem; background: rgba(255, 193, 7, 0.15); border-left: 3px solid #ffc107; border-radius: 8px; text-align: left;">
+                  <strong style="color: #ffc107; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Reden:</strong>
+                  <p style="color: #ffffff; font-size: 1rem; margin: 0; font-weight: 500;"><%= current_user_attendance.note %></p>
+                </div>
+              <% end %>
             </div>
           <% end %>
           <% if afwezig_active %>
-            <div class="afwezig-note-field" id="afwezig-note-<%= @training_session.id %>">
-              <%= form_with model: current_user_attendance, url: attendance_path(current_user_attendance), method: :patch, local: true do |f_update| %>
+            <div class="afwezig-note-field" id="afwezig-note-update-<%= @training_session.id %>" style="margin-top: 1rem;">
+              <%= form_with model: current_user_attendance, url: attendance_path(current_user_attendance), method: :patch, local: false do |f_update| %>
                 <%= f_update.hidden_field :user_id, value: current_user.id %>
                 <%= f_update.hidden_field :training_session_id, value: @training_session.id %>
                 <%= f_update.hidden_field :status, value: 'afwezig' %>
-                <%= f_update.text_field :note, value: current_user_attendance.note, placeholder: 'Reden (optioneel)', style: 'width: 100%; padding: 0.75rem; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: #ffffff; background: rgba(255, 255, 255, 0.1); font-size: 0.9rem; margin-bottom: 0.5rem;' %>
+                <label for="attendance_note_update_<%= @training_session.id %>" style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #ffffff; font-size: 0.9rem; text-align: left;">Reden wijzigen:</label>
+                <%= f_update.text_field :note, value: current_user_attendance.note, placeholder: 'bijv. geen zin, blessure, vakantie...', id: "attendance_note_update_#{@training_session.id}", required: true, style: 'width: 100%; padding: 0.75rem; border: 2px solid rgba(255, 107, 53, 0.5); border-radius: 8px; color: #ffffff; background: rgba(255, 255, 255, 0.15); font-size: 0.9rem; margin-bottom: 0.5rem;' %>
                 <button type="submit" class="theme-btn" style="background: #1ee3cf; color: #0c1730; padding: 0.5rem 1.5rem; font-size: 0.9rem; font-weight: 600; border-radius: 8px; width: 100%;">Reden bijwerken</button>
               <% end %>
             </div>
@@ -67,6 +90,12 @@
 <% else %>
   <% users = @training_session.group&.users&.select { |u| u.has_role?(:trainer) == false && User.alleen_actieve_lopers.include?(u) }&.sort_by(&:name) || [] %>
 <% end %>
+<%
+  # Voeg gebruikers toe die zich hebben aangemeld/afgemeld maar niet in de groep zitten
+  attendance_user_ids = @training_session.attendances.pluck(:user_id)
+  attendance_users = User.where(id: attendance_user_ids).select { |u| !users.include?(u) && User.alleen_actieve_lopers.include?(u) }
+  users = (users + attendance_users).sort_by(&:name)
+%>
 <%
   session_day_value = @training_session.dag.to_s.downcase
   if session_day_value.blank? && @training_session.date.present?
@@ -84,15 +113,36 @@
 <% users.unshift(users.delete(current_user)) if users.include?(current_user) %>
 <% # Sorteer de overige gebruikers op status: afwezig -> aanwezig -> geen status %>
 <% overige = users[1..-1] || [] %>
-<% afwezig = overige.select { |u| @training_session.attendances.find_by(user: u)&.status == 'afwezig' } %>
-<% aanwezig = overige.select { |u| @training_session.attendances.find_by(user: u)&.status == 'aanwezig' } %>
-<% geen_status = overige - afwezig - aanwezig %>
-<% gesorteerde_users = [users.first] + afwezig + aanwezig + geen_status %>
 
-<% actieve_lopers = (@training_session.group&.users || []).select { |u| u.has_role?(:trainer) == false && User.alleen_actieve_lopers.include?(u) && training_day_active.call(u) } %>
-<% aanwezig_count = actieve_lopers.count { |u| @training_session.attendances.find_by(user: u)&.status == 'aanwezig' } %>
-<% afwezig_count = actieve_lopers.count { |u| @training_session.attendances.find_by(user: u)&.status == 'afwezig' } %>
-<% totaal_lopers = actieve_lopers.count %>
+<% # Filter: alleen lopers die actief zijn op deze dag OF zich expliciet hebben aangemeld/afgemeld %>
+<% filtered_overige = overige.select do |u|
+  attendance = @training_session.attendances.find_by(user: u)
+  # Toon als: (1) actief op deze dag, OF (2) heeft zich aangemeld/afgemeld
+  training_day_active.call(u) || attendance.present?
+end %>
+
+<% # Maak de lijsten met gefilterde users (afwezig, aanwezig, geen status) %>
+<% afwezig = filtered_overige.select { |u| @training_session.attendances.find_by(user: u)&.status == 'afwezig' } %>
+<% aanwezig = filtered_overige.select { |u| @training_session.attendances.find_by(user: u)&.status == 'aanwezig' } %>
+<% geen_status = filtered_overige - afwezig - aanwezig %>
+<% gesorteerde_users = [users.first].compact + afwezig + aanwezig + geen_status %>
+
+<%
+  # === CENTRALE BEREKENING: Statistieken + Deelnemers ===
+  # Deze berekening wordt gebruikt voor ZOWEL de statistieken bovenaan ALS de deelnemers lijst
+  
+  attendance_lookup = @training_session.attendances.index_by(&:user_id)
+  aanwezig_users = gesorteerde_users.select { |u| attendance_lookup[u.id]&.status.to_s == 'aanwezig' }
+  afwezig_users = gesorteerde_users.select { |u| attendance_lookup[u.id]&.status.to_s == 'afwezig' }
+  onbekend_users = gesorteerde_users - aanwezig_users - afwezig_users
+  
+  # Deze variabelen worden gebruikt in BEIDE secties (statistieken EN deelnemers)
+  totaal_lopers = gesorteerde_users.count
+  aanwezig_count = aanwezig_users.count
+  afwezig_count = afwezig_users.count
+  
+  Rails.logger.info "[SYNC] Training #{@training_session.id} - Totaal: #{totaal_lopers}, Aanwezig: #{aanwezig_count}, Afwezig: #{afwezig_count}"
+%>
 
 <% aanwezige_trainers = @training_session.group&.users&.select { |u| u.has_role?(:trainer) && @training_session.attendances.find_by(user: u)&.status == 'aanwezig' } || [] %>
 <% afwezige_trainers = @training_session.group&.users&.select { |u| u.has_role?(:trainer) && @training_session.attendances.find_by(user: u)&.status == 'afwezig' } || [] %>
@@ -102,19 +152,19 @@
   <h2 style="color: #ffffff !important; font-size: 1.5rem; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255, 255, 255, 0.2);">Training Details</h2>
   
   <div class="training-details-list" style="display: flex !important; flex-direction: column !important; gap: 1rem !important; width: 100% !important; max-width: 100% !important;">
-    <div class="detail-item" style="padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
-      <div style="font-size: 0.75rem; font-weight: 600; color: #1ee3cf; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem;">Week</div>
-      <div style="font-size: 1.125rem; font-weight: 500; color: #ffffff;"><%= @training_session.week %></div>
+    <div class="detail-item" style="padding: 1.25rem; background: rgba(255, 255, 255, 0.12); border-radius: 12px; border: 2px solid rgba(30, 227, 207, 0.3);">
+      <div style="font-size: 0.8rem; font-weight: 700; color: #1ee3cf; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Week</div>
+      <div style="font-size: 1.2rem; font-weight: 600; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.4);"><%= @training_session.week %></div>
     </div>
     
-    <div class="detail-item" style="padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
-      <div style="font-size: 0.75rem; font-weight: 600; color: #1ee3cf; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem;">Datum</div>
-      <div style="font-size: 1.125rem; font-weight: 500; color: #ffffff;"><%= @training_session.date %></div>
+    <div class="detail-item" style="padding: 1.25rem; background: rgba(255, 255, 255, 0.12); border-radius: 12px; border: 2px solid rgba(30, 227, 207, 0.3);">
+      <div style="font-size: 0.8rem; font-weight: 700; color: #1ee3cf; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Datum</div>
+      <div style="font-size: 1.2rem; font-weight: 600; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.4);"><%= @training_session.date %></div>
     </div>
     
-    <div class="detail-item" style="padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
-      <div style="font-size: 0.75rem; font-weight: 600; color: #1ee3cf; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem;">Dag</div>
-      <div style="font-size: 1.125rem; font-weight: 500; color: #ffffff;">
+    <div class="detail-item" style="padding: 1.25rem; background: rgba(255, 255, 255, 0.12); border-radius: 12px; border: 2px solid rgba(30, 227, 207, 0.3);">
+      <div style="font-size: 0.8rem; font-weight: 700; color: #1ee3cf; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Dag</div>
+      <div style="font-size: 1.2rem; font-weight: 600; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.4);">
         <% if @training_session.dag.to_s.downcase == 'zaterdag' %>
           Zaterdag 08:45
         <% elsif @training_session.dag.to_s.downcase == 'dinsdag' %>
@@ -125,38 +175,38 @@
       </div>
     </div>
     
-    <div class="detail-item" style="padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
-      <div style="font-size: 0.75rem; font-weight: 600; color: #1ee3cf; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem;">Training</div>
-      <div style="font-size: 1.125rem; font-weight: 500; color: #ffffff; word-wrap: break-word;"><%= @training_session.description %></div>
+    <div class="detail-item" style="padding: 1.25rem; background: rgba(255, 255, 255, 0.12); border-radius: 12px; border: 2px solid rgba(30, 227, 207, 0.3);">
+      <div style="font-size: 0.8rem; font-weight: 700; color: #1ee3cf; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Training</div>
+      <div style="font-size: 1.1rem; font-weight: 600; color: #ffffff; word-wrap: break-word; line-height: 1.6; text-shadow: 0 1px 3px rgba(0,0,0,0.4);"><%= @training_session.description %></div>
     </div>
     
-    <div class="detail-item" style="padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
-      <div style="font-size: 0.75rem; font-weight: 600; color: #1ee3cf; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem;">Loopscholing</div>
-      <div style="font-size: 1.125rem; font-weight: 500; color: #ffffff; word-wrap: break-word;"><%= @training_session.loopscholing %></div>
+    <div class="detail-item" style="padding: 1.25rem; background: rgba(255, 255, 255, 0.12); border-radius: 12px; border: 2px solid rgba(30, 227, 207, 0.3);">
+      <div style="font-size: 0.8rem; font-weight: 700; color: #1ee3cf; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Loopscholing</div>
+      <div style="font-size: 1.1rem; font-weight: 600; color: #ffffff; word-wrap: break-word; line-height: 1.6; text-shadow: 0 1px 3px rgba(0,0,0,0.4);"><%= @training_session.loopscholing %></div>
     </div>
     
-    <div class="detail-item" style="padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
-      <div style="font-size: 0.75rem; font-weight: 600; color: #1ee3cf; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem;">Trainer</div>
-      <div style="font-size: 1.125rem; font-weight: 500; color: #ffffff;"><%= @training_session.trainer&.name || '-' %></div>
+    <div class="detail-item" style="padding: 1.25rem; background: rgba(255, 255, 255, 0.12); border-radius: 12px; border: 2px solid rgba(30, 227, 207, 0.3);">
+      <div style="font-size: 0.8rem; font-weight: 700; color: #1ee3cf; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Trainer</div>
+      <div style="font-size: 1.2rem; font-weight: 600; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.4);"><%= @training_session.trainer&.name || '-' %></div>
     </div>
     
     <% if aanwezige_trainers.any? %>
-      <div class="detail-item" style="padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
-        <div style="font-size: 0.75rem; font-weight: 600; color: #1ee3cf; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem;">Aanwezige trainers</div>
-        <div style="font-size: 1.125rem; font-weight: 500; color: #ffffff;"><%= aanwezige_trainers.map(&:name).join(', ') %></div>
+      <div class="detail-item" style="padding: 1.25rem; background: rgba(30, 227, 207, 0.15); border-radius: 12px; border: 2px solid rgba(30, 227, 207, 0.4);">
+        <div style="font-size: 0.8rem; font-weight: 700; color: #1ee3cf; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Aanwezige trainers</div>
+        <div style="font-size: 1.2rem; font-weight: 600; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.4);"><%= aanwezige_trainers.map(&:name).join(', ') %></div>
       </div>
     <% end %>
     
     <% if afwezige_trainers.any? %>
-      <div class="detail-item" style="padding: 1rem; background: rgba(255, 107, 53, 0.1); border-radius: 12px; border: 1px solid rgba(255, 107, 53, 0.3);">
-        <div style="font-size: 0.75rem; font-weight: 600; color: #ff6b35; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem;">Afwezige trainers</div>
-        <div style="font-size: 1.125rem; font-weight: 500; color: #ffffff;">
+      <div class="detail-item" style="padding: 1.25rem; background: rgba(255, 107, 53, 0.15); border-radius: 12px; border: 2px solid rgba(255, 107, 53, 0.4);">
+        <div style="font-size: 0.8rem; font-weight: 700; color: #ff6b35; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Afwezige trainers</div>
+        <div style="font-size: 1.1rem; font-weight: 600; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.4);">
           <% afwezige_trainers.each do |trainer| %>
             <% trainer_attendance = @training_session.attendances.find_by(user_id: trainer.id) %>
             <div style="margin-bottom: 0.5rem;">
-              <strong style="color: #ff6b35;"><%= trainer.name %></strong>
+              <strong style="color: #ffffff;"><%= trainer.name %></strong>
               <% if trainer_attendance&.note.present? %>
-                <span style="margin-left: 0.5em; color: #c7d7ff; font-style: italic; font-size: 0.9rem;">- <%= trainer_attendance.note %></span>
+                <span style="margin-left: 0.5em; color: #ffffff; font-style: italic; font-size: 0.95rem; opacity: 0.9;">- <%= trainer_attendance.note %></span>
               <% end %>
             </div>
           <% end %>
@@ -164,32 +214,32 @@
       </div>
     <% end %>
     
-    <div class="detail-item" style="padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
-      <div style="font-size: 0.75rem; font-weight: 600; color: #1ee3cf; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem;">Locatie</div>
-      <div style="font-size: 1.125rem; font-weight: 500; color: #ffffff;"><%= @training_session.locatie %></div>
+    <div class="detail-item" style="padding: 1.25rem; background: rgba(255, 255, 255, 0.12); border-radius: 12px; border: 2px solid rgba(30, 227, 207, 0.3);">
+      <div style="font-size: 0.8rem; font-weight: 700; color: #1ee3cf; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Locatie</div>
+      <div style="font-size: 1.2rem; font-weight: 600; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.4);"><%= @training_session.locatie %></div>
     </div>
     
-    <div class="detail-item" style="padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
-      <div style="font-size: 0.75rem; font-weight: 600; color: #1ee3cf; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem;">Groep</div>
-      <div style="font-size: 1.125rem; font-weight: 500; color: #ffffff;"><%= @training_session.group&.name || '-' %></div>
+    <div class="detail-item" style="padding: 1.25rem; background: rgba(255, 255, 255, 0.12); border-radius: 12px; border: 2px solid rgba(30, 227, 207, 0.3);">
+      <div style="font-size: 0.8rem; font-weight: 700; color: #1ee3cf; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Groep</div>
+      <div style="font-size: 1.2rem; font-weight: 600; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.4);"><%= @training_session.group&.name || '-' %></div>
     </div>
     
-    <div class="detail-item" style="padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
-      <div style="font-size: 0.75rem; font-weight: 600; color: #1ee3cf; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem;">Fase</div>
-      <div style="font-size: 1.125rem; font-weight: 500; color: #ffffff;"><%= @training_session.fase %></div>
+    <div class="detail-item" style="padding: 1.25rem; background: rgba(255, 255, 255, 0.12); border-radius: 12px; border: 2px solid rgba(30, 227, 207, 0.3);">
+      <div style="font-size: 0.8rem; font-weight: 700; color: #1ee3cf; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Fase</div>
+      <div style="font-size: 1.2rem; font-weight: 600; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.4);"><%= @training_session.fase %></div>
     </div>
     
-    <div class="detail-item" style="padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
-      <div style="font-size: 0.75rem; font-weight: 600; color: #1ee3cf; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem;">Wedstrijd</div>
-      <div style="font-size: 1.125rem; font-weight: 500; color: #ffffff;"><%= @training_session.wedstrijd %></div>
+    <div class="detail-item" style="padding: 1.25rem; background: rgba(255, 255, 255, 0.12); border-radius: 12px; border: 2px solid rgba(30, 227, 207, 0.3);">
+      <div style="font-size: 0.8rem; font-weight: 700; color: #1ee3cf; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Wedstrijd</div>
+      <div style="font-size: 1.2rem; font-weight: 600; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.4);"><%= @training_session.wedstrijd %></div>
     </div>
   </div>
   
-  <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.2);">
-    <h3 style="color: #ffffff !important; font-size: 1.25rem; margin-bottom: 1rem;">Kern overzicht</h3>
+  <div style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid rgba(30, 227, 207, 0.3);">
+    <h3 style="color: #ffffff !important; font-size: 1.3rem; font-weight: 700; margin-bottom: 1.25rem; text-shadow: 0 1px 3px rgba(0,0,0,0.4);">Kern overzicht</h3>
     <ul class="core-list" style="list-style:none; padding:0; margin: 0;">
       <% human_core(@training_session.structured_core, current_user).each do |line| %>
-        <li style="padding: 1rem 1.25rem; margin-bottom: 0.75rem; background: rgba(255, 255, 255, 0.05); border-left: 3px solid #1ee3cf; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); font-size: 0.95rem; line-height: 1.6; color: #ffffff;">✅ <%= line %></li>
+        <li style="padding: 1.25rem; margin-bottom: 0.75rem; background: rgba(255, 255, 255, 0.12); border-left: 4px solid #1ee3cf; border-radius: 12px; border: 2px solid rgba(30, 227, 207, 0.3); font-size: 1.05rem; line-height: 1.7; color: #ffffff; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.4);">✅ <%= line %></li>
       <% end %>
     </ul>
   </div>
@@ -216,45 +266,71 @@
 
 <!-- SECTIE 3: Deelnemers -->
 <section class="training-participants-section" style="margin: 2rem 0; padding: 2rem; background: #1f3150; border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 18px 40px rgba(7, 10, 24, 0.45);">
-  <h2 style="color: #ffffff !important; font-size: 1.5rem; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255, 255, 255, 0.2);">Deelnemers</h2>
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid rgba(255, 255, 255, 0.12);">
+    <h2 style="color: #ffffff !important; font-size: 1.6rem; margin: 0; font-weight: 700; letter-spacing: -0.02em;">Deelnemers</h2>
+    <span style="background: rgba(255, 255, 255, 0.1); padding: 0.5rem 1rem; border-radius: 8px; color: #ffffff; font-size: 0.95rem; font-weight: 600; border: 1px solid rgba(255, 255, 255, 0.2);">
+      Totaal: <strong style="font-size: 1.2rem; color: #1ee3cf;"><%= gesorteerde_users.count %></strong>
+    </span>
+  </div>
 
-  <% attendance_lookup = @training_session.attendances.index_by(&:user_id) %>
-  <% aanwezig_users = gesorteerde_users.select { |u| attendance_lookup[u.id]&.status.to_s == 'aanwezig' } %>
-  <% afwezig_users = gesorteerde_users.select { |u| attendance_lookup[u.id]&.status.to_s == 'afwezig' } %>
-  <% onbekend_users = gesorteerde_users - aanwezig_users - afwezig_users %>
+  <%# Variabelen zijn al berekend bovenaan (na gesorteerde_users) %>
 
   <%
+    # Structureel afwezig = niet actief op deze dag EN heeft zich NIET aangemeld/afgemeld
     structural_absent_users = if recognized_day.present?
       gesorteerde_users.select do |u|
-        u.training_days.present? && !u.training_days.map(&:downcase).include?(recognized_day)
+        attendance = attendance_lookup[u.id]
+        # Alleen structureel afwezig als: niet actief op deze dag EN geen attendance record
+        u.training_days.present? && 
+        !u.training_days.map(&:downcase).include?(recognized_day) &&
+        attendance.nil?
       end
     else
       []
     end
   %>
 
+  <style>
+    @media (max-width: 768px) {
+      .participants-containers-wrapper {
+        flex-direction: column !important;
+      }
+    }
+  </style>
+  
   <div class="participants-containers-wrapper" style="display: flex; gap: 2rem; margin-bottom: 2rem;">
     <!-- Container 1: Aanwezig -->
     <div class="participants-container participants-aanwezig" style="flex: 1; background: rgba(30, 227, 207, 0.1); border: 1px solid rgba(30, 227, 207, 0.3); border-radius: 16px; padding: 1.5rem;">
-      <h3 style="color: #1ee3cf !important; font-size: 1.25rem; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(30, 227, 207, 0.3);">Aanwezig</h3>
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; margin-bottom: 1rem; border-bottom: 1px solid rgba(30, 227, 207, 0.2);">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #1ee3cf; border-radius: 10px; color: #0c1730; font-size: 1.3rem; font-weight: 700; box-shadow: 0 2px 8px rgba(30, 227, 207, 0.25);">✓</span>
+          <span style="color: #1ee3cf; font-size: 1.15rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Aanwezig</span>
+        </div>
+        <span style="background: rgba(30, 227, 207, 0.15); padding: 0.5rem 1.25rem; border-radius: 8px; color: #1ee3cf; font-size: 1.5rem; font-weight: 800; min-width: 60px; text-align: center; border: 2px solid rgba(30, 227, 207, 0.3);"><%= aanwezig_users.count %></span>
+      </div>
       <div class="participants-list">
         <% non_structural_onbekend = onbekend_users - structural_absent_users %>
         <% if aanwezig_users.any? || non_structural_onbekend.any? %>
-          <% aanwezig_users.each do |user| %>
+          <% aanwezig_users.each_with_index do |user, index| %>
             <% attendance = attendance_lookup[user.id] %>
             <div class="participant-item" style="padding: 1rem; margin-bottom: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px;">
               <div style="display: flex; align-items: center; justify-content: space-between;">
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
-                  <span style="display:inline-block; width:12px;height:12px;border-radius:50%;background:#1ee3cf;"></span>
+                  <span style="display:inline-flex; align-items:center; justify-content:center; min-width:28px; height:28px; border-radius:8px; background: linear-gradient(135deg, #1ee3cf, #17b8a8); color:#0c1730; font-weight:700; font-size:0.8rem; box-shadow: 0 2px 4px rgba(30, 227, 207, 0.3);"><%= index + 1 %></span>
                   <strong style="color: #ffffff !important; font-weight: 600;"><%= user.name %></strong>
                 </div>
                 <% if user == current_user || current_user.admin? || (current_user.has_role?(:trainer) && (@training_session.group&.hoofdtrainer_id == current_user.id || @training_session.group&.medetrainer_id == current_user.id)) %>
-                  <%= form_with url: attendances_path, method: :post, local: true, style: 'display:inline; width: 40%; max-width: 220px;' do |f| %>
+                  <%= form_with url: attendances_path, method: :post, local: true, scope: :attendance, style: 'display:inline; width: 40%; max-width: 220px;', id: "afwezig-form-#{user.id}-aanwezig" do |f| %>
                     <%= f.hidden_field :user_id, value: user.id %>
                     <%= f.hidden_field :training_session_id, value: @training_session.id %>
                     <%= f.hidden_field :status, value: 'afwezig' %>
-                    <%= f.text_field :note, placeholder: 'Reden (optioneel)', style: 'width: 100%; padding: 0.5rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: #ffffff; background: rgba(255,255,255,0.08); font-size: 0.85rem; margin-bottom: 0.5rem;' %>
-                    <button type="submit" class="theme-btn" style="background:#ff6b35; color:#0c1730; padding:0.4em 0.8em; font-size:0.85em; width: 100%;">Afwezig</button>
+                    <% if user == current_user %>
+                      <%= f.text_field :note, placeholder: 'Reden (verplicht)', id: "note-field-#{user.id}-aanwezig", required: true, style: 'width: 100%; padding: 0.5rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: #ffffff; background: rgba(255,255,255,0.08); font-size: 0.85rem; margin-bottom: 0.5rem;' %>
+                      <button type="submit" class="theme-btn afwezig-btn-dynamic" id="afwezig-btn-#{user.id}-aanwezig" disabled style="background:#ff6b35; color:#0c1730; padding:0.4em 0.8em; font-size:0.85em; width: 100%; opacity: 0.5; cursor: not-allowed;">Afwezig</button>
+                    <% else %>
+                      <%= f.text_field :note, placeholder: 'Reden (optioneel)', value: 'Afgemeld door trainer', style: 'width: 100%; padding: 0.5rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: #ffffff; background: rgba(255,255,255,0.08); font-size: 0.85rem; margin-bottom: 0.5rem;' %>
+                      <button type="submit" class="theme-btn" style="background:#ff6b35; color:#0c1730; padding:0.4em 0.8em; font-size:0.85em; width: 100%;">Afwezig</button>
+                    <% end %>
                   <% end %>
                 <% end %>
               </div>
@@ -269,21 +345,23 @@
                   <span style="font-size: 0.75rem; color:#1ee3cf; background: rgba(30,227,207,0.15); border: 1px dashed rgba(30,227,207,0.5); padding: 0.2rem 0.5rem; border-radius: 999px;">Nog niet gereageerd (standaard aanwezig)</span>
                 </div>
                 <% if user == current_user || current_user.admin? || (current_user.has_role?(:trainer) && (@training_session.group&.hoofdtrainer_id == current_user.id || @training_session.group&.medetrainer_id == current_user.id)) %>
-                  <%= form_with url: attendances_path, method: :post, local: true, style: 'display:inline; width: 40%; max-width: 220px;' do |f| %>
+                  <%= form_with url: attendances_path, method: :post, local: true, scope: :attendance, style: 'display:inline; width: 40%; max-width: 220px;' do |f| %>
                     <%= f.hidden_field :user_id, value: user.id %>
                     <%= f.hidden_field :training_session_id, value: @training_session.id %>
                     <%= f.hidden_field :status, value: 'aanwezig' %>
                     <button type="submit" class="theme-btn" style="background:#1ee3cf; color:#0c1730; padding:0.4em 0.8em; font-size:0.85em; width: 100%; margin-bottom: 0.5rem;">Bevestig Aanwezig</button>
-                    <div style="margin-top: 0.5rem;">
-                      <%= f.hidden_field :status, value: 'afwezig', name: 'attendance[status_override]' %>
-                    </div>
                   <% end %>
-                  <%= form_with url: attendances_path, method: :post, local: true, style: 'display:inline; width: 40%; max-width: 220px; margin-left: 0.75rem;' do |f| %>
+                  <%= form_with url: attendances_path, method: :post, local: true, scope: :attendance, style: 'display:inline; width: 40%; max-width: 220px; margin-left: 0.75rem;', id: "afwezig-form-#{user.id}-onbekend" do |f| %>
                     <%= f.hidden_field :user_id, value: user.id %>
                     <%= f.hidden_field :training_session_id, value: @training_session.id %>
                     <%= f.hidden_field :status, value: 'afwezig' %>
-                    <%= f.text_field :note, placeholder: 'Reden (optioneel)', style: 'width: 100%; padding: 0.5rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: #ffffff; background: rgba(255,255,255,0.08); font-size: 0.85rem; margin-bottom: 0.5rem;' %>
-                    <button type="submit" class="theme-btn" style="background:#ff6b35; color:#0c1730; padding:0.4em 0.8em; font-size:0.85em; width: 100%;">Afwezig</button>
+                    <% if user == current_user %>
+                      <%= f.text_field :note, placeholder: 'Reden (verplicht)', id: "note-field-#{user.id}-onbekend", required: true, style: 'width: 100%; padding: 0.5rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: #ffffff; background: rgba(255,255,255,0.08); font-size: 0.85rem; margin-bottom: 0.5rem;' %>
+                      <button type="submit" class="theme-btn afwezig-btn-dynamic" id="afwezig-btn-#{user.id}-onbekend" disabled style="background:#ff6b35; color:#0c1730; padding:0.4em 0.8em; font-size:0.85em; width: 100%; opacity: 0.5; cursor: not-allowed;">Afwezig</button>
+                    <% else %>
+                      <%= f.text_field :note, placeholder: 'Reden (optioneel)', value: 'Afgemeld door trainer', style: 'width: 100%; padding: 0.5rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: #ffffff; background: rgba(255,255,255,0.08); font-size: 0.85rem; margin-bottom: 0.5rem;' %>
+                      <button type="submit" class="theme-btn" style="background:#ff6b35; color:#0c1730; padding:0.4em 0.8em; font-size:0.85em; width: 100%;">Afwezig</button>
+                    <% end %>
                   <% end %>
                 <% end %>
               </div>
@@ -297,17 +375,23 @@
 
     <!-- Container 2: Afwezig -->
     <div class="participants-container participants-afwezig" style="flex: 1; background: rgba(255, 107, 53, 0.1); border: 1px solid rgba(255, 107, 53, 0.3); border-radius: 16px; padding: 1.5rem;">
-      <h3 style="color: #ff6b35 !important; font-size: 1.25rem; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255, 107, 53, 0.3);">Afwezig</h3>
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; margin-bottom: 1rem; border-bottom: 1px solid rgba(255, 107, 53, 0.2);">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #ff6b35; border-radius: 10px; color: #ffffff; font-size: 1.3rem; font-weight: 700; box-shadow: 0 2px 8px rgba(255, 107, 53, 0.25);">✗</span>
+          <span style="color: #ff6b35; font-size: 1.15rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Afwezig</span>
+        </div>
+        <span style="background: rgba(255, 107, 53, 0.15); padding: 0.5rem 1.25rem; border-radius: 8px; color: #ff6b35; font-size: 1.5rem; font-weight: 800; min-width: 60px; text-align: center; border: 2px solid rgba(255, 107, 53, 0.3);"><%= afwezig_users.count %></span>
+      </div>
       <div class="participants-list">
         <% combined_afwezig = (afwezig_users + structural_absent_users).uniq %>
         <% if combined_afwezig.any? %>
-          <% combined_afwezig.each do |user| %>
+          <% combined_afwezig.each_with_index do |user, index| %>
             <% attendance = attendance_lookup[user.id] %>
             <% structureel_afwezig = structural_absent_users.include?(user) && attendance.nil? %>
             <div class="participant-item" style="padding: 1rem; margin-bottom: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px;">
               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: <%= (attendance&.note.present? || structureel_afwezig) ? '0.75rem' : '0' %>;">
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
-                  <span style="display:inline-block; width:12px;height:12px;border-radius:50%;background:#ff6b35;"></span>
+                  <span style="display:inline-flex; align-items:center; justify-content:center; min-width:28px; height:28px; border-radius:8px; background: linear-gradient(135deg, #ff6b35, #e85a25); color:#ffffff; font-weight:700; font-size:0.8rem; box-shadow: 0 2px 4px rgba(255, 107, 53, 0.3);"><%= index + 1 %></span>
                   <strong style="color: #ffffff !important; font-weight: 600;"><%= user.name %></strong>
                 </div>
                 <% if user == current_user || current_user.admin? || (current_user.has_role?(:trainer) && (@training_session.group&.hoofdtrainer_id == current_user.id || @training_session.group&.medetrainer_id == current_user.id)) %>
@@ -377,7 +461,7 @@
 
 <% if current_user&.admin? || current_user&.has_role?(:trainer) %>
   <div style="margin-top:1.2em;">
-    <%= link_to 'Log aanwezige lopers', log_attendance_training_session_path(@training_session), class:'theme-btn', style:'background:#34c759;color:#fff;' %>
+    <%= link_to 'Log aanwezige lopers', log_attendance_training_session_path(@training_session), class:'theme-btn', style:'background:#34c759;color:#fff; padding: 1rem 1.5rem; text-align: center; border-radius: 12px; font-size: 1rem; text-decoration: none; display: inline-block;' %>
   </div>
 <% end %>
 
@@ -390,4 +474,31 @@
     <%= link_to 'Trainer wijzigen', edit_training_session_path(@training_session), class: 'theme-btn', style: 'background:#ff9800;' %>
   </div>
 <% end %>
+
+<script>
+  // Enable/disable afwezig buttons based on note field for current user
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.afwezig-btn-dynamic').forEach(function(btn) {
+      const form = btn.closest('form');
+      const noteField = form.querySelector('input[type="text"][id^="note-field-"]');
+      
+      if (noteField) {
+        const toggleButton = () => {
+          if (noteField.value.trim() !== '') {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+          } else {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+          }
+        };
+        
+        noteField.addEventListener('input', toggleButton);
+        toggleButton(); // Set initial state
+      }
+    });
+  });
+</script>
 </div> 

@@ -1,51 +1,190 @@
-<style>
-@media (max-width: 600px) {
-  .afmelden-container {
-    padding: 1em !important;
-    margin: 1em 0.2em !important;
-    max-width: 98vw !important;
-    font-size: 1.05em !important;
-  }
-  .afmelden-container button {
-    width: 100% !important;
-    font-size: 1.1em !important;
-    padding: 1em 0 !important;
-  }
-  .afmelden-container .training-box {
-    font-size: 1em !important;
-    padding: 1em !important;
-  }
-}
-</style>
-
-<% if flash[:notice] %>
-  <div style="background:#222; color:#6ee75a; padding:1em; border-radius:8px; margin-bottom:1em; font-size:1.1em;">
-    <%= flash[:notice] %>
-  </div>
+<% content_for :head do %>
+  <link rel="manifest" href="/manifest_afmelden.json">
 <% end %>
 
-<div class="afmelden-container" style="background:#222; color:#fff; border-radius:8px; padding:2em; max-width:420px; margin:2em auto; text-align:left; font-size:1.15em; box-shadow:0 2px 12px #0002;">
-  <h2 style="margin-top:0; font-size:1.5em;">Training vandaag</h2>
-  <p><strong>Loper:</strong> <%= @user.name %></p>
-  <p><strong>Status:</strong> <span style="color:<%= @attendance.status == 'afwezig' ? '#e74c3c' : '#6ee75a' %>; font-weight:bold;"><%= @attendance.status.capitalize %></span></p>
-  <div class="training-box" style="background:#181818; border-radius:6px; padding:1.2em; margin:1.2em 0; font-size:1.08em;">
-    <div style="margin-bottom:0.7em;"><strong>Omschrijving:</strong><br><span style="white-space:pre-line;"><%= @training_session.description %></span></div>
-    <div><strong>Locatie:</strong> <%= @training_session.location.presence || 'Onbekend' %></div>
-    <div><strong>Datum:</strong> <%= @training_session.date.strftime('%d-%m-%Y') %></div>
+<div class="afmelden-container">
+  <!-- Add to Home Screen Button (Always visible) -->
+  <div id="add-to-home-banner" style="background: linear-gradient(135deg, #FC4C02 0%, #FF6B35 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px; text-align: center; box-shadow: 0 8px 24px rgba(252, 76, 2, 0.4); border: 3px solid rgba(255, 255, 255, 0.3);">
+    <div style="font-size: 48px; margin-bottom: 12px; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));">🏃</div>
+    <div style="color: white; font-weight: 800; font-size: 20px; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);">
+      📲 Voeg toe aan beginscherm
+    </div>
+    <div style="color: rgba(255, 255, 255, 0.95); font-size: 15px; margin-bottom: 16px; line-height: 1.5;">
+      Maak een snelkoppeling op je telefoon voor<br><strong>direct afmelden zonder inloggen</strong>
+    </div>
+    
+    <!-- Direct install button (Chrome) - shown only if available -->
+    <button id="direct-install-btn" style="display: none; background: white; color: #FC4C02; border: none; padding: 16px 32px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 16px; width: 100%; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); margin-bottom: 12px;">
+      <span style="font-size: 24px;">⬇️</span>
+      <span style="font-size: 18px; font-weight: 800;">INSTALLEER NU</span>
+    </button>
+    
+    <!-- Instructions button (always visible) -->
+    <button onclick="showInstallInstructions()" style="background: rgba(255, 255, 255, 0.2); color: white; border: 2px solid white; padding: 14px 28px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 15px; width: 100%; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);">
+      <span style="font-size: 20px;">📱</span>
+      <span>Toon instructies</span>
+    </button>
+    
+    <div style="margin-top: 12px; color: rgba(255, 255, 255, 0.95); font-size: 13px; font-weight: 600;">
+      <span id="browser-info"></span>
+    </div>
   </div>
-
-  <% if @attendance.status == 'afwezig' %>
-    <%= form_with url: public_afmelden_path(slug: @user.slug, token: @user.public_token), method: :post, local: true do %>
-      <%= hidden_field_tag :aanmelden, true %>
-      <button type="submit" style="background:#6ee75a; color:#222; border:none; padding:0.9em 2em; border-radius:6px; font-size:1.15em; cursor:pointer; font-weight:bold; width:100%; max-width:100%;">Aanmelden</button>
-    <% end %>
-  <% else %>
-    <%= form_with url: public_afmelden_path(slug: @user.slug, token: @user.public_token), method: :post, local: true do %>
-      <div style="margin-bottom:1em; text-align:left;">
-        <label for="reden" style="color:#fff; font-weight:bold;">Reden:</label><br>
-        <%= text_field_tag :reden, @attendance.note, placeholder: 'Optioneel', style: 'width:100%; padding:0.7em; border-radius:4px; border:1px solid #444; background:#333; color:#fff; font-size:1em;' %>
-      </div>
-      <button type="submit" style="background:#e74c3c; color:#fff; border:none; padding:0.9em 2em; border-radius:6px; font-size:1.15em; cursor:pointer; font-weight:bold; width:100%; max-width:100%;">Afmelden</button>
-    <% end %>
+  
+  <script>
+    // Show browser info and setup install button
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+    const isAndroid = /Android/.test(navigator.userAgent);
+    const browserInfo = document.getElementById('browser-info');
+    const directInstallBtn = document.getElementById('direct-install-btn');
+    
+    if (isIOS) {
+      browserInfo.textContent = '📱 iPhone/iPad - Gebruik Safari share menu';
+      browserInfo.style.color = 'rgba(255, 255, 255, 0.95)';
+    } else if (isChrome && isAndroid) {
+      browserInfo.textContent = '📱 Chrome Android - Installeer via menu ⋮';
+      browserInfo.style.color = 'rgba(255, 255, 255, 0.95)';
+    } else if (isChrome) {
+      browserInfo.textContent = '💻 Chrome - Installeer via menu ⋮';
+      browserInfo.style.color = 'rgba(255, 255, 255, 0.95)';
+    } else {
+      browserInfo.textContent = '🌐 Open in Chrome of Safari voor installatie';
+      browserInfo.style.color = '#FEF3C7';
+    }
+    
+    // Setup direct install button for Chrome
+    let deferredInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      
+      // Show the direct install button
+      if (directInstallBtn) {
+        directInstallBtn.style.display = 'block';
+        browserInfo.textContent = '✅ App kan geïnstalleerd worden!';
+        browserInfo.style.color = '#D1FAE5';
+      }
+    });
+    
+    if (directInstallBtn) {
+      directInstallBtn.addEventListener('click', async () => {
+        if (deferredInstallPrompt) {
+          deferredInstallPrompt.prompt();
+          const { outcome } = await deferredInstallPrompt.userChoice;
+          
+          if (outcome === 'accepted') {
+            directInstallBtn.style.display = 'none';
+            browserInfo.textContent = '✅ App geïnstalleerd! Check je beginscherm';
+            browserInfo.style.color = '#D1FAE5';
+          }
+          
+          deferredInstallPrompt = null;
+        }
+      });
+    }
+  </script>
+  
+  <div class="afmelden-header">
+    <div class="afmelden-logo">🏃</div>
+    <h1 class="afmelden-title">Training Vandaag</h1>
+    <p class="afmelden-subtitle">Snel aan- of afmelden</p>
+  </div>
+  
+  <% if flash[:notice] %>
+    <div class="alert alert-success">
+      <%= flash[:notice] %>
+    </div>
   <% end %>
+  
+  <div class="afmelden-card">
+    <h2 style="font-size: 18px; margin-bottom: 16px; color: #1a1a1a;">👤 <%= @user.name %></h2>
+    
+    <div style="margin-bottom: 16px;">
+      <div style="font-size: 14px; color: #6B7280; margin-bottom: 4px;">Huidige status:</div>
+      <div style="font-size: 18px; font-weight: 600; color: <%= @attendance.status == 'afwezig' ? '#EF4444' : '#22C55E' %>;">
+        <%= @attendance.status == 'afwezig' ? '❌ Afwezig' : '✅ Aanwezig' %>
+      </div>
+    </div>
+    
+    <div style="background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+      <div style="margin-bottom: 12px;">
+        <strong style="color: #FC4C02;">📅 Training:</strong><br>
+        <span style="color: #1a1a1a; font-size: 15px; line-height: 1.5;"><%= @training_session.description %></span>
+      </div>
+      
+      <% if @training_session.kern.present? %>
+        <div style="margin-bottom: 12px;">
+          <strong style="color: #FC4C02;">🎯 Kern:</strong><br>
+          <span style="color: #1a1a1a; font-size: 15px; line-height: 1.5;"><%= @training_session.kern %></span>
+        </div>
+      <% end %>
+      
+      <% if @training_session.loopscholing.present? %>
+        <div style="margin-bottom: 12px;">
+          <strong style="color: #FC4C02;">👟 Loopscholing:</strong><br>
+          <span style="color: #1a1a1a; font-size: 15px; line-height: 1.5;"><%= @training_session.loopscholing %></span>
+        </div>
+      <% end %>
+      
+      <div style="margin-bottom: 8px;">
+        <strong style="color: #FC4C02;">📍 Locatie:</strong> 
+        <span style="color: #1a1a1a;"><%= @training_session.location.presence || 'GAC' %></span>
+      </div>
+      
+      <div style="margin-bottom: 8px;">
+        <strong style="color: #FC4C02;">📆 Datum:</strong> 
+        <span style="color: #1a1a1a;"><%= @training_session.date.strftime('%d-%m-%Y') %></span>
+      </div>
+      
+      <% if @training_session.dag.present? %>
+        <div style="margin-bottom: 8px;">
+          <strong style="color: #FC4C02;">📌 Dag:</strong> 
+          <span style="color: #1a1a1a;"><%= @training_session.dag.capitalize %></span>
+        </div>
+      <% end %>
+      
+      <% if @training_session.trainer.present? %>
+        <div style="margin-bottom: 8px;">
+          <strong style="color: #FC4C02;">👨‍🏫 Trainer:</strong> 
+          <span style="color: #1a1a1a;"><%= @training_session.trainer.name %></span>
+        </div>
+      <% end %>
+      
+      <% if @training_session.fase.present? %>
+        <div>
+          <strong style="color: #FC4C02;">🏃 Fase:</strong> 
+          <span style="color: #1a1a1a;"><%= @training_session.fase %></span>
+        </div>
+      <% end %>
+    </div>
+    
+    <% if @attendance.status == 'afwezig' %>
+      <%= form_with url: public_afmelden_path(slug: @user.slug, token: @user.public_token), method: :post, local: true do %>
+        <%= hidden_field_tag :aanmelden, true %>
+        <button type="submit" class="afmelden-btn afmelden-btn--primary">
+          ✅ Aanmelden voor training
+        </button>
+      <% end %>
+    <% else %>
+      <%= form_with url: public_afmelden_path(slug: @user.slug, token: @user.public_token), method: :post, local: true do %>
+        <div style="margin-bottom: 16px;">
+          <label for="reden" style="color: #1a1a1a; font-weight: 600; display: block; margin-bottom: 8px; font-size: 15px;">
+            Reden (optioneel):
+          </label>
+          <%= text_field_tag :reden, @attendance.note, placeholder: 'Bijv. blessure, werk, etc.', class: 'afmelden-input' %>
+        </div>
+        <button type="submit" class="afmelden-btn afmelden-btn--primary" style="background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);">
+          ❌ Afmelden voor training
+        </button>
+      <% end %>
+    <% end %>
+    
+    <a href="<%= root_path %>" class="afmelden-btn afmelden-btn--secondary">
+      🏠 Terug naar home
+    </a>
+  </div>
+  
+  <div style="text-align: center; color: #6B7280; font-size: 12px; margin-top: 24px; padding: 0 16px;">
+    <p style="margin: 0;">🔒 Deze link is persoonlijk en alleen geldig voor <%= @user.name %></p>
+  </div>
 </div> 

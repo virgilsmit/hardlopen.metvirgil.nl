@@ -16,10 +16,21 @@
         <td data-label="ID"><%= user.id %></td>
         <td data-label="Naam"><%= user.name %></td>
         <td data-label="E-mail"><%= user.email %></td>
-        <td data-label="Rol"><%= user.role == 'admin' ? 'admin' : 'user' %></td>
+        <td data-label="Rol"><%= user_role_display(user) %></td>
         <td data-label="Actie">
           <%= form_with url: update_role_admin_user_path(user), method: :patch, local: true do |f| %>
-            <%= f.select :role, options_for_select([['user', 'user'], ['trainer', 'trainer'], ['admin', 'admin']], user.role || 'user'), {}, style: 'margin-right: 0.5rem;' %>
+            <% 
+              # Bepaal de hoogste rol voor de dropdown selectie
+              user_roles = user.roles || []
+              selected_role = if user_roles.include?('admin')
+                                'admin'
+                              elsif user_roles.include?('trainer')
+                                'trainer'
+                              else
+                                'user'
+                              end
+            %>
+            <%= f.select :role, options_for_select([['Gebruiker', 'user'], ['Trainer', 'trainer'], ['Admin', 'admin']], selected_role), {}, style: 'margin-right: 0.5rem;' %>
             <%= f.submit 'Wijzig', style: 'padding: 0.2rem 0.8rem;' %>
           <% end %>
         </td>

@@ -1,10 +1,203 @@
-<p style="color: green"><%= notice %></p>
+<div class="container-fluid py-4" style="background: #0a0e27 !important; min-height: 100vh !important;">
+  <% if notice %>
+    <div class="alert alert-success mb-4" style="background: rgba(30, 227, 207, 0.1) !important; border: 2px solid #1ee3cf !important; color: #1ee3cf !important; padding: 1rem !important; border-radius: 8px !important;">
+      ✓ <%= notice %>
+    </div>
+  <% end %>
 
-<%= render @performance %>
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="display-4" style="color: #ffffff !important; font-weight: 700 !important;">
+        📊 Prestatie Details
+      </h1>
+      <p style="color: rgba(255,255,255,0.7); font-size: 1.1rem;">
+        <%= @performance.user.name %> - <%= @performance.date&.strftime('%d-%m-%Y') %>
+      </p>
+      <p style="color: rgba(255,255,255,0.3); font-size: 0.75rem;">
+        Pagina geladen: <%= Time.now.strftime('%d-%m-%Y %H:%M:%S') %> - v3.0
+      </p>
+    </div>
+  </div>
 
-<div>
-  <%= link_to "Edit this performance", edit_performance_path(@performance) %> |
-  <%= link_to "Back to performances", performances_path %>
+  <div class="row">
+    <div class="col-md-8">
+      <!-- Basis Gegevens -->
+      <div class="card-surface mb-4">
+        <h3 style="color: #FC4C02 !important; font-weight: 700 !important; margin-bottom: 1.5rem !important;">
+          <%= @performance.test_type.present? ? @performance.test_type : "Training" %>
+        </h3>
+        
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <strong style="color: rgba(255,255,255,0.7) !important;">Datum:</strong>
+            <div style="font-size: 1.2rem; color: #ffffff !important; font-weight: 600 !important;"><%= @performance.date&.strftime('%d-%m-%Y') %></div>
+          </div>
+          <div class="col-md-4">
+            <strong style="color: rgba(255,255,255,0.7) !important;">Afstand:</strong>
+            <div style="font-size: 1.2rem; color: #ffffff !important; font-weight: 600 !important;"><%= @performance.distance %> m</div>
+          </div>
+          <div class="col-md-4">
+            <strong style="color: rgba(255,255,255,0.7) !important;">Tijd:</strong>
+            <div style="font-size: 1.2rem; color: #ffffff !important; font-weight: 600 !important;"><%= @performance.value %></div>
+          </div>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <strong style="color: rgba(255,255,255,0.7) !important;">Tempo (km/min):</strong>
+            <div style="font-size: 1.2rem; color: #1ee3cf !important; font-weight: 600 !important;"><%= km_min(@performance) %></div>
+          </div>
+        </div>
+      </div>
 
-  <%= button_to "Destroy this performance", @performance, method: :delete %>
+      <!-- Prognoses -->
+      <div class="card-surface mb-4">
+        <h3 style="color: #1ee3cf !important; font-weight: 700 !important; margin-bottom: 1.5rem !important;">
+          🎯 Race Prognoses
+        </h3>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <div style="background: rgba(30, 227, 207, 0.1) !important; border: 2px solid #1ee3cf !important; padding: 1.5rem !important; border-radius: 12px !important; text-align: center !important;">
+              <strong style="color: #1ee3cf !important; font-size: 1rem !important;">Prognose 5 km</strong>
+              <div style="font-size: 2rem; color: #1ee3cf !important; font-weight: 700 !important; margin-top: 0.5rem;">
+                <%= prognose_5km(@performance) %>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <div style="background: rgba(30, 227, 207, 0.1) !important; border: 2px solid #1ee3cf !important; padding: 1.5rem !important; border-radius: 12px !important; text-align: center !important;">
+              <strong style="color: #1ee3cf !important; font-size: 1rem !important;">Prognose 10 km</strong>
+              <div style="font-size: 2rem; color: #1ee3cf !important; font-weight: 700 !important; margin-top: 0.5rem;">
+                <%= prognose_10km(@performance) %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Hartslag Gegevens -->
+      <div class="card-surface mb-4">
+        <h3 style="color: #FC4C02 !important; font-weight: 700 !important; margin-bottom: 1.5rem !important;">
+          💓 Hartslag Gegevens
+        </h3>
+        
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <div style="background: rgba(30, 227, 207, 0.15) !important; border: 2px solid #1ee3cf !important; padding: 1.5rem !important; border-radius: 12px !important; text-align: center !important;">
+              <strong style="color: #1ee3cf !important;">Gem. Hartslag</strong>
+              <div style="font-size: 2rem; color: #1ee3cf !important; font-weight: 700 !important; margin-top: 0.5rem;">
+                <%= @performance.core_heart_rate ? "#{@performance.core_heart_rate} bpm" : '-' %>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div style="background: rgba(252, 76, 2, 0.1) !important; border: 2px solid #FC4C02 !important; padding: 1.5rem !important; border-radius: 12px !important; text-align: center !important;">
+              <strong style="color: #FC4C02 !important;">AD Tempo</strong>
+              <div style="font-size: 2rem; color: #FC4C02 !important; font-weight: 700 !important; margin-top: 0.5rem;">
+                <%= ad(@performance) %>
+              </div>
+              <small style="color: rgba(255,255,255,0.6);">90% snelheid</small>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div style="background: rgba(252, 76, 2, 0.1) !important; border: 2px solid #FC4C02 !important; padding: 1.5rem !important; border-radius: 12px !important; text-align: center !important;">
+              <strong style="color: #FC4C02 !important;">AD HF</strong>
+              <div style="font-size: 2rem; color: #FC4C02 !important; font-weight: 700 !important; margin-top: 0.5rem;">
+                <%= @performance.calculated_ad_heart_rate ? "#{@performance.calculated_ad_heart_rate} bpm" : '-' %>
+              </div>
+              <small style="color: rgba(255,255,255,0.6);">95% hartslag</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trainingstempo's -->
+      <div class="card-surface mb-4">
+        <h3 style="color: #1ee3cf !important; font-weight: 700 !important; margin-bottom: 1.5rem !important;">
+          🏃 Trainingstempo's
+        </h3>
+        
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <div style="background: rgba(30, 227, 207, 0.1) !important; border: 2px solid #1ee3cf !important; padding: 1.5rem !important; border-radius: 12px !important; text-align: center !important;">
+              <strong style="color: #1ee3cf !important;">Duurloop 85%</strong>
+              <div style="font-size: 2rem; color: #1ee3cf !important; font-weight: 700 !important; margin-top: 0.5rem;">
+                <%= dl2_85(@performance) %>
+              </div>
+              <small style="color: rgba(255,255,255,0.6);">Extensieve duurloop tempo</small>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <div style="background: rgba(30, 227, 207, 0.1) !important; border: 2px solid #1ee3cf !important; padding: 1.5rem !important; border-radius: 12px !important; text-align: center !important;">
+              <strong style="color: #1ee3cf !important;">Gelopen Tempo</strong>
+              <div style="font-size: 2rem; color: #1ee3cf !important; font-weight: 700 !important; margin-top: 0.5rem;">
+                <%= km_min(@performance) %>
+              </div>
+              <small style="color: rgba(255,255,255,0.6);">Werkelijk gelopen tempo</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Notities -->
+      <% if @performance.notes.present? %>
+        <div class="card-surface mb-4">
+          <h3 style="color: #1ee3cf !important; font-weight: 700 !important; margin-bottom: 1rem !important;">
+            📝 Notities
+          </h3>
+          <div style="color: rgba(255,255,255,0.9) !important; line-height: 1.6;">
+            <%= simple_format(@performance.notes) %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    
+    <div class="col-md-4">
+      <div class="card-surface mb-4">
+        <h4 style="color: #ffffff !important; font-weight: 700 !important; margin-bottom: 1rem !important;">Acties</h4>
+        <%= link_to edit_performance_path(@performance), class: 'theme-btn track-btn--glow', style: 'display: block !important; text-align: center !important; margin-bottom: 0.75rem !important; text-decoration: none !important;' do %>
+          ✏️ Bewerk Prestatie
+        <% end %>
+        <%= button_to performance_path(@performance), method: :delete, data: { confirm: 'Weet je zeker dat je deze prestatie wilt verwijderen?' }, class: 'theme-btn', style: 'background: #ef4444 !important; color: white !important; width: 100% !important; border: none !important; margin-bottom: 0.75rem !important;' do %>
+          🗑️ Verwijder
+        <% end %>
+        <% if @performance.user %>
+          <%= link_to user_path(@performance.user), class: 'theme-btn track-btn--outline', style: 'display: block !important; text-align: center !important; text-decoration: none !important;' do %>
+            ← Terug naar Profiel
+          <% end %>
+        <% else %>
+          <%= link_to performances_path, class: 'theme-btn track-btn--outline', style: 'display: block !important; text-align: center !important; text-decoration: none !important;' do %>
+            ← Terug naar Overzicht
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="card-surface">
+        <h4 style="color: #ffffff !important; font-weight: 700 !important; margin-bottom: 1rem !important;">📈 Snelle Stats</h4>
+        <div style="padding: 0.75rem; background: rgba(255,255,255,0.03); border-radius: 8px; margin-bottom: 0.5rem;">
+          <div style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">Snelheid (km/u)</div>
+          <div style="color: #1ee3cf; font-size: 1.2rem; font-weight: 600;">
+            <%= ((@performance.distance.to_f / (@performance.user.tijd_naar_seconden(@performance.value))) * 3.6).round(2) %> km/u
+          </div>
+        </div>
+        <div style="padding: 0.75rem; background: rgba(255,255,255,0.03); border-radius: 8px;">
+          <div style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">Totale afstand</div>
+          <div style="color: #1ee3cf; font-size: 1.2rem; font-weight: 600;">
+            <%= (@performance.distance.to_f / 1000.0).round(2) %> km
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<style>
+  .card-surface {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    backdrop-filter: blur(10px);
+  }
+</style>

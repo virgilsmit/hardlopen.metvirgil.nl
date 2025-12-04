@@ -1,14 +1,15 @@
+<div class="schema-volledig-page" style="min-height: 100vh; padding: 1rem;">
 <% schema_name = @schemas.any? ? @schemas.first.name : nil %>
 <% if schema_name.present? %>
-  <h1>Mijn schema: <%= schema_name %></h1>
+  <h1 style="color: #ffffff !important; font-weight: 700 !important; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important; margin-bottom: 1.5rem !important;">Mijn schema: <%= schema_name %></h1>
 <% else %>
-  <h1>Mijn schema</h1>
+  <h1 style="color: #ffffff !important; font-weight: 700 !important; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important; margin-bottom: 1.5rem !important;">Mijn schema</h1>
 <% end %>
 
 <% if @upcoming_sessions.present? || @past_sessions.present? %>
   <!-- KOMMENDE TRAININGEN -->
   <% if @upcoming_sessions.present? %>
-    <h2 style="margin-top:2em;">Komende trainingen</h2>
+    <h2 style="margin-top:2em; color: #ffffff !important; font-weight: 700 !important; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;">Komende trainingen</h2>
     <table class="schema-table" style="width:100%; border-collapse:collapse; margin-bottom:2rem;">
       <thead>
         <tr>
@@ -32,8 +33,8 @@
             <% my_attendance = sessie.attendances.find { |a| a.user_id == current_user.id } %>
           <% end %>
           <tr class="schema-table__row" onclick="if(event.target.tagName !== 'BUTTON' && event.target.tagName !== 'INPUT' && !event.target.closest('.attendance-buttons')){window.location='/training_sessions/<%= sessie.id %>'}" style="cursor:pointer;">
-            <td style="padding:8px; white-space:nowrap;"><%= l(sessie.date) %></td>
-            <td style="padding:8px;">
+            <td data-label="Datum" style="padding:8px; white-space:nowrap;"><%= l(sessie.date) %></td>
+            <td data-label="Dag" style="padding:8px;">
               <% if sessie.dag.to_s.downcase == 'zaterdag' %>
                 Zaterdag 08:45
               <% elsif sessie.dag.to_s.downcase == 'dinsdag' %>
@@ -42,35 +43,46 @@
                 <%= sessie.dag %>
               <% end %>
             </td>
-            <td style="padding:8px;"><%= sessie.description %></td>
-            <td style="padding:8px;"><%= sessie.loopscholing %></td>
-            <td style="padding:8px;">
+            <td data-label="Training" style="padding:8px;"><%= sessie.description %></td>
+            <td data-label="Loopscholing" style="padding:8px;"><%= sessie.loopscholing %></td>
+            <td data-label="Trainer" style="padding:8px;">
               <% if sessie.dag.to_s.downcase == 'donderdag' || sessie.dag.to_s.downcase == 'zondag' %>
                 Zelf
               <% else %>
                 <%= sessie.trainer&.name || '-' %>
               <% end %>
             </td>
-            <td style="padding:8px;"><%= sessie.locatie || 'GAC' %></td>
-            <td style="padding:8px;"><%= sessie.fase %></td>
-            <td style="padding:8px;"><%= sessie.wedstrijd %></td>
+            <td data-label="Locatie" style="padding:8px;"><%= sessie.locatie || 'GAC' %></td>
+            <td data-label="Fase" style="padding:8px;"><%= sessie.fase %></td>
+            <td data-label="Wedstrijd" style="padding:8px;"><%= sessie.wedstrijd %></td>
             <% if current_user && (sessie.group_id.nil? || current_user.groups.pluck(:id).include?(sessie.group_id)) %>
-              <td style="padding:8px;">
+              <td data-label="Status" style="padding:8px;">
                 <% if my_attendance&.status == 'aanwezig' %>
-                  <span class="status-dot status-aanwezig"></span>
-                  <span class="status-text status-aanwezig-text">Aanwezig</span>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#34c759;"></span>
+                    <span style="color: #34c759; font-weight: 600;">Aanwezig</span>
+                  </div>
                 <% elsif my_attendance&.status == 'afwezig' %>
-                  <span class="status-dot status-afwezig"></span>
-                  <span class="status-text status-afwezig-text">Afwezig</span>
-                  <% if my_attendance.note.present? %>
-                    <span class="attendance-note">- <%= my_attendance.note %></span>
-                  <% end %>
+                  <div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                      <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#e74c3c;"></span>
+                      <span style="color: #e74c3c; font-weight: 600;">Afwezig</span>
+                    </div>
+                    <% if my_attendance.note.present? %>
+                      <div style="margin-left: 1.5rem; padding: 0.5rem; background: #fff3cd; border-left: 3px solid #ffc107; border-radius: 4px;">
+                        <strong style="color: #856404; font-size: 0.85rem;">Reden:</strong>
+                        <span style="color: #856404; font-size: 0.9rem;"><%= my_attendance.note %></span>
+                      </div>
+                    <% end %>
+                  </div>
                 <% else %>
-                  <span class="status-dot status-onbekend"></span>
-                  <span class="status-text status-onbekend-text">Geen status</span>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#6c757d;"></span>
+                    <span style="color: #6c757d; font-weight: 600;">Geen status</span>
+                  </div>
                 <% end %>
               </td>
-              <td style="padding:8px;" onclick="event.stopPropagation();">
+              <td data-label="Aan-/afmelden" style="padding:8px;" onclick="event.stopPropagation();">
                 <div class="attendance-buttons">
                   <%= form_with url: attendances_path, method: :post, local: true, class: 'inline-form' do |f| %>
                     <%= f.hidden_field :user_id, value: current_user.id %>
@@ -108,7 +120,7 @@
 
   <!-- VERLEDEN TRAININGEN -->
   <% if @past_sessions.present? %>
-    <h2 style="margin-top:2.5em;">Verleden trainingen</h2>
+    <h2 style="margin-top:2.5em; color: #ffffff !important; font-weight: 700 !important; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;">Verleden trainingen</h2>
     <table class="schema-table" style="width:100%; border-collapse:collapse; margin-bottom:2rem;">
       <thead>
         <tr>
@@ -131,8 +143,8 @@
             <% my_attendance = sessie.attendances.find { |a| a.user_id == current_user.id } %>
           <% end %>
           <tr class="schema-table__row" onclick="if(event.target.tagName !== 'BUTTON' && event.target.tagName !== 'INPUT' && !event.target.closest('.attendance-buttons')){window.location='/training_sessions/<%= sessie.id %>'}" style="cursor:pointer;">
-            <td style="padding:8px; white-space:nowrap;"><%= l(sessie.date) %></td>
-            <td style="padding:8px;">
+            <td data-label="Datum" style="padding:8px; white-space:nowrap;"><%= l(sessie.date) %></td>
+            <td data-label="Dag" style="padding:8px;">
               <% if sessie.dag.to_s.downcase == 'zaterdag' %>
                 Zaterdag 08:45
               <% elsif sessie.dag.to_s.downcase == 'dinsdag' %>
@@ -141,32 +153,43 @@
                 <%= sessie.dag %>
               <% end %>
             </td>
-            <td style="padding:8px;"><%= sessie.description %></td>
-            <td style="padding:8px;"><%= sessie.loopscholing %></td>
-            <td style="padding:8px;">
+            <td data-label="Training" style="padding:8px;"><%= sessie.description %></td>
+            <td data-label="Loopscholing" style="padding:8px;"><%= sessie.loopscholing %></td>
+            <td data-label="Trainer" style="padding:8px;">
               <% if sessie.dag.to_s.downcase == 'donderdag' || sessie.dag.to_s.downcase == 'zondag' %>
                 Zelf
               <% else %>
                 <%= sessie.trainer&.name || '-' %>
               <% end %>
             </td>
-            <td style="padding:8px;"><%= sessie.locatie || 'GAC' %></td>
-            <td style="padding:8px;"><%= sessie.fase %></td>
-            <td style="padding:8px;"><%= sessie.wedstrijd %></td>
+            <td data-label="Locatie" style="padding:8px;"><%= sessie.locatie || 'GAC' %></td>
+            <td data-label="Fase" style="padding:8px;"><%= sessie.fase %></td>
+            <td data-label="Wedstrijd" style="padding:8px;"><%= sessie.wedstrijd %></td>
             <% if current_user %>
-              <td style="padding:8px;">
+              <td data-label="Status" style="padding:8px;">
                 <% if my_attendance&.status == 'aanwezig' %>
-                  <span class="status-dot status-aanwezig"></span>
-                  <span class="status-text status-aanwezig-text">Aanwezig</span>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#34c759;"></span>
+                    <span style="color: #34c759; font-weight: 600;">Aanwezig</span>
+                  </div>
                 <% elsif my_attendance&.status == 'afwezig' %>
-                  <span class="status-dot status-afwezig"></span>
-                  <span class="status-text status-afwezig-text">Afwezig</span>
-                  <% if my_attendance.note.present? %>
-                    <span class="attendance-note">- <%= my_attendance.note %></span>
-                  <% end %>
+                  <div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                      <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#e74c3c;"></span>
+                      <span style="color: #e74c3c; font-weight: 600;">Afwezig</span>
+                    </div>
+                    <% if my_attendance.note.present? %>
+                      <div style="margin-left: 1.5rem; padding: 0.5rem; background: #fff3cd; border-left: 3px solid #ffc107; border-radius: 4px;">
+                        <strong style="color: #856404; font-size: 0.85rem;">Reden:</strong>
+                        <span style="color: #856404; font-size: 0.9rem;"><%= my_attendance.note %></span>
+                      </div>
+                    <% end %>
+                  </div>
                 <% else %>
-                  <span class="status-dot status-onbekend"></span>
-                  <span class="status-text status-onbekend-text">Geen status</span>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#6c757d;"></span>
+                    <span style="color: #6c757d; font-weight: 600;">Geen status</span>
+                  </div>
                 <% end %>
               </td>
             <% end %>
@@ -177,7 +200,8 @@
   <% end %>
 <% else %>
   <div class="alert alert-info" style="padding: 1rem; background: #e3f2fd; border-left: 4px solid #2196f3; margin: 1rem 0;">
-    <p><strong>Geen trainingsschema ingesteld</strong></p>
-    <p>Je hebt nog geen persoonlijk trainingsschema gekozen. Ga naar je <a href="<%= profile_path %>">profiel</a> om een standaard schema te selecteren.</p>
+    <p style="color: #1a2332;"><strong>Geen trainingsschema ingesteld</strong></p>
+    <p style="color: #1a2332;">Je hebt nog geen persoonlijk trainingsschema gekozen. Ga naar je <a href="<%= profile_path %>">profiel</a> om een standaard schema te selecteren.</p>
   </div>
 <% end %>
+</div>

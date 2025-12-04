@@ -7,283 +7,384 @@
     <p>Je hebt nog geen persoonlijk trainingsschema gekozen. Ga naar je <a href="<%= profile_path %>">profiel</a> om een standaard schema te selecteren.</p>
   </div>
 <% end %>
+
 <% if @upcoming_sessions.any? || @past_sessions.any? %>
 <div class="tab-container">
-  <button id="tab-upcoming" class="tab-btn" onclick="showTab('upcoming')">Komende trainingen</button>
+  <button id="tab-upcoming" class="tab-btn active" onclick="showTab('upcoming')">Komende trainingen</button>
   <button id="tab-past" class="tab-btn" onclick="showTab('past')">Afgelopen trainingen</button>
 </div>
 
+<!-- Komende trainingen -->
 <div id="tab-upcoming-content">
   <h2 class="section-title">Komende trainingen</h2>
   <% if @upcoming_sessions.any? %>
-  <table class="schema-table">
-    <thead>
-      <tr>
-        <th>Datum</th>
-        <th>Dag</th>
-        <th>Training</th>
-        <th>Loopscholing</th>
-        <th>Trainer</th>
-        <th>Locatie</th>
-        <th>Fase</th>
-        <th>Wedstrijd</th>
-        <th>Status</th>
-        <th>Aan-/afmelden</th>
-        <th>Acties</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @upcoming_sessions.each do |sessie| %>
-        <tr class="clickable-row" onclick="if(event.target.tagName !== 'BUTTON' && event.target.tagName !== 'A' && !event.target.closest('.theme-btn')){window.location='/training_sessions/<%= sessie.id %>'}">
-          <td><%= l(sessie.date) %></td>
-          <td><%= sessie.dag %></td>
-          <td><%= sessie.description %></td>
-          <td><%= sessie.loopscholing %></td>
-          <td>
-            <% if current_user&.has_role?(:trainer) %>
-              <%= form_with model: sessie, url: training_session_path(sessie), method: :patch, local: true, class: 'inline-form' do |f| %>
-                <%= f.collection_select :trainer_id, User.with_role(:trainer), :id, :name, { include_blank: true, selected: sessie.trainer_id }, { class: 'trainer-select', onclick: 'event.stopPropagation();', name: 'training_session[trainer_id]' } %>
-                <button type="submit" class="theme-btn trainer-submit-btn" onclick="event.stopPropagation();">✓</button>
-              <% end %>
+  <div class="training-cards-grid">
+    <% @upcoming_sessions.each do |sessie| %>
+      <% attendance = current_user ? sessie.attendances.find_by(user_id: current_user.id) : nil %>
+      <div class="training-card" onclick="window.location='/training_sessions/<%= sessie.id %>'" style="cursor: pointer;">
+        <!-- Header -->
+        <div class="training-card-header">
+          <div>
+            <div class="training-card-date">
+              <%= l(sessie.date, format: '%A %d %B %Y') %>
+            </div>
+            <div class="training-card-phase"><%= sessie.fase %></div>
+          </div>
+          <div class="training-card-status">
+            <% if attendance&.status == 'aanwezig' %>
+              <span class="status-badge status-aanwezig">✓ Aanwezig</span>
+            <% elsif attendance&.status == 'afwezig' %>
+              <span class="status-badge status-afwezig">✗ Afwezig</span>
             <% else %>
-              <%= sessie.trainer&.name || '-' %>
+              <span class="status-badge status-onbekend">⚪ Geen status</span>
             <% end %>
-          </td>
-          <td><%= sessie.locatie %></td>
-          <td><%= sessie.fase %></td>
-          <td><%= sessie.wedstrijd %></td>
-          <td>
-            <% if current_user %>
-              <% attendance = sessie.attendances.find_by(user_id: current_user.id) %>
-              <% if attendance&.status == 'aanwezig' %>
-                <span class="status-dot status-aanwezig"></span>
-                <span class="status-text status-aanwezig-text">Aanwezig</span>
-              <% elsif attendance&.status == 'afwezig' %>
-                <span class="status-dot status-afwezig"></span>
-                <span class="status-text status-afwezig-text">Afwezig</span>
-                <% if attendance.note.present? %>
-                  <span class="attendance-note">- <%= attendance.note %></span>
+          </div>
+        </div>
+        
+        <!-- Body -->
+        <div class="training-card-body">
+          <h3 class="training-card-title"><%= sessie.description %></h3>
+          <div class="training-card-details">
+            <div class="training-detail-item">
+              <span class="detail-label">🏃 Loopscholing:</span>
+              <span class="detail-value"><%= sessie.loopscholing || '-' %></span>
+            </div>
+            <div class="training-detail-item">
+              <span class="detail-label">👤 Trainer:</span>
+              <span class="detail-value">
+                <% if current_user&.has_role?(:trainer) %>
+                  <%= form_with model: sessie, url: training_session_path(sessie), method: :patch, local: true, style: 'display: inline-flex; gap: 4px; align-items: center;', onclick: 'event.stopPropagation();' do |f| %>
+                    <%= f.collection_select :trainer_id, User.with_role(:trainer), :id, :name, { include_blank: '(geen)', selected: sessie.trainer_id }, { style: 'padding: 4px 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.9rem;' } %>
+                    <%= f.submit '✓', style: 'padding: 4px 8px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem;' %>
+                  <% end %>
+                <% else %>
+                  <%= sessie.trainer&.name || '-' %>
                 <% end %>
-              <% else %>
-                <span class="status-dot status-onbekend"></span>
-                <span class="status-text status-onbekend-text">Geen status</span>
-              <% end %>
-            <% end %>
-          </td>
-          <td>
-            <% if current_user %>
-              <% attendance = sessie.attendances.find_by(user_id: current_user.id) %>
-              <div class="attendance-buttons">
-                <%= form_with url: attendances_path, method: :post, local: true, class: 'inline-form' do |f| %>
-                  <%= f.hidden_field :user_id, value: current_user.id %>
-                  <%= f.hidden_field :training_session_id, value: sessie.id %>
-                  <%= f.hidden_field :status, value: 'aanwezig' %>
-                  <button type="submit" class="theme-btn attendance-btn attendance-aanwezig-btn <%= (attendance.nil? || attendance.status == 'aanwezig') ? 'active' : 'inactive' %>">Aanw.</button>
-                <% end %>
-                <%= form_with url: attendances_path, method: :post, local: true, html: { class: 'afwezig-form', data: { session_id: sessie.id } }, class: 'inline-form' do |f| %>
-                  <%= f.hidden_field :user_id, value: current_user.id %>
-                  <%= f.hidden_field :training_session_id, value: sessie.id %>
-                  <%= f.hidden_field :status, value: 'afwezig' %>
-                  <div class="afwezig-container">
-                    <% if attendance&.status == 'afwezig' %>
-                      <button type="submit" class="theme-btn afwezig-submit" data-session-id="<%= sessie.id %>">OK</button>
-                    <% else %>
-                      <button type="submit" class="theme-btn afwezig-btn inactive" data-session-id="<%= sessie.id %>">✗</button>
-                    <% end %>
-                    <%# Notitieveld altijd tonen als status afwezig is, anders verborgen %>
-                    <div class="afwezig-note-field" id="afwezig-note-<%= sessie.id %>" class="<%= attendance&.status == 'afwezig' ? '' : 'hidden' %>">
-                      <%= f.text_field :note, value: (attendance&.status == 'afwezig' ? attendance&.note : nil), placeholder: 'Notitie (optioneel)', class: 'note-input-full' %>
-                    </div>
-                  </div>
-                <% end %>
+              </span>
+            </div>
+            <div class="training-detail-item">
+              <span class="detail-label">📍 Locatie:</span>
+              <span class="detail-value"><%= sessie.locatie || '-' %></span>
+            </div>
+            <% if sessie.wedstrijd.present? %>
+              <div class="training-detail-item">
+                <span class="detail-label">🏆 Wedstrijd:</span>
+                <span class="detail-value"><%= sessie.wedstrijd %></span>
               </div>
             <% end %>
-          </td>
-          <td>
-            <% if current_user&.admin? || (current_user&.has_role?(:trainer) && (sessie.group&.hoofdtrainer_id == current_user.id || sessie.group&.medetrainer_id == current_user.id)) %>
-              <%= link_to edit_training_session_path(sessie), class: 'theme-btn edit-btn' do %>
-                ✏️
-              <% end %>
+            <% if attendance&.status == 'afwezig' && attendance.note.present? %>
+              <div class="training-detail-item">
+                <span class="detail-label">📝 Notitie:</span>
+                <span class="detail-value"><%= attendance.note %></span>
+              </div>
             <% end %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+          </div>
+        </div>
+        
+        <!-- Footer met acties -->
+        <div class="training-card-footer" onclick="event.stopPropagation();">
+          <% if current_user %>
+            <div class="training-card-actions">
+              <%= form_with url: attendances_path, method: :post, local: true, style: 'display: inline;' do |f| %>
+                <%= f.hidden_field :user_id, value: current_user.id %>
+                <%= f.hidden_field :training_session_id, value: sessie.id %>
+                <%= f.hidden_field :status, value: 'aanwezig' %>
+                <button type="submit" class="action-btn action-btn-aanwezig <%= (attendance.nil? || attendance.status == 'aanwezig') ? 'active' : '' %>">
+                  ✓ Aanwezig
+                </button>
+              <% end %>
+              
+              <%= form_with url: attendances_path, method: :post, local: true, style: 'display: inline;' do |f| %>
+                <%= f.hidden_field :user_id, value: current_user.id %>
+                <%= f.hidden_field :training_session_id, value: sessie.id %>
+                <%= f.hidden_field :status, value: 'afwezig' %>
+                <button type="submit" class="action-btn action-btn-afwezig <%= attendance&.status == 'afwezig' ? 'active' : '' %>">
+                  ✗ Afwezig
+                </button>
+                <% if attendance&.status == 'afwezig' %>
+                  <%= f.text_field :note, value: attendance.note, placeholder: 'Notitie (optioneel)', style: 'margin-left: 8px; padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9rem; width: 200px;' %>
+                <% end %>
+              <% end %>
+            </div>
+            
+            <% if current_user.admin? || (current_user.has_role?(:trainer) && (sessie.group&.hoofdtrainer_id == current_user.id || sessie.group&.medetrainer_id == current_user.id)) %>
+              <%= link_to '✏️ Bewerken', edit_training_session_path(sessie), class: 'action-btn action-btn-edit' %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
   <% else %>
     <p>Geen komende trainingen.</p>
   <% end %>
 </div>
 
+<!-- Afgelopen trainingen -->
 <div id="tab-past-content" style="display:none;">
   <h2 class="section-title">Afgelopen trainingen</h2>
   <% if @past_sessions.any? %>
-  <table class="schema-table">
-    <thead>
-      <tr>
-        <th>Datum</th>
-        <th>Dag</th>
-        <th>Training</th>
-        <th>Loopscholing</th>
-        <th>Trainer</th>
-        <th>Locatie</th>
-        <th>Fase</th>
-        <th>Wedstrijd</th>
-        <th>Status</th>
-        <th>Aan-/afmelden</th>
-        <th>Acties</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @past_sessions.each do |sessie| %>
-        <tr class="clickable-row" onclick="if(event.target.tagName !== 'BUTTON' && event.target.tagName !== 'A' && !event.target.closest('.theme-btn')){window.location='/training_sessions/<%= sessie.id %>'}">
-          <td><%= l(sessie.date) %></td>
-          <td><%= sessie.dag %></td>
-          <td><%= sessie.description %></td>
-          <td><%= sessie.loopscholing %></td>
-          <td>
-            <% if current_user&.has_role?(:trainer) %>
-              <%= form_with model: sessie, url: training_session_path(sessie), method: :patch, local: true, class: 'inline-form' do |f| %>
-                <%= f.collection_select :trainer_id, User.with_role(:trainer), :id, :name, { include_blank: true, selected: sessie.trainer_id }, { class: 'trainer-select', onclick: 'event.stopPropagation();' } %>
-                <button type="submit" class="theme-btn trainer-submit-btn" onclick="event.stopPropagation();">✓</button>
-              <% end %>
+  <div class="training-cards-grid">
+    <% @past_sessions.each do |sessie| %>
+      <% attendance = current_user ? sessie.attendances.find_by(user_id: current_user.id) : nil %>
+      <div class="training-card" onclick="window.location='/training_sessions/<%= sessie.id %>'" style="cursor: pointer; opacity: 0.85;">
+        <div class="training-card-header">
+          <div>
+            <div class="training-card-date">
+              <%= l(sessie.date, format: '%A %d %B %Y') %>
+            </div>
+            <div class="training-card-phase"><%= sessie.fase %></div>
+          </div>
+          <div class="training-card-status">
+            <% if attendance&.status == 'aanwezig' %>
+              <span class="status-badge status-aanwezig">✓ Aanwezig</span>
+            <% elsif attendance&.status == 'afwezig' %>
+              <span class="status-badge status-afwezig">✗ Afwezig</span>
             <% else %>
-              <%= sessie.trainer&.name || '-' %>
+              <span class="status-badge status-onbekend">⚪ Geen status</span>
             <% end %>
-          </td>
-          <td><%= sessie.locatie %></td>
-          <td><%= sessie.fase %></td>
-          <td><%= sessie.wedstrijd %></td>
-          <td>
-            <% if current_user %>
-              <% attendance = sessie.attendances.find_by(user_id: current_user.id) %>
-              <% if attendance&.status == 'aanwezig' %>
-                <span class="status-dot status-aanwezig"></span>
-                <span class="status-text status-aanwezig-text">Aanwezig</span>
-              <% elsif attendance&.status == 'afwezig' %>
-                <span class="status-dot status-afwezig"></span>
-                <span class="status-text status-afwezig-text">Afwezig</span>
-                <% if attendance.note.present? %>
-                  <span class="attendance-note">- <%= attendance.note %></span>
-                <% end %>
-              <% else %>
-                <span class="status-dot status-onbekend"></span>
-                <span class="status-text status-onbekend-text">Geen status</span>
-              <% end %>
-            <% end %>
-          </td>
-          <td>
-            <% if current_user %>
-              <% attendance = sessie.attendances.find_by(user_id: current_user.id) %>
-              <div class="attendance-buttons">
-                <%= form_with url: attendances_path, method: :post, local: true, class: 'inline-form' do |f| %>
-                  <%= f.hidden_field :user_id, value: current_user.id %>
-                  <%= f.hidden_field :training_session_id, value: sessie.id %>
-                  <%= f.hidden_field :status, value: 'aanwezig' %>
-                  <button type="submit" class="theme-btn attendance-btn attendance-aanwezig-btn <%= (attendance.nil? || attendance.status == 'aanwezig') ? 'active' : 'inactive' %>">Aanw.</button>
-                <% end %>
-                <%= form_with url: attendances_path, method: :post, local: true, html: { class: 'afwezig-form', data: { session_id: sessie.id } }, class: 'inline-form' do |f| %>
-                  <%= f.hidden_field :user_id, value: current_user.id %>
-                  <%= f.hidden_field :training_session_id, value: sessie.id %>
-                  <%= f.hidden_field :status, value: 'afwezig' %>
-                  <div class="afwezig-container">
-                    <% if attendance&.status == 'afwezig' %>
-                      <button type="submit" class="theme-btn afwezig-submit" data-session-id="<%= sessie.id %>">OK</button>
-                    <% else %>
-                      <button type="submit" class="theme-btn afwezig-btn inactive" data-session-id="<%= sessie.id %>">✗</button>
-                    <% end %>
-                    <%# Notitieveld altijd tonen als status afwezig is, anders verborgen %>
-                    <div class="afwezig-note-field" id="afwezig-note-<%= sessie.id %>" class="<%= attendance&.status == 'afwezig' ? '' : 'hidden' %>">
-                      <%= f.text_field :note, value: (attendance&.status == 'afwezig' ? attendance&.note : nil), placeholder: 'Notitie (optioneel)', class: 'note-input-full' %>
-                    </div>
-                  </div>
-                <% end %>
+          </div>
+        </div>
+        
+        <div class="training-card-body">
+          <h3 class="training-card-title"><%= sessie.description %></h3>
+          <div class="training-card-details">
+            <div class="training-detail-item">
+              <span class="detail-label">🏃 Loopscholing:</span>
+              <span class="detail-value"><%= sessie.loopscholing || '-' %></span>
+            </div>
+            <div class="training-detail-item">
+              <span class="detail-label">👤 Trainer:</span>
+              <span class="detail-value"><%= sessie.trainer&.name || '-' %></span>
+            </div>
+            <div class="training-detail-item">
+              <span class="detail-label">📍 Locatie:</span>
+              <span class="detail-value"><%= sessie.locatie || '-' %></span>
+            </div>
+            <% if sessie.wedstrijd.present? %>
+              <div class="training-detail-item">
+                <span class="detail-label">🏆 Wedstrijd:</span>
+                <span class="detail-value"><%= sessie.wedstrijd %></span>
               </div>
             <% end %>
-          </td>
-          <td>
-            <% if current_user&.admin? || (current_user&.has_role?(:trainer) && (sessie.group&.hoofdtrainer_id == current_user.id || sessie.group&.medetrainer_id == current_user.id)) %>
-              <%= link_to edit_training_session_path(sessie), class: 'theme-btn edit-btn' do %>
-                ✏️
-              <% end %>
+            <% if attendance&.note.present? %>
+              <div class="training-detail-item">
+                <span class="detail-label">📝 Notitie:</span>
+                <span class="detail-value"><%= attendance.note %></span>
+              </div>
             <% end %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
   <% else %>
     <p>Geen afgelopen trainingen.</p>
   <% end %>
 </div>
 <% end %>
 
-<% if @upcoming_sessions.any? %>
-<div class="mobile-cards" style="display:none;">
-  <% @upcoming_sessions.each do |sessie| %>
-    <div class="mobile-card" onclick="window.location='/training_sessions/<%= sessie.id %>'">
-      <div class="mobile-card-header">
-        <div class="mobile-card-title">
-          <%= l(sessie.date) %> <span class="date-subtitle">(<%= sessie.dag %>)</span><br>
-          <%= sessie.description %>
-        </div>
-        <div class="mobile-card-status">
-          <% attendance = sessie.attendances.find_by(user_id: current_user&.id) %>
-          <% if attendance&.status == 'aanwezig' %>
-            <span class="status-dot status-aanwezig"></span><span class="status-text status-aanwezig-text">Aanwezig</span>
-          <% elsif attendance&.status == 'afwezig' %>
-            <span class="status-dot status-afwezig"></span><span class="status-text status-afwezig-text">Afwezig</span>
-          <% else %>
-            <span class="status-dot status-onbekend"></span><span class="status-text status-onbekend-text">Geen status</span>
-          <% end %>
-        </div>
-      </div>
-      <div class="mobile-card-btns" onclick="event.stopPropagation();">
-        <% if current_user %>
-          <%= form_with url: attendances_path, method: :post, local: true, class: 'inline-form' do |f| %>
-            <%= f.hidden_field :user_id, value: current_user.id %>
-            <%= f.hidden_field :training_session_id, value: sessie.id %>
-            <%= f.hidden_field :status, value: 'aanwezig' %>
-            <button type="submit" class="theme-btn attendance-btn attendance-aanwezig-btn <%= (attendance.nil? || attendance.status == 'aanwezig') ? 'active' : 'inactive' %>"><span>✓</span></button>
-          <% end %>
-          <%= form_with url: attendances_path, method: :post, local: true, html: { class: 'afwezig-form', data: { session_id: sessie.id } }, class: 'inline-form' do |f| %>
-            <%= f.hidden_field :user_id, value: current_user.id %>
-            <%= f.hidden_field :training_session_id, value: sessie.id %>
-            <%= f.hidden_field :status, value: 'afwezig' %>
-            <div class="afwezig-container">
-              <% if attendance&.status == 'afwezig' %>
-                <button type="submit" class="theme-btn afwezig-submit" data-session-id="<%= sessie.id %>">OK</button>
-              <% else %>
-                <button type="submit" class="theme-btn afwezig-btn inactive" data-session-id="<%= sessie.id %>">✗</button>
-              <% end %>
-              <%# Notitieveld altijd tonen als status afwezig is, anders verborgen %>
-              <div class="afwezig-note-field" id="afwezig-note-<%= sessie.id %>" class="<%= attendance&.status == 'afwezig' ? '' : 'hidden' %>">
-                <%= f.text_field :note, value: (attendance&.status == 'afwezig' ? attendance&.note : nil), placeholder: 'Notitie (optioneel)', class: 'note-input-full' %>
-              </div>
-            </div>
-          <% end %>
-        <% end %>
-        <% if current_user&.admin? || (current_user&.has_role?(:trainer) && (sessie.group&.hoofdtrainer_id == current_user.id || sessie.group&.medetrainer_id == current_user.id)) %>
-          <%= link_to edit_training_session_path(sessie), class: 'theme-btn edit-btn' do %>✏️<% end %>
-        <% end %>
-      </div>
-      <div class="mobile-card-more" onclick="toggleCardDetails(this); event.stopPropagation();">
-        <span>Meer info</span> <span class="toggle-icon">▼</span>
-      </div>
-      <div class="mobile-card-details">
-        <div><b>Trainer:</b> <%= sessie.trainer&.name || '-' %></div>
-        <div><b>Locatie:</b> <%= sessie.locatie %></div>
-        <div><b>Loopscholing:</b> <%= sessie.loopscholing %></div>
-        <div><b>Fase:</b> <%= sessie.fase %></div>
-        <div><b>Wedstrijd:</b> <%= sessie.wedstrijd %></div>
-        <% if attendance&.status == 'afwezig' && attendance.note.present? %>
-          <div><b>Notitie:</b> <%= attendance.note %></div>
-        <% end %>
-      </div>
-    </div>
-  <% end %>
-</div>
-<% end %>
+<style>
+/* Training cards grid */
+.training-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+@media (max-width: 768px) {
+  .training-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Training card */
+.training-card {
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.training-card:hover {
+  border-color: #FC4C02;
+  box-shadow: 0 8px 24px rgba(252, 76, 2, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Card header */
+.training-card-header {
+  background: linear-gradient(135deg, #FC4C02 0%, #FF6B35 100%);
+  padding: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1rem;
+}
+
+.training-card-date {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin-bottom: 0.25rem;
+  text-transform: capitalize;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.training-card-phase {
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.training-card-status {
+  flex-shrink: 0;
+}
+
+/* Status badges */
+.status-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.status-badge.status-aanwezig {
+  background: #10b981;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.status-badge.status-afwezig {
+  background: #ef4444;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.status-badge.status-onbekend {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Card body */
+.training-card-body {
+  padding: 1.25rem;
+}
+
+.training-card-title {
+  color: #0a0a0a;
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin: 0 0 1rem 0;
+  line-height: 1.4;
+}
+
+.training-card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.training-detail-item {
+  display: flex;
+  gap: 0.5rem;
+  align-items: start;
+}
+
+.detail-label {
+  color: #4b5563;
+  font-weight: 700;
+  font-size: 0.95rem;
+  min-width: 130px;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  color: #0a0a0a;
+  font-size: 0.95rem;
+  font-weight: 500;
+  flex: 1;
+}
+
+/* Card footer */
+.training-card-footer {
+  padding: 1rem 1.25rem;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.training-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Action buttons */
+.action-btn {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #ffffff;
+  color: #1a2332;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.action-btn-aanwezig {
+  border-color: #10b981;
+  color: #10b981;
+}
+
+.action-btn-aanwezig.active {
+  background: #10b981;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.action-btn-afwezig {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.action-btn-afwezig.active {
+  background: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.action-btn-edit {
+  border-color: #FC4C02;
+  color: #FC4C02;
+  padding: 0.75rem 1rem;
+}
+
+.action-btn-edit:hover {
+  background: #FC4C02;
+  color: #ffffff;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+</style>
 
 <script>
   function showTab(tab) {
@@ -291,34 +392,9 @@
     document.getElementById('tab-past-content').style.display = (tab === 'past') ? '' : 'none';
     document.getElementById('tab-upcoming').classList.toggle('active', tab === 'upcoming');
     document.getElementById('tab-past').classList.toggle('active', tab === 'past');
-    // Mobiel: alleen cards tonen bij komende trainingen
-    if(window.innerWidth < 800){
-      document.querySelector('.mobile-cards').style.display = (tab === 'upcoming') ? 'block' : 'none';
-    }
   }
-  showTab('upcoming');
-
-  function toggleCardDetails(el) {
-    var details = el.nextElementSibling;
-    details.classList.toggle('open');
-    el.querySelector('.toggle-icon').textContent = details.classList.contains('open') ? '▲' : '▼';
-  }
-
+  
   document.addEventListener('DOMContentLoaded', function() {
-    // Geen JS meer nodig voor notitieveld toggle, alles is server-side
-    // Toon cards op mobiel
-    if(window.innerWidth < 800){
-      document.querySelector('.mobile-cards').style.display = 'block';
-      document.querySelector('.schema-table').style.display = 'none';
-    }
+    showTab('upcoming');
   });
-  window.addEventListener('resize', function(){
-    if(window.innerWidth < 800){
-      document.querySelector('.mobile-cards').style.display = 'block';
-      document.querySelector('.schema-table').style.display = 'none';
-    } else {
-      document.querySelector('.mobile-cards').style.display = 'none';
-      document.querySelector('.schema-table').style.display = '';
-    }
-  });
-</script> 
+</script>

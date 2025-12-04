@@ -1,0 +1,61 @@
+<h1 class="page-heading">Thema beheer</h1>
+<p class="section-subtitle">Beheer de visuele stijl van de applicatie. Wijzig kleuren, fonts en andere design elementen.</p>
+
+<% if notice %>
+  <div class="alert-card alert-success"><%= notice %></div>
+<% end %>
+<% if alert %>
+  <div class="alert-card"><%= alert %></div>
+<% end %>
+
+<div style="margin-bottom: 2rem;">
+  <%= link_to 'Nieuw thema', new_admin_theme_path, class: 'theme-btn track-btn--glow' %>
+</div>
+
+<div class="themes-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+  <% @themes.each do |theme| %>
+    <div class="theme-card" style="background: <%= theme.card_background %>; border: 2px solid <%= theme.active? ? theme.primary_color : theme.border_color %>; border-radius: <%= theme.border_radius_medium %>; padding: 1.5rem; box-shadow: <%= theme.shadow_medium %>;">
+      <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+        <h3 style="color: <%= theme.text_color_light %>; margin: 0;"><%= theme.name %></h3>
+        <% if theme.active? %>
+          <span style="background: <%= theme.success_color %>; color: white; padding: 0.25rem 0.75rem; border-radius: <%= theme.border_radius_small %>; font-size: 0.85rem; font-weight: 600;">Actief</span>
+        <% end %>
+      </div>
+      
+      <div style="margin-bottom: 1rem;">
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+          <div style="width: 40px; height: 40px; background: <%= theme.primary_color %>; border-radius: <%= theme.border_radius_small %>;"></div>
+          <div style="width: 40px; height: 40px; background: <%= theme.secondary_color %>; border-radius: <%= theme.border_radius_small %>;"></div>
+          <div style="width: 40px; height: 40px; background: <%= theme.accent_color %>; border-radius: <%= theme.border_radius_small %>;"></div>
+          <div style="width: 40px; height: 40px; background: <%= theme.header_background %>; border-radius: <%= theme.border_radius_small %>;"></div>
+        </div>
+        <div style="font-size: 0.85rem; color: <%= theme.text_color_muted %>;">
+          Font: <%= theme.font_family.split(',').first %>
+        </div>
+      </div>
+      
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <%= link_to 'Bewerken', edit_admin_theme_path(theme), class: 'theme-btn track-btn--outline', style: 'flex: 1; min-width: 100px;' %>
+        <% unless theme.active? %>
+          <%= link_to 'Activeren', activate_admin_theme_path(theme), method: :patch, class: 'theme-btn', style: "background: #{theme.primary_color}; flex: 1; min-width: 100px;" %>
+        <% end %>
+        <% unless theme.active? %>
+          <%= link_to 'Verwijderen', admin_theme_path(theme), method: :delete, 
+              data: { confirm: 'Weet je zeker dat je dit thema wilt verwijderen?' }, 
+              class: 'theme-btn', 
+              style: "background: #{theme.danger_color}; flex: 1; min-width: 100px;" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+
+
+
+
+
+
+
+
+

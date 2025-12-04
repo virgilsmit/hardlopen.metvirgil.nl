@@ -1,0 +1,1023 @@
+// ============================================
+// MOBILE SPORT APP - Native App Feel
+// Strava-geïnspireerd met levendige kleuren
+// ============================================
+
+// ---- MOBILE APP VARIABLES ----
+:root {
+  // Safe area insets voor iPhone notch
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+  
+  // Mobile spacing
+  --mobile-spacing-xs: 8px;
+  --mobile-spacing-sm: 12px;
+  --mobile-spacing-md: 16px;
+  --mobile-spacing-lg: 24px;
+  --mobile-spacing-xl: 32px;
+  
+  // Mobile header height
+  --mobile-header-height: 56px;
+  --mobile-nav-height: 64px;
+}
+
+// ---- MOBILE/DESKTOP VISIBILITY ----
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-only {
+    display: block;
+  }
+  
+  .desktop-only {
+    display: none !important;
+  }
+}
+
+// ---- MOBILE BASE ----
+@media (max-width: 768px) {
+  body {
+    padding-top: var(--safe-area-top);
+    padding-bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom));
+    background: var(--sport-bg-primary);
+    overflow-x: hidden;
+  }
+  
+  // ---- MOBILE HEADER ----
+  .sport-header,
+  .theme-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: calc(var(--mobile-header-height) + var(--safe-area-top));
+    padding-top: var(--safe-area-top);
+    background: linear-gradient(135deg, rgba(28, 33, 39, 0.98) 0%, rgba(36, 46, 60, 0.98) 100%);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--sport-border-light);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: calc(12px + var(--safe-area-left));
+    padding-right: calc(12px + var(--safe-area-right));
+  }
+  
+  .theme-header__logo-link {
+    display: flex;
+    align-items: center;
+  }
+  
+  .theme-header__logo {
+    width: 32px;
+    height: 32px;
+    filter: drop-shadow(0 0 8px rgba(252, 82, 0, 0.6));
+  }
+  
+  .theme-header__title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--sport-text-primary);
+    background: linear-gradient(135deg, #FFFFFF 0%, #A78BFA 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-left: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+  }
+  
+  // Hide install button on mobile
+  #install-button {
+    display: none !important;
+  }
+  
+  // Hide desktop menu on mobile
+  .theme-menu.desktop-menu {
+    display: none !important;
+  }
+  
+  // Show mobile menu toggle
+  .mobile-menu-toggle {
+    display: flex !important;
+    font-size: 32px;
+    color: #ffffff;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.2s ease;
+    
+    &:active {
+      transform: scale(0.9);
+      color: #FC4C02;
+    }
+  }
+  
+  // ---- MOBILE NAVIGATION (Bottom) - VEEL DUIDELIJKER ----
+  .mobile-nav-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(var(--mobile-nav-height) + var(--safe-area-bottom));
+    padding-bottom: var(--safe-area-bottom);
+    background: rgba(26, 29, 35, 0.98);
+    backdrop-filter: blur(20px);
+    border-top: 2px solid rgba(252, 76, 2, 0.3);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding-left: var(--safe-area-left);
+    padding-right: var(--safe-area-right);
+    padding-top: 8px;
+  }
+  
+  .mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 12px;
+    color: #9CA3AF;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-radius: 12px;
+    position: relative;
+    flex: 1;
+    max-width: 75px;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 4px;
+      background: var(--sport-orange-gradient);
+      border-radius: 0 0 4px 4px;
+      transition: width 0.3s ease;
+      box-shadow: 0 2px 8px rgba(252, 76, 2, 0.6);
+    }
+    
+    &.active {
+      color: #FC4C02;
+      background: rgba(252, 76, 2, 0.1);
+      
+      &::before {
+        width: 50px;
+      }
+      
+      .mobile-nav-icon {
+        transform: scale(1.15);
+        filter: drop-shadow(0 2px 6px rgba(252, 76, 2, 0.8));
+      }
+    }
+    
+    &:active {
+      transform: scale(0.92);
+      background: rgba(252, 76, 2, 0.15);
+    }
+  }
+  
+  .mobile-nav-icon {
+    font-size: 26px;
+    transition: all 0.2s ease;
+    line-height: 1;
+  }
+  
+  .mobile-nav-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.2;
+  }
+  
+  // ---- MOBILE HERO ----
+  .sport-hero {
+    min-height: 60vh;
+    padding: calc(var(--mobile-header-height) + var(--mobile-spacing-xl)) var(--mobile-spacing-md) var(--mobile-spacing-xl);
+    
+    &::before {
+      opacity: 0.6;
+    }
+  }
+  
+  .sport-hero__content {
+    padding: 0;
+  }
+  
+  .sport-hero__eyebrow {
+    font-size: 12px;
+    padding: 6px 16px;
+  }
+  
+  .sport-hero__title {
+    font-size: 32px;
+    margin-bottom: var(--mobile-spacing-md);
+  }
+  
+  .sport-hero__subtitle {
+    font-size: 16px;
+    margin-bottom: var(--mobile-spacing-lg);
+  }
+  
+  .sport-hero__cta {
+    flex-direction: column;
+    gap: var(--mobile-spacing-sm);
+  }
+  
+  // ---- MOBILE BUTTONS ----
+  .sport-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 14px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+  
+  // ---- MOBILE SECTIONS ----
+  .sport-section {
+    padding: var(--mobile-spacing-lg) var(--mobile-spacing-md);
+  }
+  
+  .sport-section__header {
+    margin-bottom: var(--mobile-spacing-lg);
+  }
+  
+  .sport-section__icon {
+    font-size: 32px;
+    margin-bottom: var(--mobile-spacing-sm);
+  }
+  
+  .sport-section__title {
+    font-size: 24px !important;
+    margin-bottom: var(--mobile-spacing-sm) !important;
+  }
+  
+  .sport-section__description {
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+  }
+  
+  // ---- MOBILE GRID ----
+  .sport-grid {
+    grid-template-columns: 1fr;
+    gap: var(--mobile-spacing-md);
+    padding: 0 var(--mobile-spacing-md);
+  }
+  
+  // ---- MOBILE CARDS ----
+  .sport-card {
+    padding: var(--mobile-spacing-lg);
+    border-radius: var(--sport-radius-md);
+    
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+  
+  .sport-card__icon {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+    margin-bottom: var(--mobile-spacing-md);
+  }
+  
+  .sport-card__title {
+    font-size: 18px;
+    margin-bottom: var(--mobile-spacing-sm);
+  }
+  
+  .sport-card__description {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  
+  // ---- MOBILE STATS ----
+  .sport-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--mobile-spacing-sm);
+  }
+  
+  .sport-stat {
+    padding: var(--mobile-spacing-md);
+    border-radius: var(--sport-radius-md);
+  }
+  
+  .sport-stat__value {
+    font-size: 32px;
+  }
+  
+  .sport-stat__label {
+    font-size: 12px;
+  }
+  
+  // ---- MOBILE MENU OVERLAY ----
+  .mobile-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    
+    &.active {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+  
+  .mobile-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 85%;
+    max-width: 320px;
+    background: linear-gradient(135deg, var(--sport-bg-secondary) 0%, var(--sport-bg-card) 100%);
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.5);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+    padding-top: calc(var(--mobile-header-height) + var(--safe-area-top));
+    padding-bottom: var(--safe-area-bottom);
+    
+    .mobile-menu-overlay.active & {
+      transform: translateX(0);
+    }
+  }
+  
+  .mobile-menu__header {
+    padding: var(--mobile-spacing-lg);
+    border-bottom: 1px solid var(--sport-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    h3 {
+      margin: 0;
+      font-size: 20px;
+      background: var(--sport-orange-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+  
+  .mobile-menu-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(252, 82, 0, 0.1);
+    border: 1px solid var(--sport-border);
+    color: var(--sport-orange);
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:active {
+      transform: scale(0.9);
+      background: rgba(252, 82, 0, 0.2);
+    }
+  }
+  
+  .mobile-menu__section {
+    padding: 1rem !important;
+    margin: 1rem !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 2px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 8px !important;
+    
+    h4 {
+      font-size: 0.9rem !important;  // EXACT SAME SIZE AS DESKTOP
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #f7fbff !important;  // EXACT SAME AS DESKTOP ITEMS
+      font-weight: 500 !important;  // EXACT SAME AS DESKTOP
+      margin-bottom: 0.75rem !important;
+      padding-left: 0 !important;
+    }
+  }
+  
+  .mobile-menu__item {
+    display: flex;
+    align-items: center;
+    gap: var(--mobile-spacing-md);
+    padding: 1.25rem 1.5rem !important;
+    color: #f7fbff !important;  // EXACT SAME AS DESKTOP DROPDOWN
+    font-weight: 500 !important;  // EXACT SAME AS DESKTOP DROPDOWN
+    font-size: 1rem !important;
+    text-decoration: none;
+    border-radius: 8px !important;
+    border: 3px solid rgba(255, 255, 255, 0.3) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    letter-spacing: 0.025em !important;  // EXACT SAME AS DESKTOP
+    transition: all 0.3s ease;
+    margin-bottom: 0.5rem !important;
+    
+    span {
+      color: #f7fbff !important;  // EXACT SAME AS DESKTOP
+      font-weight: 500 !important;  // EXACT SAME AS DESKTOP
+    }
+    
+    &:hover, &:focus, &:active {
+      background: rgba(255, 107, 53, 0.25) !important;  // EXACT SAME AS DESKTOP
+      color: #ffb193 !important;  // EXACT SAME AS DESKTOP
+    }
+    
+    &:active {
+      transform: scale(0.98);
+      background: rgba(139, 92, 246, 0.2);
+    }
+    
+    .mobile-menu__icon {
+      font-size: 20px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(252, 82, 0, 0.2) 100%);
+      border-radius: 8px;
+    }
+    
+    span:last-child {
+      flex: 1;
+      font-size: 15px;
+      font-weight: 500;
+    }
+  }
+  
+  // ---- MOBILE PULL TO REFRESH ----
+  .mobile-pull-refresh {
+    position: absolute;
+    top: calc(var(--mobile-header-height) + var(--safe-area-top));
+    left: 50%;
+    transform: translateX(-50%) translateY(-60px);
+    width: 40px;
+    height: 40px;
+    background: var(--sport-orange-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    opacity: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(252, 82, 0, 0.4);
+    
+    &.active {
+      opacity: 1;
+      transform: translateX(-50%) translateY(10px);
+    }
+  }
+  
+  // ---- MOBILE CONTENT AREA ----
+  .sport-page,
+  .app-container {
+    padding-top: calc(var(--mobile-header-height) + var(--safe-area-top));
+    padding-bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom));
+    min-height: 100vh;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  
+  // Override voor prototype-track
+  .prototype-track,
+  .home-track {
+    padding: 0;
+    margin: 0;
+  }
+  
+  // ---- MOBILE HERO (Compact) ----
+  .sport-hero {
+    min-height: auto;
+    padding: var(--mobile-spacing-xl) var(--mobile-spacing-md);
+    text-align: center;
+    
+    &::before {
+      background: radial-gradient(circle at 50% 30%, rgba(139, 92, 246, 0.3) 0%, transparent 60%),
+                  radial-gradient(circle at 50% 70%, rgba(252, 82, 0, 0.2) 0%, transparent 60%);
+    }
+  }
+  
+  // ---- MOBILE STATS (Horizontal Scroll) ----
+  .sport-stats {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 12px;
+    padding: var(--mobile-spacing-md);
+    margin: 0;
+    -webkit-overflow-scrolling: touch;
+    
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  
+  .sport-stat {
+    flex: 0 0 130px;
+    scroll-snap-align: start;
+    background: var(--sport-bg-card);
+    border: 1px solid var(--sport-border-light);
+    border-radius: var(--sport-radius-md);
+    padding: 16px 12px;
+    text-align: center;
+    
+    // Verschillende kleuren per stat
+    &:nth-child(1) {
+      border-color: rgba(252, 82, 0, 0.3);
+      box-shadow: 0 4px 12px rgba(252, 82, 0, 0.2);
+    }
+    
+    &:nth-child(2) {
+      border-color: rgba(139, 92, 246, 0.3);
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+    }
+    
+    &:nth-child(3) {
+      border-color: rgba(236, 72, 153, 0.3);
+      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.2);
+    }
+    
+    &:nth-child(4) {
+      border-color: rgba(6, 182, 212, 0.3);
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2);
+    }
+  }
+  
+  .sport-stat__value {
+    font-size: 28px !important;
+    margin-bottom: 4px !important;
+  }
+  
+  .sport-stat__label {
+    font-size: 10px !important;
+    line-height: 1.3 !important;
+  }
+  
+  // ---- MOBILE CARDS (Full Width) ----
+  .sport-card {
+    margin-bottom: var(--mobile-spacing-md);
+    padding: var(--mobile-spacing-lg);
+    
+    // Touch feedback
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+  
+  // ---- MOBILE TRAINING CARDS ----
+  .track-session-card,
+  .training-card {
+    background: var(--sport-bg-card);
+    border: 1px solid var(--sport-border);
+    border-radius: var(--sport-radius-lg);
+    padding: var(--mobile-spacing-lg);
+    margin-bottom: var(--mobile-spacing-md);
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--sport-orange-gradient);
+    }
+    
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+  
+  // ---- MOBILE FAB (Floating Action Button) ----
+  .mobile-fab {
+    position: fixed;
+    bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom) + 16px);
+    right: calc(16px + var(--safe-area-right));
+    width: 56px;
+    height: 56px;
+    background: var(--sport-orange-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+    box-shadow: 0 4px 16px rgba(252, 82, 0, 0.4);
+    z-index: 999;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:active {
+      transform: scale(0.9);
+    }
+    
+    &:hover {
+      box-shadow: 0 6px 20px rgba(252, 82, 0, 0.6);
+    }
+  }
+  
+  // ---- MOBILE SWIPE CARDS ----
+  .mobile-swipe-container {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    display: flex;
+    gap: var(--mobile-spacing-md);
+    padding: var(--mobile-spacing-md);
+    margin: 0 calc(-1 * var(--mobile-spacing-md));
+    -webkit-overflow-scrolling: touch;
+    
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  
+  .mobile-swipe-card {
+    flex: 0 0 85%;
+    scroll-snap-align: start;
+  }
+  
+  // ---- MOBILE BOTTOM SHEET ----
+  .mobile-bottom-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--sport-bg-card);
+    border-radius: var(--sport-radius-xl) var(--sport-radius-xl) 0 0;
+    padding: var(--mobile-spacing-lg);
+    padding-bottom: calc(var(--mobile-spacing-lg) + var(--safe-area-bottom));
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    z-index: 2001;
+    
+    &.active {
+      transform: translateY(0);
+    }
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 4px;
+      background: var(--sport-border-light);
+      border-radius: 2px;
+    }
+  }
+  
+  // ---- MOBILE PROFILE HEADER ----
+  .mobile-profile-header {
+    background: linear-gradient(135deg, var(--sport-bg-secondary) 0%, var(--sport-bg-card) 100%);
+    padding: var(--mobile-spacing-xl) var(--mobile-spacing-md);
+    text-align: center;
+    border-radius: 0 0 var(--sport-radius-xl) var(--sport-radius-xl);
+    margin-bottom: var(--mobile-spacing-lg);
+    
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--sport-purple-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin: 0 auto var(--mobile-spacing-md);
+      box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+    }
+    
+    .profile-name {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--sport-text-primary);
+      margin-bottom: 4px;
+    }
+    
+    .profile-role {
+      font-size: 14px;
+      color: var(--sport-text-muted);
+      display: inline-block;
+      padding: 4px 12px;
+      background: rgba(139, 92, 246, 0.2);
+      border-radius: var(--sport-radius-full);
+    }
+  }
+  
+  // ---- MOBILE LIST ITEMS ----
+  .mobile-list-item {
+    display: flex;
+    align-items: center;
+    gap: var(--mobile-spacing-md);
+    padding: var(--mobile-spacing-md);
+    background: var(--sport-bg-card);
+    border: 1px solid var(--sport-border);
+    border-radius: var(--sport-radius-md);
+    margin-bottom: var(--mobile-spacing-sm);
+    transition: all 0.3s ease;
+    
+    &:active {
+      transform: scale(0.98);
+      background: var(--sport-bg-secondary);
+    }
+    
+    .list-item-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--sport-purple-gradient);
+      border-radius: var(--sport-radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    
+    .list-item-content {
+      flex: 1;
+      
+      .list-item-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--sport-text-primary);
+        margin-bottom: 2px;
+      }
+      
+      .list-item-subtitle {
+        font-size: 13px;
+        color: var(--sport-text-muted);
+      }
+    }
+    
+    .list-item-action {
+      font-size: 20px;
+      color: var(--sport-text-muted);
+    }
+  }
+  
+  // ---- MOBILE QUICK ACTIONS ----
+  .mobile-quick-actions {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--mobile-spacing-sm);
+    padding: var(--mobile-spacing-md);
+    margin-bottom: var(--mobile-spacing-lg);
+  }
+  
+  .mobile-quick-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: var(--mobile-spacing-md) var(--mobile-spacing-sm);
+    background: var(--sport-bg-card);
+    border: 1px solid var(--sport-border);
+    border-radius: var(--sport-radius-md);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    
+    &:active {
+      transform: scale(0.95);
+    }
+    
+    .quick-action-icon {
+      font-size: 28px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+    
+    .quick-action-label {
+      font-size: 11px;
+      color: var(--sport-text-muted);
+      text-align: center;
+      font-weight: 500;
+    }
+  }
+  
+  // ---- MOBILE HAPTIC FEEDBACK ----
+  @supports (vibrate: 1) {
+    .sport-btn:active,
+    .mobile-nav-item:active,
+    .mobile-menu__item:active {
+      // Trigger haptic feedback via JavaScript
+    }
+  }
+  
+  // ---- MOBILE SKELETON LOADING ----
+  .skeleton {
+    background: linear-gradient(90deg, var(--sport-bg-card) 25%, var(--sport-bg-secondary) 50%, var(--sport-bg-card) 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s ease-in-out infinite;
+    border-radius: var(--sport-radius-md);
+  }
+  
+  @keyframes loading {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+  
+  // ---- MOBILE PROGRESS BAR ----
+  .mobile-progress {
+    height: 8px;
+    background: rgba(139, 92, 246, 0.2);
+    border-radius: var(--sport-radius-full);
+    overflow: hidden;
+    margin-bottom: var(--mobile-spacing-md);
+    
+    .progress-fill {
+      height: 100%;
+      background: var(--sport-orange-gradient);
+      border-radius: var(--sport-radius-full);
+      transition: width 0.5s ease;
+      box-shadow: 0 0 10px rgba(252, 82, 0, 0.5);
+    }
+  }
+  
+  // ---- MOBILE TABS ----
+  .mobile-tabs {
+    display: flex;
+    gap: 8px;
+    padding: var(--mobile-spacing-md);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  
+  .mobile-tab {
+    flex: 0 0 auto;
+    padding: 10px 20px;
+    background: transparent;
+    border: 1px solid var(--sport-border);
+    border-radius: var(--sport-radius-full);
+    color: var(--sport-text-muted);
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    
+    &.active {
+      background: var(--sport-orange-gradient);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(252, 82, 0, 0.4);
+    }
+    
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+  
+  // ---- MOBILE BADGE ----
+  .mobile-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: rgba(139, 92, 246, 0.2);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: var(--sport-radius-full);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--sport-purple-light);
+    
+    &--orange {
+      background: rgba(252, 82, 0, 0.2);
+      border-color: rgba(252, 82, 0, 0.3);
+      color: var(--sport-orange-light);
+    }
+    
+    &--green {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: var(--sport-green-light);
+    }
+  }
+  
+  // ---- MOBILE ACTIVITY FEED ----
+  .mobile-activity-item {
+    display: flex;
+    gap: var(--mobile-spacing-md);
+    padding: var(--mobile-spacing-md);
+    background: var(--sport-bg-card);
+    border: 1px solid var(--sport-border);
+    border-radius: var(--sport-radius-md);
+    margin-bottom: var(--mobile-spacing-sm);
+    
+    .activity-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--sport-orange-gradient);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(252, 82, 0, 0.3);
+    }
+    
+    .activity-content {
+      flex: 1;
+      
+      .activity-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--sport-text-primary);
+        margin-bottom: 4px;
+      }
+      
+      .activity-meta {
+        font-size: 13px;
+        color: var(--sport-text-muted);
+        display: flex;
+        gap: 12px;
+        
+        span {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+      }
+    }
+  }
+  
+  // ---- MOBILE EMPTY STATE ----
+  .mobile-empty-state {
+    text-align: center;
+    padding: var(--mobile-spacing-2xl) var(--mobile-spacing-md);
+    
+    .empty-icon {
+      font-size: 64px;
+      margin-bottom: var(--mobile-spacing-md);
+      opacity: 0.3;
+    }
+    
+    .empty-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--sport-text-secondary);
+      margin-bottom: var(--mobile-spacing-sm);
+    }
+    
+    .empty-description {
+      font-size: 14px;
+      color: var(--sport-text-muted);
+      margin-bottom: var(--mobile-spacing-lg);
+    }
+  }
+}
+
+// ---- MOBILE GESTURES ----
+@media (max-width: 768px) {
+  // Swipe gestures
+  .swipeable {
+    touch-action: pan-y;
+    user-select: none;
+  }
+  
+  // Tap highlight
+  * {
+    -webkit-tap-highlight-color: rgba(252, 82, 0, 0.2);
+  }
+}
+

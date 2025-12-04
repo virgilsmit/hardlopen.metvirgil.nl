@@ -1,0 +1,83 @@
+<div class="events-page" style="padding: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1 style="color: #ffffff !important; font-weight: 700 !important; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;">🏃 Hardloop Evenementen</h1>
+    
+    <% if current_user&.admin? || current_user&.has_role?(:trainer) %>
+      <div style="display: flex; gap: 0.75rem;">
+        <%= link_to new_event_path, class: 'theme-btn', style: 'background: linear-gradient(135deg, #1ee3cf, #34c759); color: #0c1730; font-weight: 700; padding: 0.75rem 1.5rem;' do %>
+          <span>➕ Nieuw Evenement</span>
+        <% end %>
+        <%= link_to import_events_path, class: 'theme-btn', style: 'background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.3);' do %>
+          <span>📁 Importeer Excel</span>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+  
+  <!-- Upcoming Events -->
+  <% if @upcoming_events.any? %>
+    <section style="margin-bottom: 3rem;">
+      <h2 style="color: #1ee3cf !important; font-weight: 700 !important; margin-bottom: 1.5rem; font-size: 1.75rem;">📅 Komende Evenementen</h2>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;">
+        <% @upcoming_events.each do |event| %>
+          <%= render 'event_card', event: event %>
+        <% end %>
+      </div>
+    </section>
+  <% else %>
+    <div style="background: rgba(255, 193, 7, 0.15); border-left: 4px solid #ffc107; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+      <p style="color: #ffc107; margin: 0; font-weight: 600;">
+        📅 Er zijn momenteel geen komende evenementen gepland.
+      </p>
+      <% if current_user&.admin? || current_user&.has_role?(:trainer) %>
+        <p style="color: rgba(244, 248, 255, 0.7); margin: 0.5rem 0 0 0;">
+          Voeg evenementen toe via "Nieuw Evenement" of importeer vanuit Excel.
+        </p>
+      <% end %>
+    </div>
+  <% end %>
+  
+  <!-- Past Events -->
+  <% if @past_events.any? %>
+    <section>
+      <h2 style="color: rgba(244, 248, 255, 0.6) !important; font-weight: 700 !important; margin-bottom: 1.5rem; font-size: 1.5rem;">🏁 Afgelopen Evenementen</h2>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;">
+        <% @past_events.each do |event| %>
+          <%= render 'event_card', event: event, past: true %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+</div>
+
+<style>
+  .events-page {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  @media (max-width: 768px) {
+    .events-page {
+      padding: 1rem !important;
+    }
+    
+    .events-page h1 {
+      font-size: 1.75rem !important;
+    }
+    
+    .events-page > div:first-child {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 1rem;
+    }
+    
+    .events-page > div:first-child > div {
+      width: 100%;
+      flex-direction: column;
+    }
+  }
+</style>
+
+

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PWA Debug - Waarom geen Install?</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #1a1a1a;
+      color: #fff;
+      padding: 20px;
+      font-size: 14px;
+    }
+    
+    .section {
+      background: #2a2a2a;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border-left: 4px solid #FC4C02;
+    }
+    
+    .ok { border-left-color: #28a745; }
+    .error { border-left-color: #dc3545; }
+    .warning { border-left-color: #ffc107; }
+    
+    h1 { color: #FC4C02; margin: 0 0 20px 0; }
+    h2 { margin: 10px 0 5px 0; font-size: 16px; }
+    
+    pre {
+      background: #1a1a1a;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+    
+    .status {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    
+    .status.ok { background: #28a745; }
+    .status.error { background: #dc3545; }
+    .status.warning { background: #ffc107; color: #000; }
+    
+    button {
+      background: #FC4C02;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 PWA Install Debug</h1>
+  <p>Waarom verschijnt "Add to Home Screen" niet?</p>
+  
+  <div id="results"></div>
+  
+  <div style="margin-top: 20px;">
+    <button onclick="window.location.reload()">🔄 Refresh</button>
+    <button onclick="window.location.href='/'">🏠 Home</button>
+  </div>
+
+  <script>
+    const results = document.getElementById('results');
+    
+    function addSection(title, status, details, cssClass) {
+      const div = document.createElement('div');
+      div.className = `section ${cssClass}`;
+      div.innerHTML = `
+        <h2>${title} <span class="status ${cssClass}">${status}</span></h2>
+        <pre>${details}</pre>
+      `;
+      results.appendChild(div);
+    }
+    
+    // Test 1: HTTPS
+    const isHTTPS = window.location.protocol === 'https:';
+    addSection(
+      '1. HTTPS',
+      isHTTPS ? 'OK' : 'ERROR',
+      isHTTPS ? 'Site draait op HTTPS ✓' : 'PWA vereist HTTPS!\nHuidige protocol: ' + window.location.protocol,
+      isHTTPS ? 'ok' : 'error'
+    );
+    
+    // Test 2: Service Worker Support
+    const swSupported = 'serviceWorker' in navigator;
+    addSection(
+      '2. Service Worker Support',
+      swSupported ? 'OK' : 'ERROR',
+      swSupported ? 'Browser ondersteunt Service Workers ✓' : 'Browser ondersteunt geen Service Workers',
+      swSupported ? 'ok' : 'error'
+    );
+    
+    // Test 3: Manifest Link
+    const manifestLink = document.querySelector('link[rel="manifest"]');
+    addSection(
+      '3. Manifest Link in HTML',
+      manifestLink ? 'OK' : 'ERROR',
+      manifestLink ? `Link gevonden: ${manifestLink.href}` : 'Geen manifest link gevonden in HTML!',
+      manifestLink ? 'ok' : 'error'
+    );
+    
+    // Test 4: Fetch Manifest
+    if (manifestLink) {
+      fetch(manifestLink.href)
+        .then(r => r.json())
+        .then(data => {
+          const hasName = !!data.name;
+          const hasIcons = data.icons && data.icons.length > 0;
+          const hasDisplay = data.display === 'standalone';
+          const hasStartUrl = !!data.start_url;
+          
+          addSection(
+            '4. Manifest Content',
+            hasName && hasIcons && hasDisplay ? 'OK' : 'WARNING',
+            `name: ${data.name || 'MISSING'}\n` +
+            `display: ${data.display || 'MISSING'}\n` +
+            `start_url: ${data.start_url || 'MISSING'}\n` +
+            `icons: ${data.icons?.length || 0} found\n` +
+            `theme_color: ${data.theme_color || 'MISSING'}`,
+            hasName && hasIcons && hasDisplay ? 'ok' : 'warning'
+          );
+        })
+        .catch(e => {
+          addSection(
+            '4. Manifest Content',
+            'ERROR',
+            `Kan manifest niet laden:\n${e.message}`,
+            'error'
+          );
+        });
+    }
+    
+    // Test 5: Service Worker Registration
+    setTimeout(() => {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistration()
+          .then(registration => {
+            if (registration) {
+              addSection(
+                '5. Service Worker Status',
+                registration.active ? 'OK' : 'WARNING',
+                `Geregistreerd: ✓\n` +
+                `Scope: ${registration.scope}\n` +
+                `Status: ${registration.active ? 'ACTIVE ✓' : 'Not active yet'}`,
+                registration.active ? 'ok' : 'warning'
+              );
+            } else {
+              addSection(
+                '5. Service Worker Status',
+                'ERROR',
+                'Service Worker niet geregistreerd!\nCheck browser console voor errors.',
+                'error'
+              );
+            }
+          });
+      }
+    }, 1000);
+    
+    // Test 6: Install Prompt
+    let promptAvailable = false;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      promptAvailable = true;
+      addSection(
+        '6. Install Prompt',
+        'OK',
+        'Install prompt is beschikbaar! ✓\nApp is installeerbaar.',
+        'ok'
+      );
+    });
+    
+    setTimeout(() => {
+      if (!promptAvailable) {
+        const inStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                            window.navigator.standalone === true;
+        
+        addSection(
+          '6. Install Prompt',
+          inStandalone ? 'OK' : 'INFO',
+          inStandalone ? 
+            'App draait al in standalone mode ✓\n(Al geïnstalleerd!)' :
+            'Install prompt nog niet getriggered.\n' +
+            'Mogelijke oorzaken:\n' +
+            '- Service Worker moet eerst actief zijn\n' +
+            '- Manifest moet valid zijn\n' +
+            '- Site al een keer geïnstalleerd (check home screen)\n' +
+            '- Browser criteria niet voldaan\n\n' +
+            'TIP: Refresh de pagina over 30 seconden',
+          inStandalone ? 'ok' : 'warning'
+        );
+      }
+    }, 2000);
+    
+    // Test 7: Browser Info
+    const ua = navigator.userAgent;
+    const isIOS = /iPhone|iPad|iPod/.test(ua);
+    const isAndroid = /Android/.test(ua);
+    const isChrome = /Chrome/.test(ua) && !/Edge/.test(ua);
+    const isSafari = /Safari/.test(ua) && !/Chrome/.test(ua);
+    
+    let browserAdvice = '';
+    if (isIOS) {
+      browserAdvice = '📱 iOS Device\nInstalleer via: Safari → Deel → "Zet op beginscherm"';
+    } else if (isAndroid) {
+      browserAdvice = '🤖 Android Device\nInstalleer via: Chrome → Menu → "App installeren"';
+    } else {
+      browserAdvice = '💻 Desktop Browser\nInstalleer via: Menu → "App installeren"';
+    }
+    
+    addSection(
+      '7. Browser & Platform',
+      'INFO',
+      `User Agent: ${ua.substring(0, 80)}...\n\n${browserAdvice}`,
+      'ok'
+    );
+    
+    // Console logging
+    console.log('[PWA Debug] Running diagnostic...');
+    console.log('[PWA Debug] HTTPS:', isHTTPS);
+    console.log('[PWA Debug] SW Support:', swSupported);
+    console.log('[PWA Debug] Manifest Link:', manifestLink?.href);
+  </script>
+</body>
+</html>
+
+

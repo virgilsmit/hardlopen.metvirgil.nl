@@ -1,0 +1,672 @@
+// ============================================
+// MODERN SPORT THEME - Strava/Runkeeper geïnspireerd
+// Donker, sportief, professioneel met persoonlijke touch
+// ============================================
+
+// ---- KLEUREN PALETTE - STRAVA INSPIRED (NEUTRAAL & ATLETISCH) ----
+:root {
+  // Hoofdkleuren - Donker & Atletisch (zoals Strava)
+  --sport-dark-blue: #1A1D23;
+  --sport-navy: #242933;
+  --sport-deep-blue: #2E3440;
+  --sport-slate: #3B4252;
+  --sport-slate-light: #4C566A;
+  
+  // Accent kleuren - Strava Oranje (hoofdkleur)
+  --sport-orange: #FC4C02;
+  --sport-orange-light: #FF6B35;
+  --sport-orange-dark: #E63900;
+  --sport-orange-gradient: linear-gradient(135deg, #FC4C02 0%, #FF6B35 100%);
+  
+  // Secundaire accenten - Neutraal en atletisch
+  --sport-blue: #0EA5E9;
+  --sport-blue-light: #38BDF8;
+  --sport-teal: #14B8A6;
+  --sport-teal-light: #2DD4BF;
+  --sport-green: #22C55E;
+  --sport-green-light: #4ADE80;
+  --sport-gray: #6B7280;
+  --sport-gray-light: #9CA3AF;
+  
+  // Tekst kleuren
+  --sport-text-primary: #FFFFFF;
+  --sport-text-secondary: #E5E7EB;
+  --sport-text-muted: #9CA3AF;
+  --sport-text-dark: #1F2937;
+  
+  // Achtergronden - Koeler en neutraler
+  --sport-bg-primary: #1A1D23;
+  --sport-bg-secondary: #242933;
+  --sport-bg-card: #2E3440;
+  --sport-bg-overlay: rgba(26, 29, 35, 0.95);
+  
+  // Borders & Shadows - Neutraal grijs/blauw
+  --sport-border: rgba(255, 255, 255, 0.08);
+  --sport-border-light: rgba(255, 255, 255, 0.12);
+  --sport-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --sport-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --sport-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --sport-shadow-glow: 0 0 30px rgba(252, 76, 2, 0.4);
+  
+  // Spacing
+  --sport-spacing-xs: 8px;
+  --sport-spacing-sm: 16px;
+  --sport-spacing-md: 24px;
+  --sport-spacing-lg: 32px;
+  --sport-spacing-xl: 48px;
+  --sport-spacing-2xl: 64px;
+  
+  // Border radius
+  --sport-radius-sm: 8px;
+  --sport-radius-md: 12px;
+  --sport-radius-lg: 16px;
+  --sport-radius-xl: 24px;
+  --sport-radius-full: 9999px;
+  
+  // Typography
+  --sport-font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --sport-font-display: 'Rubik', 'Inter', sans-serif;
+}
+
+// ---- GLOBAL RESET ----
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--sport-font-primary);
+  background: var(--sport-bg-primary);
+  color: var(--sport-text-primary);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+// ---- TYPOGRAPHY ----
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--sport-font-display);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--sport-text-primary);
+  margin-bottom: var(--sport-spacing-md);
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 800;
+  background: linear-gradient(135deg, #FFFFFF 0%, #E5E7EB 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+}
+
+h2 {
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 700;
+}
+
+h3 {
+  font-size: clamp(22px, 3vw, 32px);
+  font-weight: 600;
+}
+
+h4 {
+  font-size: clamp(18px, 2.5vw, 24px);
+  font-weight: 600;
+}
+
+p {
+  color: var(--sport-text-secondary);
+  line-height: 1.7;
+  margin-bottom: var(--sport-spacing-md);
+}
+
+a {
+  color: var(--sport-orange);
+  text-decoration: none;
+  transition: color 0.3s ease;
+  
+  &:hover {
+    color: var(--sport-orange-light);
+  }
+}
+
+// ---- SPORT HERO SECTION - STRAVA STYLE (NEUTRAAL) ----
+.sport-hero {
+  position: relative;
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sport-spacing-xl) var(--sport-spacing-md);
+  overflow: hidden;
+  background: linear-gradient(135deg, #1A1D23 0%, #242933 50%, #2E3440 100%);
+  
+  // Subtiele animated background - Alleen oranje accent
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 50% 50%, rgba(252, 76, 2, 0.08) 0%, transparent 60%);
+    animation: pulse 10s ease-in-out infinite;
+    pointer-events: none;
+  }
+  
+  // Subtiele vignette voor diepte
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, transparent 0%, rgba(26, 29, 35, 0.4) 100%);
+    pointer-events: none;
+  }
+}
+
+.sport-hero__content {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.sport-hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sport-spacing-xs);
+  padding: var(--sport-spacing-xs) var(--sport-spacing-md);
+  background: rgba(252, 76, 2, 0.1);
+  border: 1px solid rgba(252, 76, 2, 0.3);
+  border-radius: var(--sport-radius-full);
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--sport-orange);
+  margin-bottom: var(--sport-spacing-lg);
+  
+  &::before {
+    content: '🏃';
+    font-size: 18px;
+  }
+}
+
+.sport-hero__title {
+  margin-bottom: var(--sport-spacing-md);
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.sport-hero__subtitle {
+  font-size: clamp(18px, 2vw, 24px);
+  font-weight: 500;
+  color: var(--sport-text-secondary);
+  margin-bottom: var(--sport-spacing-xl);
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.sport-hero__cta {
+  display: flex;
+  gap: var(--sport-spacing-md);
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+// ---- MODERN BUTTONS ----
+.sport-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sport-spacing-xs);
+  padding: 16px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: var(--sport-radius-md);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+  
+  &:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+  
+  span {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+.sport-btn--primary {
+  background: var(--sport-orange-gradient);
+  color: var(--sport-text-primary);
+  box-shadow: var(--sport-shadow-glow);
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(252, 76, 2, 0.5);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.sport-btn--secondary {
+  background: transparent;
+  color: var(--sport-text-primary);
+  border: 2px solid var(--sport-border-light);
+  
+  &:hover {
+    border-color: var(--sport-orange);
+    background: rgba(252, 76, 2, 0.1);
+  }
+}
+
+.sport-btn--ghost {
+  background: var(--sport-bg-card);
+  color: var(--sport-text-primary);
+  border: 1px solid var(--sport-border);
+  
+  &:hover {
+    background: var(--sport-bg-secondary);
+    border-color: var(--sport-border-light);
+  }
+}
+
+// ---- SPORT SECTIONS ----
+.sport-section {
+  padding: var(--sport-spacing-2xl) var(--sport-spacing-md);
+  position: relative;
+  
+  &--alt {
+    background: var(--sport-bg-secondary);
+  }
+}
+
+.sport-section__header {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto var(--sport-spacing-xl);
+}
+
+.sport-section__icon {
+  font-size: 48px;
+  margin-bottom: var(--sport-spacing-md);
+  display: inline-block;
+  animation: float 3s ease-in-out infinite;
+}
+
+.sport-section__title {
+  margin-bottom: var(--sport-spacing-md);
+}
+
+.sport-section__description {
+  font-size: 18px;
+  color: var(--sport-text-muted);
+}
+
+// ---- SPORT CARDS - STRAVA STYLE (NEUTRAAL) ----
+.sport-card {
+  background: var(--sport-bg-card);
+  border: 1px solid var(--sport-border);
+  border-radius: var(--sport-radius-lg);
+  padding: var(--sport-spacing-lg);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--sport-orange-gradient);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  
+  // Alleen oranje en blauwtinten (neutraal)
+  &:nth-child(2)::before {
+    background: linear-gradient(135deg, #0EA5E9 0%, #38BDF8 100%);
+  }
+  
+  &:nth-child(3)::before {
+    background: linear-gradient(135deg, #14B8A6 0%, #2DD4BF 100%);
+  }
+  
+  &:nth-child(4)::before {
+    background: linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%);
+  }
+  
+  &:nth-child(5)::before {
+    background: linear-gradient(135deg, #22C55E 0%, #4ADE80 100%);
+  }
+  
+  &:nth-child(6)::before {
+    background: linear-gradient(135deg, #F97316 0%, #FB923C 100%);
+  }
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    border-color: rgba(252, 76, 2, 0.3);
+    
+    &::before {
+      transform: scaleX(1);
+    }
+  }
+}
+
+.sport-card__icon {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #3B4252 0%, #4C566A 100%);
+  border-radius: var(--sport-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-bottom: var(--sport-spacing-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  
+  // Variaties - Alleen oranje en blauwtinten (neutraal)
+  .sport-card:nth-child(1) & {
+    background: linear-gradient(135deg, #FC4C02 0%, #FF6B35 100%);
+    box-shadow: 0 4px 12px rgba(252, 76, 2, 0.3);
+  }
+  
+  .sport-card:nth-child(2) & {
+    background: linear-gradient(135deg, #0EA5E9 0%, #38BDF8 100%);
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+  }
+  
+  .sport-card:nth-child(3) & {
+    background: linear-gradient(135deg, #14B8A6 0%, #2DD4BF 100%);
+    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+  }
+  
+  .sport-card:nth-child(4) & {
+    background: linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%);
+    box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+  }
+  
+  .sport-card:nth-child(5) & {
+    background: linear-gradient(135deg, #22C55E 0%, #4ADE80 100%);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+  }
+  
+  .sport-card:nth-child(6) & {
+    background: linear-gradient(135deg, #F97316 0%, #FB923C 100%);
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+  }
+}
+
+.sport-card__title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: var(--sport-spacing-sm);
+  color: var(--sport-text-primary);
+}
+
+.sport-card__description {
+  color: var(--sport-text-muted);
+  line-height: 1.6;
+}
+
+// ---- SPORT GRID ----
+.sport-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--sport-spacing-lg);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// ---- SPORT STATS ----
+.sport-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--sport-spacing-md);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.sport-stat {
+  text-align: center;
+  padding: var(--sport-spacing-lg);
+  background: var(--sport-bg-card);
+  border: 1px solid var(--sport-border);
+  border-radius: var(--sport-radius-md);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    border-color: var(--sport-orange);
+    transform: translateY(-2px);
+  }
+}
+
+.sport-stat__value {
+  font-size: 42px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #FC4C02 0%, #FF6B35 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--sport-spacing-xs);
+  line-height: 1;
+}
+
+.sport-stat__label {
+  font-size: 14px;
+  color: var(--sport-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+// ---- ANIMATIONS ----
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+    opacity: 0.7;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+// ---- RESPONSIVE ----
+@media (max-width: 768px) {
+  .sport-hero {
+    min-height: 80vh;
+    padding: var(--sport-spacing-lg) var(--sport-spacing-md);
+  }
+  
+  .sport-hero__cta {
+    flex-direction: column;
+  }
+  
+  .sport-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .sport-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .sport-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+// ---- SPORT HEADER/NAV ----
+.sport-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--sport-bg-overlay);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--sport-border);
+  padding: var(--sport-spacing-md) var(--sport-spacing-lg);
+  transition: all 0.3s ease;
+  
+  &.scrolled {
+    padding: var(--sport-spacing-sm) var(--sport-spacing-lg);
+    box-shadow: var(--sport-shadow-md);
+  }
+}
+
+.sport-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.sport-nav__logo {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--sport-text-primary);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: var(--sport-spacing-sm);
+  
+  &:hover {
+    color: var(--sport-orange);
+  }
+}
+
+.sport-nav__menu {
+  display: flex;
+  gap: var(--sport-spacing-md);
+  list-style: none;
+}
+
+.sport-nav__link {
+  color: var(--sport-text-secondary);
+  font-weight: 500;
+  padding: var(--sport-spacing-xs) var(--sport-spacing-sm);
+  border-radius: var(--sport-radius-sm);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    color: var(--sport-text-primary);
+    background: rgba(255, 255, 255, 0.05);
+  }
+  
+  &.active {
+    color: var(--sport-orange);
+    background: rgba(252, 76, 2, 0.1);
+  }
+}
+
+// ---- FEATURE HIGHLIGHTS ----
+.sport-feature {
+  display: flex;
+  align-items: center;
+  gap: var(--sport-spacing-xl);
+  margin-bottom: var(--sport-spacing-2xl);
+  
+  &:nth-child(even) {
+    flex-direction: row-reverse;
+  }
+  
+  @media (max-width: 768px) {
+    flex-direction: column !important;
+  }
+}
+
+.sport-feature__image {
+  flex: 1;
+  border-radius: var(--sport-radius-lg);
+  overflow: hidden;
+  
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+}
+
+.sport-feature__content {
+  flex: 1;
+}
+
+// ---- LOADING STATES ----
+.sport-loading {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--sport-border);
+  border-top-color: var(--sport-orange);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+

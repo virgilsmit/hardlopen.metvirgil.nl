@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
   get 'training_schemas/index'
   get 'training_schemas/show'
+  resources :training_schemas, only: [:update]
   resources :statuses
   get 'import_history/index'
   get 'home/index'
@@ -11,6 +12,15 @@ Rails.application.routes.draw do
   resources :routes
   resources :vacations
   resources :performances
+  
+  resources :events do
+    collection do
+      get :import
+      post :do_import
+      post :do_import_loopjes_2026
+    end
+  end
+  
   resources :attendances
   resources :trainings do
     resources :attendances, only: [:create, :update]
@@ -20,17 +30,32 @@ Rails.application.routes.draw do
     post :add_members, on: :member
     delete :remove_member, on: :member
   end
-  resources :users
-  resources :lopers, controller: 'users'
+  resources :users do
+    member do
+      get :zones
+    end
+  end
+  resources :lopers, controller: 'users' do
+    member do
+      get :zones
+    end
+  end
   resources :import_history, only: [:index]
   get 'training_sessions/vandaag', to: 'training_sessions#vandaag', as: :vandaag_training_session
+  get 'training_sessions/vandaag/quick_attendance', to: 'training_sessions#vandaag_quick_attendance', as: :vandaag_quick_attendance
   get '/training_sessions/preview_cores', to: 'training_sessions#preview_cores', as: :preview_cores_training_sessions
   get '/training_sessions/preview_upcoming_cores', to: 'training_sessions#preview_upcoming_cores', as: :preview_upcoming_cores_training_sessions
   get '/training_sessions/preview_all_cores', to: 'training_sessions#preview_all_cores', as: :preview_all_cores_training_sessions
+  # Test routes
+  get '/test/redirect', to: 'test#redirect_test'
+  get '/test/blank', to: 'test#blank_test'
+  
   resources :training_sessions, only: [:show, :edit, :update] do
     member do
       get  :log_attendance, to: 'training_results#new_bulk'
       post :log_attendance, to: 'training_results#create_bulk'
+      get  :quick_attendance
+      post :finalize_attendance, action: :finalize_attendance
     end
   end
   get 'mijntrainingen', to: 'training_sessions#mijn', as: :mijn_trainingen
@@ -82,6 +107,20 @@ Rails.application.routes.draw do
   get 'trainers/ad_gemiddelden', to: 'trainers#ad_gemiddelden', as: :trainers_ad_gemiddelden
 
   namespace :admin do
+    resources :login_logs, only: [:index]
+    resources :error_logs, only: [:index, :show, :destroy] do
+      member do
+        post :resolve
+        post :reopen
+        patch :update_notes
+      end
+      collection do
+        post :bulk_resolve
+        post :bulk_delete
+        delete :clear_resolved
+      end
+    end
+    resources :error_messages, only: [:index, :edit, :update]
     resources :intakes, only: [:index, :show] do
       post :convert, on: :member
     end
@@ -101,6 +140,12 @@ Rails.application.routes.draw do
         post :save_all
       end
     end
+    resources :themes do
+      member do
+        patch :activate
+        put :activate
+      end
+    end
     get '/', to: 'dashboard#index', as: :dashboard
     get 'schemas/koppelen', to: 'schemas#koppelen', as: :schemas_koppelen
     post 'schemas/koppelen', to: 'schemas#koppelen'
@@ -111,8 +156,13 @@ Rails.application.routes.draw do
     collection do
       patch :update
       put :update
+      post :create_button
     end
   end
+  
+  # Hero button routes
+  patch 'site_contents/:id/update_button', to: 'site_contents#update_button', as: :update_button_site_content
+  delete 'site_contents/:id/destroy_button', to: 'site_contents#destroy_button', as: :destroy_button_site_content
 
   get '/schema', to: 'training_schemas#index', as: :schema
   get '/schema/volledig', to: 'training_schemas#show', as: :schema_volledig
@@ -134,6 +184,11 @@ Rails.application.routes.draw do
   get 'prototype', to: 'home#prototype', as: :prototype
   get 'prototype-info', to: 'home#prototype_info', as: :prototype_info
   get 'prototype-track', to: 'home#prototype_track', as: :prototype_track
+  get 'sport', to: 'home#sport_index', as: :sport_home
 
-  root "home#index"
+  root "home#sport_index"
+  
+  # Test endpoint (temporary - remove after debugging)
+  get '/test/error_logs', to: 'test#error_logs_test'
+  get '/test/error_logs_fresh', to: 'test#error_logs_test'
 end

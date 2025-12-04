@@ -10,7 +10,7 @@
         <% if current_user %>
           <%= link_to 'Training deze week', user_schema_path(current_user, :dezeweek), class: 'app-btn track-btn--glow' %>
           <%= link_to 'Mijn schema', user_schema_path(current_user, :schema), class: 'app-btn app-btn--secondary track-btn--outline' %>
-          <%= link_to 'Afmelden vandaag', vandaag_training_session_path, class: 'app-btn track-btn--outline', style: 'border-color: #ff6b35 !important; color: #ff6b35 !important; box-shadow: 0 0 25px rgba(255, 107, 53, 0.25);' %>
+          <%= link_to 'Afmelden vandaag', vandaag_training_session_path, class: 'app-btn app-btn--secondary track-btn--outline' %>
         <% else %>
           <%= link_to 'Log in', login_path, class: 'app-btn track-btn--glow' %>
           <%= link_to 'Registreren', register_path, class: 'app-btn app-btn--secondary track-btn--outline' %>
@@ -33,20 +33,20 @@
   </section>
 
   <section class="prototype-section track-metrics home-track-metrics">
-    <article>
+    <article class="metric-card">
       <h3>Trainingen</h3>
       <p>Week 26–52</p>
-      <span>27 weken</span>
+      <span class="metric-label">27 weken</span>
     </article>
-    <article>
+    <article class="metric-card">
       <h3>Trainers</h3>
       <p>Virgil & Danny</p>
-      <span>2 hoofdcoaches</span>
+      <span class="metric-label">2 hoofdcoaches</span>
     </article>
-    <article>
+    <article class="metric-card">
       <h3>Fases</h3>
       <p>Zomer → Wedstrijd</p>
-      <span>4 blokken</span>
+      <span class="metric-label">4 blokken</span>
     </article>
   </section>
 
@@ -66,11 +66,9 @@
             <span class="track-session-card__date"><%= formatted_date %></span>
             <h3><%= session.description.presence || 'Training' %></h3>
             <p><%= session.loopscholing.presence || session.kern.presence || '' %></p>
-            <div class="track-session-card__meta" style="display: flex; flex-direction: column; gap: 0.5rem;">
-              <div class="track-session-card__meta-content" style="display: flex; flex-direction: column; gap: 0.5rem;">
-                <span class="prototype-tag track-session-tag" style="background: #0c1730 !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; display: inline-flex; align-items: center; padding: 0.35rem 0.85rem; border-radius: 999px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; width: fit-content;"><%= session.fase.presence || session.week %></span>
-                <span class="track-session-card__trainer" style="color: #c7d7ff !important; font-size: 0.9rem;"><%= session.trainer&.name || session.trainer&.email || 'Trainer volgt' %></span>
-              </div>
+            <div class="track-session-card__meta">
+              <span class="badge badge-primary"><%= session.fase.presence || session.week %></span>
+              <span class="track-session-card__trainer"><%= session.trainer&.name || session.trainer&.email || 'Trainer volgt' %></span>
             </div>
             <div class="track-session-card__actions">
               <%= link_to 'Bekijk details', training_session_path(session), class: 'app-btn app-btn--secondary track-btn--outline' %>
@@ -88,8 +86,8 @@
       </header>
       <div class="home-track-dashboard__list">
         <% @tiles.each do |tile| %>
-          <article class="home-track-dashboard__item">
-            <div>
+          <article class="home-track-dashboard__item theme-card">
+            <div class="dashboard-item-content">
               <span class="home-track-dashboard__icon"><%= tile[:icon] %></span>
               <div>
                 <h3><%= tile[:label] %></h3>
@@ -97,7 +95,7 @@
               </div>
             </div>
             <% if tile[:key] == 'birthdays_30' %>
-              <%= link_to 'Verjaardagen', trainers_verjaardagen_path, class: 'app-btn track-btn--outline' %>
+              <%= link_to 'Verjaardagen', trainers_verjaardagen_path, class: 'app-btn app-btn--secondary track-btn--outline' %>
             <% else %>
               <%= link_to 'Open', tile[:url], class: 'app-btn track-btn--glow' %>
             <% end %>
@@ -109,7 +107,7 @@
 
   <% if current_user&.role == 'admin' %>
     <section class="prototype-section home-track-admin">
-      <div class="home-track-admin__card">
+      <div class="home-track-admin__card theme-card">
         <p class="prototype-eyebrow">Beheer</p>
         <h3>Admin dashboard</h3>
         <p>Alle bestaande beheerflows werken zoals altijd, nu met het nieuwe uiterlijk.</p>
@@ -120,12 +118,165 @@
 
   <% unless current_user %>
     <section class="prototype-section home-track-onboarding">
-      <h3>Nieuw bij de loopgroep?</h3>
-      <p>Registreer je en krijg direct toegang tot schema’s, aanwezigheden en community-updates.</p>
-      <div class="track-hero__ctas">
-        <%= link_to 'Registreren', register_path, class: 'app-btn track-btn--glow' %>
-        <%= link_to 'Plan een kennismaking', schema_path, class: 'app-btn app-btn--secondary track-btn--outline' %>
+      <div class="onboarding-content">
+        <h3>Nieuw bij de loopgroep?</h3>
+        <p>Registreer je en krijg direct toegang tot schema's, aanwezigheden en community-updates.</p>
+        <div class="track-hero__ctas">
+          <%= link_to 'Registreren', register_path, class: 'app-btn track-btn--glow' %>
+          <%= link_to 'Plan een kennismaking', schema_path, class: 'app-btn app-btn--secondary track-btn--outline' %>
+        </div>
       </div>
     </section>
   <% end %>
 </div>
+
+<style>
+/* Homepage specifieke styling met CSS-variabelen */
+.home-track {
+  background: var(--background-color);
+}
+
+.track-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.track-metrics .metric-card {
+  text-align: center;
+}
+
+.track-schedule__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.track-session-card {
+  background: var(--background-color-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.2s ease;
+}
+
+.track-session-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.track-session-card__date {
+  display: inline-block;
+  background: var(--accent-color);
+  color: var(--text-color);
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.track-session-card h3 {
+  color: var(--text-color);
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.track-session-card p {
+  color: var(--text-color-muted);
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+.track-session-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.track-session-card__trainer {
+  color: var(--text-color-muted);
+  font-size: 14px;
+}
+
+.track-session-card__actions {
+  margin-top: 16px;
+}
+
+.home-track-dashboard__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
+}
+
+.home-track-dashboard__item {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dashboard-item-content {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.home-track-dashboard__icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.home-track-dashboard__item h3 {
+  margin-bottom: 8px;
+  font-size: 20px;
+}
+
+.home-track-dashboard__item p {
+  color: var(--text-color-muted);
+  font-size: 16px;
+  margin: 0;
+}
+
+.home-track-admin__card {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.home-track-onboarding {
+  text-align: center;
+}
+
+.onboarding-content {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.onboarding-content h3 {
+  font-size: 32px;
+  margin-bottom: 16px;
+}
+
+.onboarding-content p {
+  font-size: 20px;
+  color: var(--text-color-muted);
+  margin-bottom: 32px;
+}
+
+@media (max-width: 768px) {
+  .track-metrics {
+    grid-template-columns: 1fr;
+  }
+  
+  .track-schedule__grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .home-track-dashboard__list {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

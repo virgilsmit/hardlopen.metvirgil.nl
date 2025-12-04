@@ -1,14 +1,24 @@
-<h1>Trainingen van deze week</h1>
+<h1 style="color: #ffffff !important; font-weight: 700 !important; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important; margin-bottom: 1.5rem !important;">Trainingen van deze week</h1>
 <% if @schema_name.present? %>
-  <p class="schema-subtitle">Schema: <strong><%= @schema_name %></strong></p>
-<% elsif @week_sessions.empty? %>
+  <p class="schema-subtitle" style="color: #ffffff !important; font-weight: 600 !important; margin-bottom: 1rem !important;">Schema: <strong style="color: #ffffff !important;"><%= @schema_name %></strong></p>
+<% end %>
+
+<% if current_user && current_user.training_days.present? %>
+  <p class="schema-subtitle" style="color: #ffffff !important; font-weight: 600 !important; margin-bottom: 1.5rem !important;">Jouw trainingsdagen: <strong style="color: #1ee3cf !important;"><%= current_user.training_days.join(', ') %></strong></p>
+<% end %>
+
+<% if @week_sessions.empty? %>
   <div class="alert alert-info" style="padding: 1rem; background: #e3f2fd; border-left: 4px solid #2196f3; margin: 1rem 0;">
-    <p><strong>Geen trainingsschema ingesteld</strong></p>
-    <p>Je hebt nog geen persoonlijk trainingsschema gekozen. Ga naar je <a href="<%= profile_path %>">profiel</a> om een standaard schema te selecteren.</p>
+    <p><strong>Geen trainingen deze week</strong></p>
+    <% if current_user && current_user.training_days.blank? %>
+      <p>Je hebt nog geen trainingsdagen ingesteld. Ga naar je <a href="<%= profile_path %>">profiel</a> om je trainingsdagen te selecteren.</p>
+    <% else %>
+      <p>Er zijn geen trainingen gepland voor jouw trainingsdagen deze week.</p>
+    <% end %>
   </div>
 <% end %>
 <% if @week_sessions.any? %>
-<table class="schema-table">
+<table class="schema-table week-sessions-table">
   <thead>
     <tr>
       <th class="schema-table__th">Datum</th>
@@ -25,7 +35,7 @@
   </thead>
   <tbody>
     <% @week_sessions.each do |sessie| %>
-      <tr class="clickable-row" onclick="if(event.target.tagName !== 'BUTTON' && event.target.tagName !== 'A' && !event.target.closest('.theme-btn')){window.location='/training_sessions/<%= sessie.id %>'}">
+      <tr class="clickable-row" onclick="if(event.target.tagName !== 'BUTTON' && event.target.tagName !== 'A' && !event.target.closest('.theme-btn') && !event.target.closest('form')){window.location='/training_sessions/<%= sessie.id %>'}">
         <td class="date-cell"><%= l(sessie.date) %></td>
         <td><%= sessie.dag %></td>
         <td><%= sessie.description %></td>
@@ -171,6 +181,147 @@
   <% end %>
 </div>
 <% end %>
+<style>
+/* Betere contrast en klikbare rijen styling */
+.week-sessions-table {
+  background: #ffffff !important;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.week-sessions-table thead {
+  background: linear-gradient(135deg, #FC4C02 0%, #FF6B35 100%) !important;
+}
+
+.week-sessions-table th {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: none !important;
+  padding: 16px 12px !important;
+  border-bottom: none !important;
+}
+
+.week-sessions-table tbody tr {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+.week-sessions-table tbody tr:hover {
+  background: #f9fafb !important;
+}
+
+.week-sessions-table tbody tr.clickable-row {
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.week-sessions-table tbody tr.clickable-row:hover {
+  background: #fef3c7 !important;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(252, 76, 2, 0.15);
+}
+
+.week-sessions-table tbody tr.clickable-row:active {
+  background: #fde68a !important;
+  transform: translateX(2px);
+}
+
+.week-sessions-table td {
+  color: #1a1a1a !important;
+  padding: 14px 12px !important;
+  font-size: 0.95rem !important;
+}
+
+.week-sessions-table td strong,
+.week-sessions-table td b {
+  color: #1a1a1a !important;
+  font-weight: 700 !important;
+}
+
+/* Datum cel opvallender */
+.week-sessions-table .date-cell {
+  font-weight: 700 !important;
+  color: #FC4C02 !important;
+  font-size: 1rem !important;
+}
+
+/* Status kleuren met goede contrast */
+.status-aanwezig-text {
+  color: #059669 !important;
+  font-weight: 700 !important;
+}
+
+.status-afwezig-text {
+  color: #dc2626 !important;
+  font-weight: 700 !important;
+}
+
+.status-onbekend-text {
+  color: #6b7280 !important;
+  font-weight: 600 !important;
+}
+
+/* Visual indicator voor klikbare rij */
+.week-sessions-table tr.clickable-row::after {
+  content: '👁️ Bekijk details';
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  font-size: 0.85rem;
+  color: #FC4C02;
+  font-weight: 600;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.week-sessions-table tr.clickable-row:hover::after {
+  opacity: 1;
+}
+
+/* Attendance buttons styling */
+.attendance-btn {
+  pointer-events: auto !important;
+  z-index: 10 !important;
+}
+
+.afwezig-btn, .afwezig-submit {
+  pointer-events: auto !important;
+  z-index: 10 !important;
+}
+
+/* Trainer select */
+.trainer-select {
+  background: #ffffff !important;
+  color: #1a1a1a !important;
+  border: 1px solid #d1d5db !important;
+  padding: 4px 8px !important;
+  border-radius: 6px !important;
+}
+
+/* Note input */
+.note-input-full {
+  background: #ffffff !important;
+  color: #1a1a1a !important;
+  border: 1px solid #d1d5db !important;
+  padding: 6px 10px !important;
+  border-radius: 6px !important;
+}
+
+.note-input-full::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Attendance note */
+.attendance-note {
+  color: #6b7280 !important;
+  font-size: 0.85rem !important;
+  font-style: italic !important;
+}
+</style>
+
 <script>
   function toggleCardDetails(el) {
     var details = el.nextElementSibling;

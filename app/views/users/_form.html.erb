@@ -88,13 +88,13 @@
 
   <div class="app-form-group">
     <label class="app-form-label">Trainingsdagen</label>
-    <div style="margin-top: 0.5rem;">
-      <label style="margin-right: 1.5em; display: inline-block;">
-        <%= check_box_tag 'user[training_days][]', 'Dinsdag', user.training_days.present? ? user.training_days.include?('Dinsdag') : true %> Dinsdag
-      </label>
-      <label style="display: inline-block;">
-        <%= check_box_tag 'user[training_days][]', 'Zaterdag', user.training_days.present? ? user.training_days.include?('Zaterdag') : true %> Zaterdag
-      </label>
+    <div style="margin-top: 0.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.5rem;">
+      <% %w[Maandag Dinsdag Woensdag Donderdag Vrijdag Zaterdag Zondag].each do |day| %>
+        <label style="display: flex; align-items: center; gap: 0.5rem;">
+          <%= check_box_tag 'user[training_days][]', day, user.training_days.present? ? user.training_days.include?(day) : false %>
+          <span><%= day %></span>
+        </label>
+      <% end %>
     </div>
   </div>
 

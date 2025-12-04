@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clear Service Worker Cache</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #000000;
+      color: #ffffff;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    
+    h1 {
+      color: #FC4C02;
+      font-weight: 800;
+      margin-bottom: 1rem;
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, #FC4C02 0%, #FF6B35 100%);
+      color: white;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      cursor: pointer;
+      margin: 0.5rem;
+      display: inline-block;
+    }
+    
+    .result {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      color: #1ee3cf;
+      font-weight: 700;
+    }
+    
+    code {
+      background: rgba(30, 227, 207, 0.2);
+      color: #1ee3cf;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧹 Clear Service Worker Cache</h1>
+  <p style="color: #c9d1d9; margin-bottom: 2rem; font-size: 1.1rem;">
+    Dit verwijdert ALLE gecachte CSS, JS en assets. Gebruik dit als styling niet wordt toegepast.
+  </p>
+  
+  <button onclick="clearAllCaches()" class="btn">
+    🗑️ Verwijder Alle Caches
+  </button>
+  
+  <button onclick="unregisterServiceWorker()" class="btn" style="background: #dc3545;">
+    ⚠️ Unregister Service Worker
+  </button>
+  
+  <button onclick="forceReload()" class="btn" style="background: #28a745;">
+    🔄 Force Reload Pagina
+  </button>
+  
+  <div id="result" class="result" style="display: none;"></div>
+  
+  <div style="margin-top: 3rem; background: rgba(252, 76, 2, 0.1); border: 2px solid rgba(252, 76, 2, 0.3); padding: 1.5rem; border-radius: 8px;">
+    <h2 style="color: #FC4C02; margin-bottom: 1rem;">📋 Stappen:</h2>
+    <ol style="color: #c9d1d9; line-height: 2;">
+      <li>Klik "Verwijder Alle Caches"</li>
+      <li>Klik "Unregister Service Worker"</li>
+      <li>Force quit browser</li>
+      <li>Wacht 10 seconden</li>
+      <li>Heropen browser</li>
+      <li>Ga naar homepage en test menu</li>
+    </ol>
+  </div>
+  
+  <div style="text-align: center; margin-top: 2rem;">
+    <a href="/" class="btn" style="text-decoration: none;">
+      🏠 Terug naar Home
+    </a>
+  </div>
+  
+  <script>
+    const resultDiv = document.getElementById('result');
+    
+    async function clearAllCaches() {
+      resultDiv.style.display = 'block';
+      resultDiv.innerHTML = '<p>🧹 Bezig met caches wissen...</p>';
+      
+      try {
+        const cacheNames = await caches.keys();
+        console.log('[CLEAR] Found caches:', cacheNames);
+        
+        await Promise.all(
+          cacheNames.map(cacheName => {
+            console.log('[CLEAR] Deleting cache:', cacheName);
+            return caches.delete(cacheName);
+          })
+        );
+        
+        resultDiv.innerHTML = `
+          <p style="color: #28a745;">✅ SUCCESS!</p>
+          <p style="color: #c9d1d9; margin-top: 0.5rem;">
+            ${cacheNames.length} caches verwijderd:
+          </p>
+          <ul style="color: #c9d1d9; margin-top: 0.5rem; padding-left: 1.5rem;">
+            ${cacheNames.map(name => '<li><code>' + name + '</code></li>').join('')}
+          </ul>
+          <p style="color: #ffc107; margin-top: 1rem; font-weight: 700;">
+            Nu: "Unregister Service Worker" klikken!
+          </p>
+        `;
+      } catch (error) {
+        resultDiv.innerHTML = '<p style="color: #dc3545;">❌ Fout: ' + error.message + '</p>';
+      }
+    }
+    
+    async function unregisterServiceWorker() {
+      resultDiv.style.display = 'block';
+      resultDiv.innerHTML = '<p>⚠️ Bezig met unregister Service Worker...</p>';
+      
+      try {
+        if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          console.log('[CLEAR] Found SW registrations:', registrations.length);
+          
+          for (let registration of registrations) {
+            await registration.unregister();
+            console.log('[CLEAR] Unregistered SW:', registration.scope);
+          }
+          
+          resultDiv.innerHTML = `
+            <p style="color: #28a745;">✅ SUCCESS!</p>
+            <p style="color: #c9d1d9; margin-top: 0.5rem;">
+              ${registrations.length} Service Worker(s) unregistered
+            </p>
+            <p style="color: #ffc107; margin-top: 1rem; font-weight: 700;">
+              Nu: Force quit browser en heropen!
+            </p>
+          `;
+        } else {
+          resultDiv.innerHTML = '<p style="color: #ffc107;">⚠️ Service Worker niet ondersteund</p>';
+        }
+      } catch (error) {
+        resultDiv.innerHTML = '<p style="color: #dc3545;">❌ Fout: ' + error.message + '</p>';
+      }
+    }
+    
+    function forceReload() {
+      window.location.reload(true);
+    }
+  </script>
+</body>
+</html>
+

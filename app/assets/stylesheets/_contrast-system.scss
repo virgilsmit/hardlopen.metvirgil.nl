@@ -1,0 +1,298 @@
+// ═══════════════════════════════════════════════════════════════
+// CONTRAST SYSTEM - Professional WCAG AA Compliant Design System
+// ═══════════════════════════════════════════════════════════════
+
+// WCAG AA Requirements:
+// - Normal text (< 18px): 4.5:1 contrast ratio
+// - Large text (≥ 18px): 3:1 contrast ratio
+// - UI components: 3:1 contrast ratio
+
+// ─────────────────────────────────────────────────────────────
+// 1. COLOR PALETTE - Semantic Colors
+// ─────────────────────────────────────────────────────────────
+
+:root {
+  // Brand Colors
+  --color-primary: #FC4C02;
+  --color-primary-dark: #CC3D02;
+  --color-secondary: #1ee3cf;
+  --color-secondary-dark: #17c5b3;
+  
+  // Neutral Colors - Light Theme
+  --color-bg-light: #ffffff;
+  --color-bg-light-secondary: #f8f9fa;
+  --color-bg-light-tertiary: #e9ecef;
+  
+  --color-text-on-light: #1a1a1a;        // High contrast on light bg
+  --color-text-on-light-secondary: #4a4a4a;  // Medium contrast
+  --color-text-on-light-muted: #6c757d;      // Low contrast (still readable)
+  
+  // Neutral Colors - Dark Theme
+  --color-bg-dark: #050912;
+  --color-bg-dark-secondary: #0d1117;
+  --color-bg-dark-tertiary: #161b22;
+  
+  --color-text-on-dark: #f4f8ff;           // High contrast on dark bg
+  --color-text-on-dark-secondary: #c9d1d9;  // Medium contrast
+  --color-text-on-dark-muted: #8b949e;      // Low contrast (still readable)
+  
+  // Status Colors (with safe contrasts)
+  --color-success: #28a745;
+  --color-success-text: #ffffff;
+  --color-warning: #ffc107;
+  --color-warning-text: #1a1a1a;
+  --color-error: #dc3545;
+  --color-error-text: #ffffff;
+  --color-info: #17a2b8;
+  --color-info-text: #ffffff;
+  
+  // Transparent overlays
+  --overlay-light: rgba(255, 255, 255, 0.95);
+  --overlay-dark: rgba(5, 9, 18, 0.95);
+}
+
+// ─────────────────────────────────────────────────────────────
+// 2. UTILITY CLASSES - Automatic Contrast
+// ─────────────────────────────────────────────────────────────
+
+// Light Backgrounds
+.bg-light,
+.bg-white,
+.bg-light-primary,
+.bg-light-secondary {
+  background-color: var(--color-bg-light) !important;
+  color: var(--color-text-on-light) !important;
+  
+  // Nested elements inherit proper contrast
+  h1, h2, h3, h4, h5, h6,
+  p, span, div, a, label,
+  th, td, li {
+    color: var(--color-text-on-light) !important;
+  }
+  
+  // Links get slightly different color but still high contrast
+  a:not(.btn) {
+    color: var(--color-primary-dark) !important;
+    &:hover {
+      color: var(--color-primary) !important;
+    }
+  }
+}
+
+// Dark Backgrounds
+.bg-dark,
+.bg-dark-primary,
+.bg-dark-secondary {
+  background-color: var(--color-bg-dark) !important;
+  color: var(--color-text-on-dark) !important;
+  
+  h1, h2, h3, h4, h5, h6,
+  p, span, div, a, label,
+  th, td, li {
+    color: var(--color-text-on-dark) !important;
+  }
+  
+  a:not(.btn) {
+    color: var(--color-secondary) !important;
+    &:hover {
+      color: var(--color-secondary-dark) !important;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// 3. MIXINS - Reusable Contrast Functions
+// ─────────────────────────────────────────────────────────────
+
+@mixin contrast-safe-text($bg-color) {
+  @if lightness($bg-color) > 50% {
+    // Light background = dark text
+    color: var(--color-text-on-light);
+    
+    h1, h2, h3, h4, h5, h6 {
+      color: var(--color-text-on-light);
+    }
+  } @else {
+    // Dark background = light text
+    color: var(--color-text-on-dark);
+    
+    h1, h2, h3, h4, h5, h6 {
+      color: var(--color-text-on-dark);
+    }
+  }
+}
+
+@mixin high-contrast-box($bg-color: var(--color-bg-dark)) {
+  background-color: $bg-color;
+  @include contrast-safe-text($bg-color);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+// ─────────────────────────────────────────────────────────────
+// 4. COMPONENT OVERRIDES - Force Readable Defaults
+// ─────────────────────────────────────────────────────────────
+
+// Tables - Always readable
+table {
+  th, td {
+    // Check parent background
+    background-color: inherit;
+  }
+  
+  &.table-dark {
+    th, td {
+      color: var(--color-text-on-dark) !important;
+    }
+  }
+  
+  &.table-light {
+    th, td {
+      color: var(--color-text-on-light) !important;
+    }
+  }
+}
+
+// Forms - Always readable labels and inputs
+.form-control,
+.form-select,
+input,
+textarea,
+select {
+  &:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 0.2rem rgba(252, 76, 2, 0.25);
+  }
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+// Badges and Pills - High contrast
+.badge,
+.pill {
+  padding: 0.35em 0.65em;
+  font-weight: 700;
+  border-radius: 0.25rem;
+  
+  &.badge-primary {
+    background-color: var(--color-primary);
+    color: #ffffff;
+  }
+  
+  &.badge-success {
+    background-color: var(--color-success);
+    color: var(--color-success-text);
+  }
+  
+  &.badge-warning {
+    background-color: var(--color-warning);
+    color: var(--color-warning-text);
+  }
+  
+  &.badge-danger {
+    background-color: var(--color-error);
+    color: var(--color-error-text);
+  }
+}
+
+// Buttons - Always high contrast
+.btn {
+  font-weight: 600;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  
+  &.btn-primary {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    color: #ffffff !important;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(252, 76, 2, 0.4);
+    }
+  }
+  
+  &.btn-secondary {
+    background: var(--color-bg-light);
+    color: var(--color-text-on-light) !important;
+    border: 2px solid var(--color-text-on-light);
+    
+    &:hover {
+      background: var(--color-text-on-light);
+      color: var(--color-bg-light) !important;
+    }
+  }
+  
+  &.btn-success {
+    background: var(--color-success);
+    color: var(--color-success-text) !important;
+  }
+  
+  &.btn-danger {
+    background: var(--color-error);
+    color: var(--color-error-text) !important;
+  }
+}
+
+// Alerts - High contrast
+.alert {
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid;
+  font-weight: 500;
+  
+  &.alert-success {
+    background-color: rgba(40, 167, 69, 0.1);
+    border-color: var(--color-success);
+    color: var(--color-text-on-light);
+  }
+  
+  &.alert-warning {
+    background-color: rgba(255, 193, 7, 0.1);
+    border-color: var(--color-warning);
+    color: var(--color-text-on-light);
+  }
+  
+  &.alert-danger {
+    background-color: rgba(220, 53, 69, 0.1);
+    border-color: var(--color-error);
+    color: var(--color-text-on-light);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// 5. ACCESSIBILITY HELPERS
+// ─────────────────────────────────────────────────────────────
+
+// Force high contrast mode
+.force-high-contrast {
+  * {
+    color: inherit !important;
+    border-color: currentColor !important;
+  }
+}
+
+// Screen reader only (but still accessible)
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+// Focus visible for keyboard navigation
+*:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+

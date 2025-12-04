@@ -1,4 +1,6 @@
 class TrainingSessionsController < ApplicationController
+  before_action :require_user, only: [:finalize_attendance, :vandaag_quick_attendance]
+  
   def show
     @training_session = TrainingSession.find(params[:id])
   end
@@ -8,6 +10,22 @@ class TrainingSessionsController < ApplicationController
     if @training_session.nil?
       redirect_to root_path, alert: 'Geen training voor vandaag gevonden.'
     end
+  end
+  
+  def vandaag_quick_attendance
+    @training_session = TrainingSession.where(date: Date.today).first
+    
+    if @training_session.nil?
+      redirect_to root_path, alert: 'Geen training voor vandaag gevonden.' and return
+    end
+    
+    # Alleen trainers en admins hebben toegang
+    unless current_user.admin? || current_user.has_role?(:trainer)
+      redirect_to training_session_path(@training_session), alert: 'Geen toegang.' and return
+    end
+    
+    # Redirect naar de quick_attendance pagina van deze training
+    redirect_to quick_attendance_training_session_path(@training_session)
   end
 
   def edit
@@ -211,6 +229,134 @@ class TrainingSessionsController < ApplicationController
       trainings: sessions.map { |session| format_training_for_api(session) }
     }
   end
+  
+  # Snelle presentielijst voor trainers
+  def quick_attendance
+    # Check of gebruiker ingelogd is
+    unless logged_in?
+      flash[:alert] = 'Je moet ingelogd zijn om deze pagina te bekijken.'
+      redirect_to login_path
+      return
+    end
+    
+    @training_session = TrainingSession.find_by(id: params[:id])
+    
+    if @training_session.nil?
+      flash[:alert] = 'Training niet gevonden.'
+      redirect_to root_path
+      return
+    end
+    
+    # Check toegang - admins en trainers hebben toegang
+    has_access = is_admin? || current_user&.has_role?(:trainer)
+    
+    Rails.logger.info "=== QUICK ATTENDANCE DEBUG ==="
+    Rails.logger.info "current_user: #{current_user&.id} (#{current_user&.name})"
+    Rails.logger.info "logged_in?: #{logged_in?}"
+    Rails.logger.info "is_admin?: #{is_admin?}"
+    Rails.logger.info "has_role?(:trainer): #{current_user&.has_role?(:trainer)}"
+    Rails.logger.info "has_access: #{has_access}"
+    Rails.logger.info "=============================="
+    
+    unless has_access
+      flash[:alert] = 'Geen toegang. Je moet een trainer of admin zijn.'
+      redirect_to training_session_path(@training_session)
+      return
+    end
+    
+    # Haal alle actieve lopers op die op deze dag trainen
+    session_day_value = @training_session.dag.to_s.downcase
+    if session_day_value.blank? && @training_session.date.present?
+      begin
+        session_day_value = I18n.l(@training_session.date, format: '%A').to_s.downcase
+      rescue
+        session_day_value = @training_session.date.strftime('%A').to_s.downcase
+      end
+    end
+    recognized_day = %w[dinsdag zaterdag].find { |dag| session_day_value.include?(dag) }
+    
+    if current_user.admin?
+      all_users = @training_session.group&.users&.select { |u| 
+        (u.has_role?(:trainer) || (u.has_role?(:trainer) == false && User.alleen_actieve_lopers.include?(u))) 
+      } || []
+    else
+      all_users = @training_session.group&.users&.select { |u| 
+        u.has_role?(:trainer) == false && User.alleen_actieve_lopers.include?(u) 
+      } || []
+    end
+    
+    # Filter op actieve trainingsdag
+    @users = all_users.select do |u|
+      recognized_day.blank? || u.training_days.blank? || u.training_days.map(&:downcase).include?(recognized_day)
+    end.sort_by(&:name)
+    
+    # Haal bestaande attendances op
+    @attendances = @training_session.attendances.index_by(&:user_id)
+  end
+  
+  # Afsluiten presentielijst
+  def finalize_attendance
+    # Log start
+    logger.info "[FINALIZE] START - Training ID: #{params[:id]}"
+    
+    @training_session = TrainingSession.find(params[:id])
+    
+    # Check toegang
+    unless current_user&.admin? || current_user&.has_role?(:trainer)
+      redirect_to training_session_path(@training_session), alert: 'Geen toegang.' and return
+    end
+    
+    # Haal present user IDs op
+    present_user_ids = (params[:present_users] || []).map(&:to_i)
+    logger.info "[FINALIZE] Present IDs: #{present_user_ids}"
+    
+    # Haal alle lopers op (EXACT zoals in quick_attendance view)
+    session_day_value = @training_session.dag.to_s.downcase
+    recognized_day = %w[dinsdag zaterdag].find { |dag| session_day_value.include?(dag) }
+    
+    all_users = if current_user.admin?
+      @training_session.group&.users&.select { |u| 
+        u.has_role?(:trainer) || (!u.has_role?(:trainer) && User.alleen_actieve_lopers.include?(u))
+      } || []
+    else
+      @training_session.group&.users&.select { |u| 
+        !u.has_role?(:trainer) && User.alleen_actieve_lopers.include?(u)
+      } || []
+    end
+    
+    users_on_day = all_users.select do |u|
+      recognized_day.blank? || u.training_days.blank? || u.training_days.map(&:downcase).include?(recognized_day)
+    end
+    
+    attendances = @training_session.attendances.index_by(&:user_id)
+    explicit_attendees = @training_session.attendances.map(&:user).compact.select { |u|
+      User.alleen_actieve_lopers.include?(u) && !users_on_day.include?(u)
+    }
+    
+    all_users_to_process = (users_on_day + explicit_attendees).uniq
+    logger.info "[FINALIZE] Processing #{all_users_to_process.count} users"
+    
+    # Update alle attendances
+    all_users_to_process.each do |user|
+      att = @training_session.attendances.find_or_initialize_by(user_id: user.id)
+      
+      if present_user_ids.include?(user.id)
+        att.status = :aanwezig
+        att.note = nil
+      else
+        att.status = :afwezig
+        att.note ||= 'Niet aanwezig bij start training'
+      end
+      
+      att.save!
+    end
+    
+    logger.info "[FINALIZE] SUCCESS - redirecting"
+    redirect_to training_session_path(@training_session), notice: 'Presentielijst afgesloten!'
+  rescue => e
+    logger.error "[FINALIZE] ERROR: #{e.message}"
+    redirect_to root_path, alert: "Fout: #{e.message}"
+  end
 
   private
 
@@ -239,6 +385,9 @@ class TrainingSessionsController < ApplicationController
       attendance_note: session.attendances.find_by(user_id: current_user.id)&.note
     }
   end
+
+  private
+
   def training_session_params
     params.require(:training_session).permit(:date, :description, :loopscholing, :fase, :wedstrijd, :dag, :trainer_id, :location)
   end

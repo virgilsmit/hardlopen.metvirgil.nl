@@ -6,19 +6,25 @@
     <strong>Locatie:</strong> GAC
   </div>
   <% attendance = @training_session.attendances.find_by(user_id: current_user.id) %>
-  <div style="display:flex;gap:1em;align-items:center;">
-    <%= form_with url: attendances_path, method: :post, local: true, style: 'display:inline;' do |f| %>
+  <div style="display:flex;gap:1.5em;align-items:flex-start;">
+    <!-- Aanwezig form -->
+    <%= form_with url: attendances_path, method: :post, local: true, style: 'flex: 1;' do |f| %>
       <%= f.hidden_field :user_id, value: current_user.id %>
       <%= f.hidden_field :training_session_id, value: @training_session.id %>
       <%= f.hidden_field :status, value: 'aanwezig' %>
-      <button type="submit" class="theme-btn" style="background:#34c759; color:#fff; border:<%= (attendance&.status == 'aanwezig') ? '2px solid #222' : 'none' %>; font-weight:bold; padding:0.5em 1.2em; font-size:1.1em; min-width: 90px; opacity:<%= (attendance&.status == 'aanwezig') ? '1' : '0.4' %>;"><span>Aanwezig</span></button>
+      <button type="submit" class="theme-btn" style="background:#34c759; color:#fff; border:<%= (attendance&.status == 'aanwezig') ? '3px solid #1a7a3a' : 'none' %>; font-weight:bold; padding:0.75em 1.5em; font-size:1.1em; width: 100%; opacity:<%= (attendance&.status == 'aanwezig') ? '1' : '0.5' %>; box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3);"><span>✓ Aanwezig</span></button>
     <% end %>
-    <%= form_with url: attendances_path, method: :post, local: true, style: 'display:inline;' do |f| %>
+    
+    <!-- Afwezig form -->
+    <%= form_with url: attendances_path, method: :post, local: true, style: 'flex: 1;', id: 'afwezig-form-vandaag' do |f| %>
       <%= f.hidden_field :user_id, value: current_user.id %>
       <%= f.hidden_field :training_session_id, value: @training_session.id %>
       <%= f.hidden_field :status, value: 'afwezig' %>
-      <%= f.text_field :note, value: (attendance&.status == 'afwezig' ? attendance&.note : nil), placeholder: 'Notitie (optioneel)', style: 'margin-left:0.5em;width:120px;font-size:1em;' %>
-      <button type="submit" class="theme-btn" style="background:#e74c3c; color:#fff; border:<%= (attendance&.status == 'afwezig') ? '2px solid #222' : 'none' %>; font-weight:bold; padding:0.5em 1.2em; font-size:1.1em; min-width: 90px; opacity:<%= (attendance&.status == 'afwezig') ? '1' : '0.4' %>;"><span>Afwezig</span></button>
+      <div style="margin-bottom: 1em;">
+        <label for="attendance_note_vandaag" style="display: block; font-weight: 600; margin-bottom: 0.5em; color: #1a2332; font-size: 0.95em;">Reden <span style="color: #e74c3c;">*</span></label>
+        <%= f.text_field :note, value: (attendance&.status == 'afwezig' ? attendance&.note : nil), placeholder: 'bijv. geen zin, blessure, vakantie...', id: 'attendance_note_vandaag', required: true, style: 'width: 100%; padding: 0.75em; border: 2px solid #e74c3c; border-radius: 8px; font-size: 1em; background: #fff; color: #1a2332;' %>
+      </div>
+      <button type="submit" class="theme-btn" id="afwezig-btn-vandaag" style="background:#e74c3c; color:#fff; border:<%= (attendance&.status == 'afwezig') ? '3px solid #a02d1f' : 'none' %>; font-weight:bold; padding:0.75em 1.5em; font-size:1.1em; width: 100%; opacity:<%= (attendance&.status == 'afwezig') ? '1' : '0.5' %>; box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3); cursor: <%= (attendance&.status == 'afwezig') ? 'pointer' : 'not-allowed' %>;" <%= 'disabled' unless attendance&.status == 'afwezig' %>><span>✗ Afwezig</span></button>
     <% end %>
   </div>
   <% if attendance&.status == 'aanwezig' %>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PWA Test - Hardlopen met Virgil</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f8f9fa;
+      padding: 2rem;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      color: #FC4C02;
+      margin-bottom: 1rem;
+    }
+    
+    .test-section {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: #f9fafb;
+      border-radius: 8px;
+      border-left: 4px solid #d1d5db;
+    }
+    
+    .test-section.pass {
+      border-left-color: #28a745;
+      background: #f0fdf4;
+    }
+    
+    .test-section.fail {
+      border-left-color: #dc3545;
+      background: #fef2f2;
+    }
+    
+    .test-section h3 {
+      margin-bottom: 0.5rem;
+    }
+    
+    .status {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    .status.pass {
+      background: #28a745;
+      color: white;
+    }
+    
+    .status.fail {
+      background: #dc3545;
+      color: white;
+    }
+    
+    .status.warning {
+      background: #ffc107;
+      color: #000;
+    }
+    
+    pre {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+    
+    button {
+      background: #FC4C02;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 0.5rem 0.5rem 0.5rem 0;
+    }
+    
+    button:hover {
+      opacity: 0.9;
+    }
+    
+    .info {
+      background: #dbeafe;
+      border-left: 4px solid #3b82f6;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 PWA Test Dashboard</h1>
+    <p>Controleer of je app voldoet aan alle PWA requirements</p>
+    
+    <div class="info">
+      <strong>💡 Tip:</strong> Open Chrome DevTools (F12) → Application tab voor gedetailleerde PWA info
+    </div>
+    
+    <div id="results"></div>
+    
+    <h2 style="margin-top: 2rem;">🛠️ Acties</h2>
+    <button onclick="window.location.reload()">🔄 Test Opnieuw</button>
+    <button onclick="clearCache()">🗑️ Clear Cache</button>
+    <button onclick="window.location.href='/'">🏠 Naar Home</button>
+    <button onclick="testInstall()">📲 Test Installatie</button>
+  </div>
+
+  <script>
+    const results = document.getElementById('results');
+    
+    async function runTests() {
+      const tests = [];
+      
+      // Test 1: HTTPS
+      tests.push({
+        name: 'HTTPS Verbinding',
+        status: window.location.protocol === 'https:',
+        message: window.location.protocol === 'https:' 
+          ? 'Site draait op HTTPS ✓' 
+          : 'PWA vereist HTTPS (behalve op localhost)',
+        details: `Protocol: ${window.location.protocol}`
+      });
+      
+      // Test 2: Service Worker
+      const swSupported = 'serviceWorker' in navigator;
+      let swRegistered = false;
+      let swActive = false;
+      
+      if (swSupported) {
+        try {
+          const registration = await navigator.serviceWorker.getRegistration();
+          swRegistered = !!registration;
+          swActive = registration && registration.active;
+        } catch (e) {
+          console.error('SW check error:', e);
+        }
+      }
+      
+      tests.push({
+        name: 'Service Worker Support',
+        status: swSupported,
+        message: swSupported ? 'Browser ondersteunt Service Workers ✓' : 'Browser ondersteunt geen Service Workers',
+        details: swSupported ? 'navigator.serviceWorker beschikbaar' : 'Niet beschikbaar'
+      });
+      
+      tests.push({
+        name: 'Service Worker Geregistreerd',
+        status: swRegistered,
+        message: swRegistered ? 'Service Worker is geregistreerd ✓' : 'Service Worker nog niet geregistreerd',
+        details: swActive ? 'Status: Active' : 'Status: Niet actief of niet gevonden'
+      });
+      
+      // Test 3: Manifest
+      const manifestLink = document.querySelector('link[rel="manifest"]');
+      let manifestValid = false;
+      let manifestData = null;
+      
+      if (manifestLink) {
+        try {
+          const response = await fetch(manifestLink.href);
+          manifestData = await response.json();
+          manifestValid = response.ok && manifestData.name && manifestData.icons;
+        } catch (e) {
+          console.error('Manifest check error:', e);
+        }
+      }
+      
+      tests.push({
+        name: 'Web App Manifest',
+        status: manifestValid,
+        message: manifestValid ? 'Manifest.json gevonden en geldig ✓' : 'Manifest niet gevonden of ongeldig',
+        details: manifestData ? `Name: ${manifestData.name}, Icons: ${manifestData.icons.length}` : 'Niet beschikbaar'
+      });
+      
+      // Test 4: Viewport meta tag
+      const viewport = document.querySelector('meta[name="viewport"]');
+      tests.push({
+        name: 'Viewport Meta Tag',
+        status: !!viewport,
+        message: viewport ? 'Viewport correct ingesteld ✓' : 'Viewport meta tag ontbreekt',
+        details: viewport ? viewport.content : 'Niet gevonden'
+      });
+      
+      // Test 5: Theme color
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      tests.push({
+        name: 'Theme Color',
+        status: !!themeColor,
+        message: themeColor ? 'Theme color ingesteld ✓' : 'Theme color ontbreekt',
+        details: themeColor ? themeColor.content : 'Niet gevonden'
+      });
+      
+      // Test 6: Apple meta tags
+      const appleMeta = document.querySelector('meta[name="apple-mobile-web-app-capable"]');
+      tests.push({
+        name: 'Apple iOS Support',
+        status: !!appleMeta,
+        message: appleMeta ? 'iOS meta tags aanwezig ✓' : 'iOS meta tags ontbreken',
+        details: appleMeta ? appleMeta.content : 'Niet gevonden'
+      });
+      
+      // Test 7: Installable
+      let installable = false;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        installable = true;
+      });
+      
+      tests.push({
+        name: 'Installeerbaar',
+        status: installable || window.matchMedia('(display-mode: standalone)').matches,
+        message: window.matchMedia('(display-mode: standalone)').matches 
+          ? 'App draait in standalone mode ✓' 
+          : installable ? 'App is installeerbaar ✓' : 'Installatie prompt nog niet beschikbaar',
+        details: window.matchMedia('(display-mode: standalone)').matches ? 'Standalone mode actief' : 'Browser mode'
+      });
+      
+      // Display results
+      results.innerHTML = '';
+      tests.forEach(test => {
+        const section = document.createElement('div');
+        section.className = `test-section ${test.status ? 'pass' : 'fail'}`;
+        section.innerHTML = `
+          <h3>
+            ${test.name} 
+            <span class="status ${test.status ? 'pass' : 'fail'}">
+              ${test.status ? '✓ PASS' : '✗ FAIL'}
+            </span>
+          </h3>
+          <p>${test.message}</p>
+          <pre>${test.details}</pre>
+        `;
+        results.appendChild(section);
+      });
+      
+      // Overall score
+      const passed = tests.filter(t => t.status).length;
+      const total = tests.length;
+      const score = document.createElement('div');
+      score.className = 'test-section';
+      score.style.borderLeftColor = '#667eea';
+      score.style.background = '#ede9fe';
+      score.innerHTML = `
+        <h2>📊 Score: ${passed}/${total} tests geslaagd</h2>
+        <p>${passed === total ? '🎉 Perfect! Je PWA is klaar voor gebruik!' : 
+           passed >= total - 2 ? '✅ Goed! Nog een paar kleine verbeteringen mogelijk.' :
+           '⚠️ Er zijn nog enkele issues die opgelost moeten worden.'}</p>
+      `;
+      results.insertBefore(score, results.firstChild);
+    }
+    
+    async function clearCache() {
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map(name => caches.delete(name)));
+        alert('✓ Cache geleegd! Pagina wordt herladen...');
+        window.location.reload();
+      }
+    }
+    
+    function testInstall() {
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        alert('✓ App is al geïnstalleerd en draait in standalone mode!');
+      } else {
+        alert('ℹ️ Om te installeren:\n\n' +
+              'Chrome/Edge: Menu → App installeren\n' +
+              'Safari iOS: Deel → Zet op beginscherm\n' +
+              'Firefox: Menu → Installeer');
+      }
+    }
+    
+    // Run tests on load
+    window.addEventListener('load', runTests);
+  </script>
+</body>
+</html>
+
+

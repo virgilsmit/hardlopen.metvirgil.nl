@@ -1,0 +1,173 @@
+<% if buttons.any? %>
+  <div style="margin-bottom: 2rem;">
+    <% buttons.each do |button| %>
+      <div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+              <span style="font-size: 1.5rem;"><%= button.icon %></span>
+              <strong style="font-size: 1.1rem; color: #1a2332;"><%= button.label %></strong>
+              <% unless button.visible %>
+                <span style="background: #fef3c7; color: #92400e; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">VERBORGEN</span>
+              <% end %>
+            </div>
+            <div style="color: #666; font-size: 0.875rem; margin-bottom: 0.5rem;">
+              <strong>URL:</strong> <%= button.url %>
+            </div>
+            <% if button.description.present? %>
+              <div style="color: #666; font-size: 0.875rem; margin-bottom: 0.5rem;">
+                <strong>Omschrijving:</strong> <%= button.description %>
+              </div>
+            <% end %>
+            <div style="color: #666; font-size: 0.875rem;">
+              <strong>Stijl:</strong> <%= button.style || 'primary' %> | 
+              <strong>Positie:</strong> <%= button.position %> |
+              <strong>Rol:</strong> <%= button.role_label %>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.5rem;" class="edit-button">
+            <button onclick="editButton(<%= button.id %>)" class="app-btn app-btn--secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+              ✏️ Bewerk
+            </button>
+            <%= button_to "🗑️", destroy_button_site_content_path(button), method: :delete, data: { confirm: 'Weet je zeker dat je deze knop wilt verwijderen?' }, class: "app-btn", style: "padding: 0.5rem 1rem; font-size: 0.875rem; background: #ef4444; color: white; border: none;" %>
+          </div>
+        </div>
+        
+        <!-- Edit form (hidden by default) -->
+        <div id="edit-form-<%= button.id %>" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #e5e7eb;">
+          <%= form_with model: button, url: update_button_site_content_path(button), method: :patch, local: true, scope: :hero_button do |f| %>
+            <%= f.hidden_field :user_type, value: button.user_type %>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+              <div>
+                <%= f.label :label, "Label", style: "display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1a2332;" %>
+                <%= f.text_field :label, value: button.label, class: "app-form-input", required: true %>
+              </div>
+              <div>
+                <%= f.label :icon, "Icoon (emoji)", style: "display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1a2332;" %>
+                <%= f.text_field :icon, value: button.icon, class: "app-form-input", placeholder: "🚀" %>
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 1rem;">
+              <%= f.label :role, "Zichtbaar voor rol *", style: "display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1a2332;" %>
+              <%= f.select :role, 
+                  options_for_select([
+                    ['Alle gebruikers', 'all'],
+                    ['Alleen lopers', 'user'],
+                    ['Alleen trainers', 'trainer'],
+                    ['Alleen admins', 'admin']
+                  ], button.role || 'all'),
+                  {},
+                  class: "app-form-input" %>
+              <small style="color: #666; font-size: 0.75rem; margin-top: 0.25rem; display: block;">Hiërarchisch: admin ziet alles, trainer ziet trainer+user</small>
+            </div>
+            
+            <div style="margin-bottom: 1rem;">
+              <%= f.label :url, "URL", style: "display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1a2332;" %>
+              <%= f.text_field :url, value: button.url, class: "app-form-input", required: true, placeholder: "/register" %>
+            </div>
+            
+            <div style="margin-bottom: 1rem;">
+              <%= f.label :description, "Omschrijving (optioneel)", style: "display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1a2332;" %>
+              <%= f.text_area :description, value: button.description, class: "app-form-input", rows: 2, placeholder: "Korte uitleg over deze knop" %>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+              <div>
+                <%= f.label :style, "Stijl", style: "display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1a2332;" %>
+                <%= f.select :style, [['Primary (oranje)', 'primary'], ['Secondary (wit)', 'secondary'], ['Ghost (transparant)', 'ghost']], { selected: button.style }, class: "app-form-input" %>
+              </div>
+              <div>
+                <%= f.label :position, "Positie", style: "display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1a2332;" %>
+                <%= f.number_field :position, value: button.position, class: "app-form-input", required: true %>
+              </div>
+              <div>
+                <%= f.label :visible, "Zichtbaar", style: "display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1a2332;" %>
+                <div style="margin-top: 0.75rem;">
+                  <%= f.check_box :visible, checked: button.visible, style: "width: 20px; height: 20px;" %>
+                </div>
+              </div>
+            </div>
+            
+            <div style="display: flex; gap: 0.5rem;">
+              <%= f.submit "Opslaan", class: "app-btn track-btn--glow", style: "padding: 0.75rem 1.5rem;" %>
+              <button type="button" onclick="cancelEdit(<%= button.id %>)" class="app-btn app-btn--secondary" style="padding: 0.75rem 1.5rem;">
+                Annuleren
+              </button>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <p style="color: #666; font-style: italic; margin-bottom: 1.5rem;">Nog geen knoppen toegevoegd.</p>
+<% end %>
+
+<!-- Nieuwe knop toevoegen -->
+<div id="add-form-<%= user_type %>" style="background: #f9fafb; border: 2px dashed #d1d5db; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+  <h3 style="margin-bottom: 1rem; color: #1a2332;">➕ Nieuwe Knop Toevoegen</h3>
+  <%= form_with model: HeroButton.new, url: create_button_site_contents_path, method: :post, local: true, scope: :hero_button do |f| %>
+    <%= f.hidden_field :user_type, value: user_type %>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+      <div>
+        <%= f.label :label, "Label *", style: "display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1a2332;" %>
+        <%= f.text_field :label, class: "app-form-input", required: true, placeholder: "Start nu" %>
+      </div>
+      <div>
+        <%= f.label :icon, "Icoon (emoji)", style: "display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1a2332;" %>
+        <%= f.text_field :icon, class: "app-form-input", placeholder: "🚀" %>
+      </div>
+    </div>
+    
+    <div style="margin-bottom: 1rem;">
+      <%= f.label :url, "URL *", style: "display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1a2332;" %>
+      <%= f.text_field :url, class: "app-form-input", required: true, placeholder: "/register" %>
+      <small style="color: #666; font-size: 0.875rem; margin-top: 0.25rem; display: block;">Bijvoorbeeld: /register, /login, /intake, https://externe-link.nl</small>
+    </div>
+    
+    <div style="margin-bottom: 1rem;">
+      <%= f.label :description, "Omschrijving (optioneel)", style: "display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1a2332;" %>
+      <%= f.text_area :description, class: "app-form-input", rows: 2, placeholder: "Korte uitleg over deze knop" %>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+      <div>
+        <%= f.label :style, "Stijl *", style: "display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1a2332;" %>
+        <%= f.select :style, [['Primary (oranje)', 'primary'], ['Secondary (wit)', 'secondary'], ['Ghost (transparant)', 'ghost']], { selected: 'primary' }, class: "app-form-input" %>
+      </div>
+      <div>
+        <%= f.label :role, "Zichtbaar voor rol *", style: "display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1a2332;" %>
+        <%= f.select :role, 
+            [
+              ['Alle gebruikers', 'all'],
+              ['Alleen lopers', 'user'],
+              ['Alleen trainers', 'trainer'],
+              ['Alleen admins', 'admin']
+            ], 
+            { selected: 'all' }, 
+            class: "app-form-input" %>
+        <small style="color: #666; font-size: 0.75rem;">Hiërarchisch: admin ziet alles</small>
+      </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+      <div>
+        <%= f.label :position, "Positie *", style: "display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1a2332;" %>
+        <%= f.number_field :position, value: (buttons.maximum(:position) || 0) + 1, class: "app-form-input", required: true %>
+        <small style="color: #666; font-size: 0.75rem;">Lagere nummers verschijnen eerst</small>
+      </div>
+      <div>
+        <%= f.label :visible, "Zichtbaar", style: "display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1a2332;" %>
+        <div style="margin-top: 0.75rem;">
+          <%= f.check_box :visible, checked: true, style: "width: 20px; height: 20px;" %>
+        </div>
+      </div>
+    </div>
+    
+    <%= f.submit "Knop Toevoegen", class: "app-btn track-btn--glow", style: "padding: 0.75rem 1.5rem;" %>
+  <% end %>
+</div>
+

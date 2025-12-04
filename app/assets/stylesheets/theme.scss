@@ -272,11 +272,12 @@ select:focus {
   color: var(--color-primary) !important;
 }
 
-// Ensure any explicitly light surface (utility class or inline white background) uses dark text
-.white-surface {
-  @include light-surface-text;
-}
+// ============================================
+// GLOBALE REGEL: Alle witte achtergronden krijgen automatisch zwarte tekst
+// Dit geldt voor ALLE elementen, kaders, cards, formulieren, etc.
+// ============================================
 
+// Regel 1: Inline styles met witte achtergrond
 *[style*="background:#fff"],
 *[style*="background: #fff"],
 *[style*="background:#ffffff"],
@@ -284,8 +285,51 @@ select:focus {
 *[style*="background-color:#fff"],
 *[style*="background-color: #fff"],
 *[style*="background-color:#ffffff"],
-*[style*="background-color: #ffffff"] {
+*[style*="background-color: #ffffff"],
+*[style*="background:white"],
+*[style*="background: white"],
+*[style*="background-color:white"],
+*[style*="background-color: white"],
+*[style*="background:rgba(255,255,255"],
+*[style*="background: rgba(255,255,255"],
+*[style*="background:rgb(255,255,255"],
+*[style*="background: rgb(255,255,255"] {
+  color: #0c1729 !important;
+  
+  &, & * {
+    color: #0c1729 !important;
+  }
+  
+  input:not([type="checkbox"]):not([type="radio"]),
+  textarea,
+  select {
+    color: #0c1729 !important;
+    background: #ffffff !important;
+  }
+  
+  label, p, span, div, h1, h2, h3, h4, h5, h6, strong, b, em, i, li, td, th, a, small {
+    color: #0c1729 !important;
+  }
+  
+  a {
+    text-decoration: underline;
+    
+    &:hover {
+      color: #1ee3cf !important;
+    }
+  }
+}
+
+// Utility class voor witte achtergronden
+.white-surface,
+.white-background,
+.bg-white {
   @include light-surface-text;
+  background: #ffffff !important;
+  
+  *:not(input):not(textarea):not(select):not(button):not(.theme-card-icon) {
+    color: #0c1729 !important;
+  }
 }
 
 .theme-card,
@@ -305,6 +349,37 @@ select:focus {
 .tile-form,
 .tile-sortable-item {
   @include light-surface-text;
+  background: #ffffff !important;
+  
+  *:not(input):not(textarea):not(select):not(button):not(.theme-card-icon) {
+    color: #0c1729 !important;
+  }
+}
+
+// Algemene regel: alle elementen met witte achtergrond krijgen zwarte tekst
+[class*="white"],
+[class*="bg-white"],
+[class*="background-white"],
+.card,
+.panel,
+.modal,
+.popup,
+.dialog,
+.form-container,
+.form-wrapper,
+.input-group,
+.control-group {
+  &[style*="background"]:not([style*="background:rgba(0"]):not([style*="background: rgb(0"]):not([style*="background:#0"]):not([style*="background: #0"]) {
+    &[style*="#fff"],
+    &[style*="#ffffff"],
+    &[style*="white"] {
+      color: #0c1729 !important;
+      
+      *:not(input):not(textarea):not(select):not(button):not(.theme-card-icon) {
+        color: #0c1729 !important;
+      }
+    }
+  }
 }
 
 .tile-admin-grid {
@@ -317,7 +392,8 @@ select:focus {
 
 .tile-admin-column {
   flex: 1;
-  min-width: 220px;
+  min-width: 320px;
+  max-width: 450px;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -329,14 +405,33 @@ select:focus {
   font-weight: 700;
   letter-spacing: 0.04em;
   margin: 0;
+  color: #0c1729 !important;
 }
 
 .tile-form {
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(255, 255, 255, 0.96) !important;
   border-radius: 20px;
   border: 1px solid rgba(12, 23, 41, 0.08);
   padding: 1.5rem;
   box-shadow: 0 30px 60px rgba(5, 8, 20, 0.12);
+  color: #0c1729 !important;
+  
+  // Direct zwarte tekst voor ALLES binnen tile-form
+  &, & *, & *::before, & *::after {
+    color: #0c1729 !important;
+  }
+  
+  // Specifiek voor alle tekst elementen
+  p, span, div, h1, h2, h3, h4, h5, h6, strong, b, em, i, li, td, th, a, small, label, button {
+    color: #0c1729 !important;
+  }
+  
+  input:not([type="checkbox"]):not([type="radio"]),
+  textarea,
+  select {
+    color: #0c1729 !important;
+    background: #ffffff !important;
+  }
 }
 
 .tile-admin-table {
@@ -351,7 +446,8 @@ select:focus {
   letter-spacing: 0.06em;
   font-weight: 600;
   text-align: center;
-  opacity: 0.75;
+  color: #0c1729 !important;
+  opacity: 1 !important;
   padding-bottom: 0.35rem;
 }
 
@@ -373,18 +469,140 @@ select:focus {
   min-height: 60px;
 }
 
+.tile-admin-intro {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(12, 23, 41, 0.08);
+  color: #0c1729 !important;
+  
+  // Direct zwarte tekst voor ALLES binnen tile-admin-intro
+  &, & *, & *::before, & *::after {
+    color: #0c1729 !important;
+  }
+  
+  // Specifiek voor alle tekst elementen
+  p, span, div, h1, h2, h3, h4, h5, h6, strong, b, em, i, li, td, th, a, small, label, button, ul, ol {
+    color: #0c1729 !important;
+  }
+  
+  p {
+    margin: 0 0 0.75rem 0;
+    color: #0c1729 !important;
+  }
+  
+  ul {
+    margin: 0.75rem 0;
+    padding-left: 1.5rem;
+    color: #0c1729 !important;
+  }
+  
+  li {
+    margin-bottom: 0.5rem;
+    color: #0c1729 !important;
+  }
+  
+  strong, b {
+    color: #0c1729 !important;
+  }
+}
+
 .tile-sortable-item {
-  background: #ffffff;
+  background: #ffffff !important;
   border: 1px solid rgba(12, 23, 41, 0.12);
   border-radius: 12px;
-  padding: 0.75rem 0.85rem;
-  margin-bottom: 0.85rem;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
   box-shadow: 0 20px 40px rgba(5, 8, 20, 0.1);
   display: flex;
-  align-items: center;
-  gap: 0.8rem;
+  flex-direction: column;
+  gap: 1rem;
   cursor: grab;
   transition: box-shadow 0.2s ease, transform 0.2s ease;
+  color: #0c1729 !important;
+  
+  // Direct zwarte tekst voor ALLES binnen tile-sortable-item
+  &, & *, & *::before, & *::after {
+    color: #0c1729 !important;
+  }
+  
+  // Specifiek voor alle tekst elementen
+  p, span, div, h1, h2, h3, h4, h5, h6, strong, b, em, i, li, td, th, a, small, label, button {
+    color: #0c1729 !important;
+  }
+  
+  input:not([type="checkbox"]):not([type="radio"]),
+  textarea,
+  select {
+    color: #0c1729 !important;
+    background: #ffffff !important;
+  }
+}
+
+.tile-item-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(12, 23, 41, 0.1);
+}
+
+.tile-name {
+  color: #0c1729 !important;
+  font-size: 1rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+.tile-item-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(12, 23, 41, 0.1);
+}
+
+.tile-control-group {
+  flex: 1;
+  min-width: 120px;
+}
+
+.tile-control-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  cursor: pointer;
+}
+
+.tile-label-text {
+  color: #0c1729 !important;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.tile-control-label small {
+  color: rgba(12, 23, 41, 0.6) !important;
+  font-size: 0.75rem;
+}
+
+.tile-item-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 0.75rem;
+}
+
+.tile-label-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tile-field-label {
+  color: #0c1729 !important;
+  font-weight: 600;
+  font-size: 0.85rem;
 }
 
 .tile-sortable-item.dragging {
@@ -394,17 +612,46 @@ select:focus {
 
 .tile-sortable-handle {
   font-size: 1.3rem;
-  color: rgba(12, 23, 41, 0.65);
+  color: #0c1729 !important;
+  opacity: 0.7;
 }
 
 .tile-label-input {
-  width: 70%;
-  max-width: 160px;
-  font-size: 0.98rem;
-  padding: 0.3rem 0.6rem;
-  border-radius: 8px;
-  border: 1px solid rgba(12, 23, 41, 0.2);
-  background: #ffffff;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 100% !important;
+  font-size: 0.9rem !important;
+  padding: 0.65rem 0.85rem !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(12, 23, 41, 0.2) !important;
+  background: #ffffff !important;
+  line-height: 1.5 !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+  white-space: normal !important;
+  resize: vertical !important;
+  font-family: inherit !important;
+  color: #0c1729 !important;
+  min-height: 3.5rem !important;
+  height: auto !important;
+  overflow-y: auto !important;
+  text-shadow: none !important;
+  mix-blend-mode: normal !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.tile-label-input::placeholder {
+  color: rgba(12, 23, 41, 0.5) !important;
+}
+
+.tile-sortable-item .tile-label-input {
+  color: #0c1729 !important;
+  background: #ffffff !important;
+}
+
+.tile-sortable-item .tile-label-input * {
+  color: #0c1729 !important;
 }
 
 .tile-form__actions {
@@ -427,6 +674,31 @@ select:focus {
 
 .tile-feedback--error {
   color: #e74c3c;
+}
+
+// Admin tiles page readability
+.tile-admin-grid,
+.tile-admin-column,
+.tile-form,
+.tile-form * {
+  color: #0c1729 !important;
+}
+
+.tile-admin-grid .section-subtitle,
+.tile-admin-grid .section-subtitle *,
+.tile-admin-grid .page-heading,
+.tile-admin-grid .page-heading * {
+  color: #f4f8ff !important;
+}
+
+.tile-form {
+  color: #0c1729 !important;
+}
+
+.tile-form p,
+.tile-form span,
+.tile-form label {
+  color: #0c1729 !important;
 }
 
 .switch {
@@ -539,14 +811,29 @@ select:focus {
 }
 
 .profile-page .profile-title {
-  color: #ffffff;
+  color: #ffffff !important;
   font-size: 2rem;
   margin-bottom: 0.2rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .profile-page .profile-stat {
-  color: rgba(244, 248, 255, 0.9);
+  color: #ffffff !important;
   margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+// Maak alle headings in profiel leesbaar
+.profile-page h1,
+.profile-page h2,
+.profile-page h3,
+.profile-page h4,
+.profile-page h5,
+.profile-page h6 {
+  color: #ffffff !important;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .card-surface {
@@ -1683,7 +1970,7 @@ h1, h2, h3, h4, h5, h6 {
 .theme-menu {
   background: radial-gradient(circle at top, rgba(30, 227, 207, 0.08), transparent 55%),
               linear-gradient(120deg, #0c1730, #14274c);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 25px 60px rgba(6, 8, 20, 0.45);
 }
 
@@ -1697,9 +1984,9 @@ h1, h2, h3, h4, h5, h6 {
 
 .theme-menu .theme-btn,
 .theme-menu .dropdown-toggle {
-  background: rgba(255, 255, 255, 0.06) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
   color: #f4f8ff !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
   text-shadow: none !important;
   box-shadow: 0 10px 30px rgba(3, 6, 18, 0.35);
 }
@@ -1713,8 +2000,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .dropdown-menu {
-  background: var(--surface-dark-bg-alt) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  background: rgb(14, 25, 53) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
   border-radius: 14px !important;
   box-shadow: 0 30px 60px rgba(5, 7, 18, 0.6) !important;
   padding: 0.25rem !important;
@@ -1758,15 +2045,6 @@ h1, h2, h3, h4, h5, h6 {
   color: #ffb193 !important;
 }
 
-.mobile-menu-toggle span {
-  display: block;
-  width: 22px;
-  height: 3px;
-  margin-bottom: 4px;
-  background: #fefefe;
-  border-radius: 999px;
-}
-
 .mobile-menu-overlay {
   background: rgba(4, 7, 18, 0.85) !important;
 }
@@ -1806,6 +2084,61 @@ h1, h2, h3, h4, h5, h6 {
   color: #ff6b35;
 }
 
+// ---- SCHEMA VOLLEDIG PAGINA: Lichte achtergrond ----
+.schema-volledig-page {
+  background: #f8f9fa !important;
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: #1a2332 !important;
+  }
+  
+  p, span, div, td, th, li {
+    color: #1a2332 !important;
+  }
+  
+  .schema-table tr {
+    background: #ffffff !important;
+    border: 2px solid #e5e7eb !important;
+    
+    td, th {
+      color: #1a2332 !important;
+    }
+    
+    td::before {
+      color: #FC4C02 !important;
+    }
+  }
+}
+
+// ---- ALGEMENE REGEL: Donkere achtergronden = lichte tekst ----
+// Alle elementen met donkere achtergronden krijgen automatisch witte tekst
+// MAAR NIET voor schema-volledig-page
+[style*="background: rgba(5, 10, 22"]:not(.schema-volledig-page *),
+[style*="background: rgba(8, 14, 30"]:not(.schema-volledig-page *),
+[style*="background: rgba(10, 20, 40"]:not(.schema-volledig-page *),
+[style*="background: rgba(15, 25, 45"]:not(.schema-volledig-page *),
+[style*="background: linear-gradient(135deg, rgba(10, 20, 40"]:not(.schema-volledig-page *),
+[style*="background: linear-gradient(135deg, rgba(15, 25, 45"]:not(.schema-volledig-page *),
+[class*="dark"]:not(.schema-volledig-page *),
+.schema-table tr:not(.schema-volledig-page *),
+.prestaties-table tr:not(.schema-volledig-page *) {
+  color: #ffffff !important;
+  
+  * {
+    color: #ffffff !important;
+  }
+  
+  h1, h2, h3, h4, h5, h6, p, span, div, td, th, li, a {
+    color: #ffffff !important;
+  }
+  
+  // Uitzonderingen voor labels en speciale elementen
+  &::before,
+  *::before {
+    color: #1ee3cf !important;
+  }
+}
+
 // ---- RESPONSIVE TABLES ----
 @media (max-width: 800px) {
   .prestaties-table, .schema-table {
@@ -1813,9 +2146,10 @@ h1, h2, h3, h4, h5, h6 {
     width: 100%;
     overflow-x: visible;
     -webkit-overflow-scrolling: touch;
-    background: rgba(8, 14, 30, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    color: #1a2332 !important;
   }
   
   .prestaties-table thead, .schema-table thead {
@@ -1829,43 +2163,47 @@ h1, h2, h3, h4, h5, h6 {
   .prestaties-table tr, .schema-table tr {
     display: block;
     margin-bottom: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 2px solid #e5e7eb;
     border-radius: 12px;
-    padding: 1rem;
-    background: rgba(5, 10, 22, 0.85);
+    padding: 1.25rem;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
   
   .prestaties-table td, .schema-table td {
     display: block;
     text-align: left;
     border: none;
-    padding: 0.5rem 0;
+    padding: 0.75rem 0;
     position: relative;
-    padding-left: 50%;
-    color: #f4f8ff !important;
+    padding-left: 0;
+    color: #1a2332 !important;
+    font-size: 1rem;
+    line-height: 1.6;
+    font-weight: 500;
   }
   
   .prestaties-table td::before, .schema-table td::before {
     content: attr(data-label);
-    position: absolute;
-    left: 0;
-    width: 45%;
-    font-weight: bold;
-    color: #1ee3cf;
+    display: block;
+    font-weight: 700;
+    color: #FC4C02;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
   }
   
-  // Hide less-important schema tables op mobiel, maar NIET voor prestaties- of training-details tabellen
-  .schema-table:not(.training-details-table):not(.prestaties-table), 
-  .schema-table:not(.training-details-table):not(.prestaties-table) thead, 
-  .schema-table:not(.training-details-table):not(.prestaties-table) tbody, 
-  .schema-table:not(.training-details-table):not(.prestaties-table) tr, 
-  .schema-table:not(.training-details-table):not(.prestaties-table) th, 
-  .schema-table:not(.training-details-table):not(.prestaties-table) td {
-    display: none !important;
-  }
+  // Schema tabellen worden NIET verborgen op mobiel, maar getoond als cards
+  // De responsive card styling (regels 2092-2121) zorgt voor de juiste weergave
+  // .schema-table:not(.training-details-table):not(.prestaties-table), 
+  // .schema-table:not(.training-details-table):not(.prestaties-table) thead, 
+  // .schema-table:not(.training-details-table):not(.prestaties-table) tbody, 
+  // .schema-table:not(.training-details-table):not(.prestaties-table) tr, 
+  // .schema-table:not(.training-details-table):not(.prestaties-table) th, 
+  // .schema-table:not(.training-details-table):not(.prestaties-table) td {
+  //   display: none !important;
+  // }
   
   // Training details pagina tabellen uitsluiten van verbergregel
   .training-details-page .schema-table,
@@ -1984,6 +2322,59 @@ h1, h2, h3, h4, h5, h6 {
   .tab-btn { 
     font-size: 0.95em; 
     padding: 0.3em 0.7em; 
+  }
+}
+
+// ---- DONKERE ACHTERGRONDEN = WITTE TEKST (ALGEMEEN) ----
+// Voor alle elementen met donkere achtergronden
+.theme-main,
+.surface-dark,
+.app-container,
+[class*="dark-bg"],
+[class*="surface-dark"],
+.schema-table,
+.prestaties-table {
+  color: #ffffff !important;
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: #ffffff !important;
+  }
+  
+  p, span:not([class*="status"]):not([class*="label"]), div, li {
+    color: #ffffff !important;
+  }
+  
+  td, th {
+    color: #ffffff !important;
+  }
+  
+  // Formulier velden op donkere achtergronden
+  input:not([type="checkbox"]):not([type="radio"]),
+  textarea,
+  select {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.5) !important;
+    }
+    
+    &:focus {
+      background: rgba(255, 255, 255, 0.15) !important;
+      border-color: #1ee3cf !important;
+      outline: none !important;
+      box-shadow: 0 0 0 2px rgba(30, 227, 207, 0.3) !important;
+    }
+  }
+  
+  // Links blijven zichtbaar
+  a:not(.theme-btn):not(.app-btn) {
+    color: #1ee3cf !important;
+    
+    &:hover {
+      color: #76f4ed !important;
+    }
   }
 }
 
@@ -3208,17 +3599,63 @@ section.training-details-section div[class*="list"] {
 
   // ===== ALLE PAGINA'S MOBIEL OPTIMALISATIE =====
   
-  // Alle headings moeten leesbaar zijn op mobiel
+  // Alle headings moeten leesbaar zijn op mobiel - WIT op donkere achtergronden
   h1, h2, h3, h4, h5, h6 {
-    color: inherit !important;
+    color: #ffffff !important;
     font-weight: 700 !important;
     line-height: 1.3 !important;
   }
 
-  // Alle paragraaf tekst volgt het surface-contrast
-  p, span, li, td, th {
-    color: inherit !important;
+  // Alle paragraaf tekst WIT op donkere achtergronden
+  p, span:not([class*="status"]), li, td, th, div {
+    color: #ffffff !important;
     line-height: 1.6 !important;
+  }
+  
+  // Alle tekst in cards en tabellen
+  .schema-table, .prestaties-table,
+  .schema-table *, .prestaties-table * {
+    color: #ffffff !important;
+  }
+  
+  // Labels blijven lichtblauw
+  .schema-table td::before, 
+  .prestaties-table td::before,
+  [data-label]::before {
+    color: #1ee3cf !important;
+  }
+  
+  // Formulier velden op mobile met donkere achtergronden
+  input:not([type="checkbox"]):not([type="radio"]),
+  textarea,
+  select,
+  .app-form-input,
+  .note-input-full {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    padding: 0.75rem !important;
+    border-radius: 8px !important;
+    font-size: 1rem !important;
+    
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
+    
+    &:focus {
+      background: rgba(255, 255, 255, 0.18) !important;
+      border-color: #1ee3cf !important;
+      outline: none !important;
+      box-shadow: 0 0 0 3px rgba(30, 227, 207, 0.4) !important;
+    }
+  }
+  
+  // Buttons blijven goed zichtbaar
+  button,
+  .theme-btn,
+  .app-btn {
+    color: #0c1730 !important;
+    font-weight: 600 !important;
   }
 
   // Training details pagina - tabellen responsive maken
@@ -3403,6 +3840,15 @@ section.training-details-section div[class*="list"] {
   
   // Achtergrond voor training details pagina - track thema
   .training-details-page.prototype-track {
+    background: transparent !important;
+  }
+  
+  // Forceer lichte achtergrond op mobile voor training details
+  body:has(.training-details-page) {
+    background: linear-gradient(180deg, #0a1628 0%, #0d1b35 100%) !important;
+  }
+  
+  .training-details-page {
     background: transparent !important;
   }
   
@@ -4205,5 +4651,142 @@ section.training-details-section div[class*="list"] {
   .own-status-section .own-status-container {
     flex: none !important;
     width: 100% !important;
+  }
+}
+
+// ============================================
+// FINALE GLOBALE REGEL: Alle witte achtergronden
+// Deze regel overschrijft ALLES en zorgt dat witte achtergronden altijd zwarte tekst hebben
+// ============================================
+* {
+  // Detecteer witte achtergrond via computed styles (werkt met alle methoden)
+  &[style*="background"][style*="#fff"],
+  &[style*="background"][style*="#ffffff"],
+  &[style*="background"][style*="white"],
+  &[style*="background"][style*="255,255,255"] {
+    color: #0c1729 !important;
+    
+    &, & * {
+      color: #0c1729 !important;
+    }
+  }
+}
+
+// Specifieke classes die witte achtergrond hebben
+.tile-form,
+.tile-sortable-item,
+.tile-admin-intro,
+.theme-card,
+.prototype-card,
+.white-surface,
+.white-background,
+.bg-white,
+[class*="white"],
+[class*="bg-white"] {
+  &[style*="background"]:not([style*="background:rgba(0"]):not([style*="background: rgb(0"]):not([style*="background:#0"]):not([style*="background: #0"]) {
+    &[style*="#fff"],
+    &[style*="#ffffff"],
+    &[style*="white"],
+    &[style*="255,255,255"] {
+      color: #0c1729 !important;
+      
+      &, & * {
+        color: #0c1729 !important;
+      }
+    }
+  }
+}
+
+// Forceer zwarte tekst voor alle elementen binnen witte containers
+// Deze classes hebben standaard witte achtergrond via CSS, dus altijd zwarte tekst
+.tile-form,
+.tile-sortable-item,
+.tile-admin-intro {
+  color: #0c1729 !important;
+  
+  &, & * {
+    color: #0c1729 !important;
+  }
+  
+  // Specifiek voor alle tekst elementen
+  p, span, div, h1, h2, h3, h4, h5, h6, strong, b, em, i, li, td, th, a, small, label {
+    color: #0c1729 !important;
+  }
+  
+  input:not([type="checkbox"]):not([type="radio"]),
+  textarea,
+  select {
+    color: #0c1729 !important;
+    background: #ffffff !important;
+  }
+}
+
+// ============================================
+// DONKERE ACHTERGRONDEN: Witte tekst
+// ============================================
+// Specifieke donkere achtergronden krijgen witte tekst
+// (Alleen als het niet al een witte achtergrond is)
+[style*="background"][style*="#0"]:not([style*="#fff"]):not([style*="#ffffff"]):not([style*="white"]):not([style*="255,255,255"]),
+[style*="background"][style*="#1"]:not([style*="#fff"]):not([style*="#ffffff"]):not([style*="white"]):not([style*="255,255,255"]),
+[style*="background"][style*="#2"]:not([style*="#fff"]):not([style*="#ffffff"]):not([style*="white"]):not([style*="255,255,255"]),
+[style*="background"][style*="rgba(0"]:not([style*="rgba(255"]):not([style*="rgba(255,255"]),
+[style*="background"][style*="rgb(0"]:not([style*="rgb(255"]):not([style*="rgb(255,255"]),
+[style*="background-color"][style*="#0"]:not([style*="#fff"]):not([style*="#ffffff"]):not([style*="white"]):not([style*="255,255,255"]),
+[style*="background-color"][style*="#1"]:not([style*="#fff"]):not([style*="#ffffff"]):not([style*="white"]):not([style*="255,255,255"]),
+[style*="background-color"][style*="#2"]:not([style*="#fff"]):not([style*="#ffffff"]):not([style*="white"]):not([style*="255,255,255"]),
+[style*="background-color"][style*="rgba(0"]:not([style*="rgba(255"]):not([style*="rgba(255,255"]),
+[style*="background-color"][style*="rgb(0"]:not([style*="rgb(255"]):not([style*="rgb(255,255"]) {
+  color: #f4f8ff !important;
+  
+  &, & * {
+    color: #f4f8ff !important;
+  }
+  
+  p, span, div, h1, h2, h3, h4, h5, h6, strong, b, em, i, li, td, th, a, small, label {
+    color: #f4f8ff !important;
+  }
+}
+
+// Overschrijf specifiek voor inputs en textareas binnen witte containers
+.tile-form input:not([type="checkbox"]):not([type="radio"]),
+.tile-form textarea,
+.tile-form select,
+.tile-sortable-item input:not([type="checkbox"]):not([type="radio"]),
+.tile-sortable-item textarea,
+.tile-sortable-item select,
+.tile-admin-intro input:not([type="checkbox"]):not([type="radio"]),
+.tile-admin-intro textarea,
+.tile-admin-intro select {
+  color: #0c1729 !important;
+  background: #ffffff !important;
+}
+
+// ============================================
+// FINALE OVERRIDE: Alle elementen met witte achtergrond krijgen zwarte tekst
+// Deze regel werkt voor ALLE elementen, ongeacht hoe de achtergrond is ingesteld
+// ============================================
+[style*="background"][style*="#fff"],
+[style*="background"][style*="#ffffff"],
+[style*="background"][style*="white"],
+[style*="background"][style*="255,255,255"],
+[style*="background-color"][style*="#fff"],
+[style*="background-color"][style*="#ffffff"],
+[style*="background-color"][style*="white"],
+[style*="background-color"][style*="255,255,255"] {
+  color: #0c1729 !important;
+  
+  &, & * {
+    color: #0c1729 !important;
+  }
+  
+  p, span, div, h1, h2, h3, h4, h5, h6, strong, b, em, i, li, td, th, a, small, label {
+    color: #0c1729 !important;
+  }
+  
+  input:not([type="checkbox"]):not([type="radio"]),
+  textarea,
+  select {
+    color: #0c1729 !important;
+    background: #ffffff !important;
   }
 }

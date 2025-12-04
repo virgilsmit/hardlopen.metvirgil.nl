@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Cache Status</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #000; color: #0f0; }
+    .success { color: #0f0; }
+    .error { color: #f00; }
+    button { padding: 10px 20px; font-size: 16px; margin: 10px 5px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>🔍 Cache Diagnostics</h1>
+  <p>Current time: <span id="time"></span></p>
+  <h2>Server Time Check:</h2>
+  <div id="result"></div>
+  <button onclick="testServer()">Test Server Time</button>
+  <button onclick="clearAndReload()">Nuclear Clear & Reload</button>
+  <button onclick="window.location.href='/test/error_logs'">Go to Error Logs</button>
+  
+  <script>
+    document.getElementById('time').textContent = new Date().toLocaleTimeString();
+    
+    function testServer() {
+      fetch('/?t=' + Date.now())
+        .then(r => r.text())
+        .then(html => {
+          const match = html.match(/v(\d{2}):(\d{2})/);
+          if (match) {
+            const serverTime = match[1] + ':' + match[2];
+            const now = new Date();
+            const localTime = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            
+            document.getElementById('result').innerHTML = 
+              '<p class="success">Server time: ' + serverTime + '</p>' +
+              '<p class="success">Your time: ' + localTime + '</p>' +
+              (serverTime === localTime ? '<p class="success">✅ TIMES MATCH - Server is fresh!</p>' : '<p class="error">❌ Times differ - Cache issue</p>');
+          }
+        });
+    }
+    
+    function clearAndReload() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(regs => {
+          regs.forEach(reg => reg.unregister());
+        });
+      }
+      if ('caches' in window) {
+        caches.keys().then(names => {
+          names.forEach(name => caches.delete(name));
+        });
+      }
+      setTimeout(() => {
+        window.location.href = '/test/error_logs?v=' + Date.now();
+      }, 1000);
+    }
+    
+    testServer();
+  </script>
+</body>
+</html>

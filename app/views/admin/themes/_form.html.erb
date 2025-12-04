@@ -1,0 +1,792 @@
+<%= form_with model: [:admin, @theme], local: true do |form| %>
+  <% if @theme.errors.any? %>
+    <div id="error_explanation" style="border: 2px solid #b42318; padding: 16px; margin-bottom: 24px; background-color: #ffffff; color: #0c1729; border-radius: 12px;">
+      <h2 style="color: #0c1729; margin-top: 0;"><%= pluralize(@theme.errors.count, "error") %> prohibited this theme from being saved:</h2>
+      <ul style="color: #0c1729; margin-left: 20px; font-weight: 600;">
+        <% @theme.errors.full_messages.each do |message| %>
+          <li style="color: #0c1729 !important;"><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="theme-form-sections">
+    <!-- Basis instellingen -->
+    <section class="theme-form-section">
+      <h2>Basis instellingen</h2>
+      <div class="form-group">
+        <%= form.label :name, "Thema naam", style: "color: #0c1729 !important;" %>
+        <%= form.text_field :name, class: 'form-control', style: "color: #0c1729 !important; background: #ffffff !important;" %>
+      </div>
+      <div class="form-group">
+        <label style="color: #0c1729 !important;">
+          <%= form.check_box :activate, { checked: @theme.active? }, '1', '0' %>
+          Direct activeren na opslaan
+        </label>
+      </div>
+    </section>
+
+    <!-- Kleuren -->
+    <section class="theme-form-section">
+      <h2>Kleuren</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <%= form.label :primary_color, "Primaire kleur", style: "color: #0c1729 !important;" %>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <%= form.color_field :primary_color, value: @theme.primary_color || '#FC4C02', class: 'color-picker-input', style: "width: 60px; height: 40px; border: 1px solid #ccc; border-radius: 4px;" %>
+            <%= form.text_field :primary_color, class: 'form-control color-text-input', placeholder: '#FC4C02', style: "color: #0c1729 !important; background: #ffffff !important; flex: 1;" %>
+            <div class="color-preview-wrapper" style="display: flex; gap: 0.25rem; align-items: center;">
+              <div class="color-preview" data-color="<%= @theme.primary_color || '#FC4C02' %>" style="width: 50px; height: 40px; border: 2px solid #ccc; border-radius: 8px; background: <%= @theme.primary_color || '#FC4C02' %>; flex-shrink: 0; cursor: pointer;" title="Klik voor kleurenpalet"></div>
+              <button type="button" class="color-palette-btn" data-field-name="primary_color" style="width: 32px; height: 32px; border: 1px solid #ccc; border-radius: 6px; background: #f8f9fa; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; padding: 0;" title="Kleurenpalet">🎨</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= form.label :secondary_color, "Secundaire kleur", style: "color: #0c1729 !important;" %>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <%= form.color_field :secondary_color, value: @theme.secondary_color || '#00B4DB', class: 'color-picker-input', style: "width: 60px; height: 40px; border: 1px solid #ccc; border-radius: 4px;" %>
+            <%= form.text_field :secondary_color, class: 'form-control color-text-input', placeholder: '#00B4DB', style: "color: #0c1729 !important; background: #ffffff !important; flex: 1;" %>
+            <div class="color-preview-wrapper" style="display: flex; gap: 0.25rem; align-items: center;">
+              <div class="color-preview" data-color="<%= @theme.secondary_color || '#00B4DB' %>" style="width: 50px; height: 40px; border: 2px solid #ccc; border-radius: 8px; background: <%= @theme.secondary_color || '#00B4DB' %>; flex-shrink: 0; cursor: pointer;" title="Klik voor kleurenpalet"></div>
+              <button type="button" class="color-palette-btn" data-field-name="secondary_color" style="width: 32px; height: 32px; border: 1px solid #ccc; border-radius: 6px; background: #f8f9fa; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; padding: 0;" title="Kleurenpalet">🎨</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= form.label :accent_color, "Accent kleur", style: "color: #0c1729 !important;" %>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <%= form.color_field :accent_color, value: @theme.accent_color || '#FFD23F', class: 'color-picker-input', style: "width: 60px; height: 40px; border: 1px solid #ccc; border-radius: 4px;" %>
+            <%= form.text_field :accent_color, class: 'form-control color-text-input', placeholder: '#FFD23F', style: "color: #0c1729 !important; background: #ffffff !important; flex: 1;" %>
+            <div class="color-preview" data-color="<%= @theme.accent_color || '#FFD23F' %>" style="width: 50px; height: 40px; border: 2px solid #ccc; border-radius: 8px; background: <%= @theme.accent_color || '#FFD23F' %>; flex-shrink: 0;"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= form.label :success_color, "Succes kleur", style: "color: #0c1729 !important;" %>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <%= form.color_field :success_color, value: @theme.success_color || '#28A745', class: 'color-picker-input', style: "width: 60px; height: 40px; border: 1px solid #ccc; border-radius: 4px;" %>
+            <%= form.text_field :success_color, class: 'form-control color-text-input', placeholder: '#28A745', style: "color: #0c1729 !important; background: #ffffff !important; flex: 1;" %>
+            <div class="color-preview" data-color="<%= @theme.success_color || '#28A745' %>" style="width: 50px; height: 40px; border: 2px solid #ccc; border-radius: 8px; background: <%= @theme.success_color || '#28A745' %>; flex-shrink: 0;"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= form.label :warning_color, "Waarschuwing kleur", style: "color: #0c1729 !important;" %>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <%= form.color_field :warning_color, value: @theme.warning_color || '#FFC107', class: 'color-picker-input', style: "width: 60px; height: 40px; border: 1px solid #ccc; border-radius: 4px;" %>
+            <%= form.text_field :warning_color, class: 'form-control color-text-input', placeholder: '#FFC107', style: "color: #0c1729 !important; background: #ffffff !important; flex: 1;" %>
+            <div class="color-preview" data-color="<%= @theme.warning_color || '#FFC107' %>" style="width: 50px; height: 40px; border: 2px solid #ccc; border-radius: 8px; background: <%= @theme.warning_color || '#FFC107' %>; flex-shrink: 0;"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= form.label :danger_color, "Fout kleur", style: "color: #0c1729 !important;" %>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <%= form.color_field :danger_color, value: @theme.danger_color || '#DC3545', class: 'color-picker-input', style: "width: 60px; height: 40px; border: 1px solid #ccc; border-radius: 4px;" %>
+            <%= form.text_field :danger_color, class: 'form-control color-text-input', placeholder: '#DC3545', style: "color: #0c1729 !important; background: #ffffff !important; flex: 1;" %>
+            <div class="color-preview" data-color="<%= @theme.danger_color || '#DC3545' %>" style="width: 50px; height: 40px; border: 2px solid #ccc; border-radius: 8px; background: <%= @theme.danger_color || '#DC3545' %>; flex-shrink: 0;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Achtergronden -->
+    <section class="theme-form-section">
+      <h2>Achtergronden</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <%= form.label :background_color, "Hoofd achtergrond", style: "color: #0c1729 !important;" %>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <%= form.color_field :background_color, value: @theme.background_color || '#FFFFFF', class: 'color-picker-input', style: "width: 60px; height: 40px; border: 1px solid #ccc; border-radius: 4px;" %>
+            <%= form.text_field :background_color, class: 'form-control color-text-input', placeholder: '#FFFFFF', style: "color: #0c1729 !important; background: #ffffff !important; flex: 1;" %>
+            <div class="color-preview" data-color="<%= @theme.background_color || '#FFFFFF' %>" style="width: 50px; height: 40px; border: 2px solid #ccc; border-radius: 8px; background: <%= @theme.background_color || '#FFFFFF' %>; flex-shrink: 0;"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= form.label :background_color_alt, "Alternatieve achtergrond", style: "color: #0c1729 !important;" %>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <%= form.color_field :background_color_alt, value: @theme.background_color_alt || '#F8F9FA', class: 'color-picker-input', style: "width: 60px; height: 40px; border: 1px solid #ccc; border-radius: 4px;" %>
+            <%= form.text_field :background_color_alt, class: 'form-control color-text-input', placeholder: '#F8F9FA', style: "color: #0c1729 !important; background: #ffffff !important; flex: 1;" %>
+            <div class="color-preview" data-color="<%= @theme.background_color_alt || '#F8F9FA' %>" style="width: 50px; height: 40px; border: 2px solid #ccc; border-radius: 8px; background: <%= @theme.background_color_alt || '#F8F9FA' %>; flex-shrink: 0;"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= form.label :header_background, "Header achtergrond", style: "color: #0c1729 !important;" %>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <%= form.color_field :header_background, value: @theme.header_background || '#0a152b', class: 'color-picker-input', style: "width: 60px; height: 40px; border: 1px solid #ccc; border-radius: 4px;" %>
+            <%= form.text_field :header_background, class: 'form-control color-text-input', placeholder: '#0a152b', style: "color: #0c1729 !important; background: #ffffff !important; flex: 1;" %>
+            <div class="color-preview" data-color="<%= @theme.header_background || '#0a152b' %>" style="width: 50px; height: 40px; border: 2px solid #ccc; border-radius: 8px; background: <%= @theme.header_background || '#0a152b' %>; flex-shrink: 0;"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= form.label :card_background, "Card achtergrond (licht)", style: "color: #0c1729 !important;" %>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <%= form.color_field :card_background, value: @theme.card_background || '#FFFFFF', class: 'color-picker-input', style: "width: 60px; height: 40px; border: 1px solid #ccc; border-radius: 4px;" %>
+            <%= form.text_field :card_background, class: 'form-control color-text-input', placeholder: '#FFFFFF', style: "color: #0c1729 !important; background: #ffffff !important; flex: 1;" %>
+            <div class="color-preview" data-color="<%= @theme.card_background || '#FFFFFF' %>" style="width: 50px; height: 40px; border: 2px solid #ccc; border-radius: 8px; background: <%= @theme.card_background || '#FFFFFF' %>; flex-shrink: 0;"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= form.label :card_background_dark, "Card achtergrond (donker)", style: "color: #0c1729 !important;" %>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <%= form.color_field :card_background_dark, value: @theme.card_background_dark || '#1E1E1E', class: 'color-picker-input', style: "width: 60px; height: 40px; border: 1px solid #ccc; border-radius: 4px;" %>
+            <%= form.text_field :card_background_dark, class: 'form-control color-text-input', placeholder: '#1E1E1E', style: "color: #0c1729 !important; background: #ffffff !important; flex: 1;" %>
+            <div class="color-preview" data-color="<%= @theme.card_background_dark || '#1E1E1E' %>" style="width: 50px; height: 40px; border: 2px solid #ccc; border-radius: 8px; background: <%= @theme.card_background_dark || '#1E1E1E' %>; flex-shrink: 0;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tekst kleuren -->
+    <section class="theme-form-section">
+      <h2>Tekst kleuren</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <%= form.label :text_color_light, "Tekst kleur (lichte achtergrond)", style: "color: #0c1729 !important;" %>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <%= form.color_field :text_color_light, value: @theme.text_color_light || '#0c1729', class: 'color-picker-input', style: "width: 60px; height: 40px; border: 1px solid #ccc; border-radius: 4px;" %>
+            <%= form.text_field :text_color_light, class: 'form-control color-text-input', placeholder: '#0c1729', style: "color: #0c1729 !important; background: #ffffff !important; flex: 1;" %>
+            <div class="color-preview" data-color="<%= @theme.text_color_light || '#0c1729' %>" style="width: 50px; height: 40px; border: 2px solid #ccc; border-radius: 8px; background: <%= @theme.text_color_light || '#0c1729' %>; flex-shrink: 0;"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= form.label :text_color_dark, "Tekst kleur (donkere achtergrond)", style: "color: #0c1729 !important;" %>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <%= form.color_field :text_color_dark, value: @theme.text_color_dark || '#f4f8ff', class: 'color-picker-input', style: "width: 60px; height: 40px; border: 1px solid #ccc; border-radius: 4px;" %>
+            <%= form.text_field :text_color_dark, class: 'form-control color-text-input', placeholder: '#f4f8ff', style: "color: #0c1729 !important; background: #ffffff !important; flex: 1;" %>
+            <div class="color-preview" data-color="<%= @theme.text_color_dark || '#f4f8ff' %>" style="width: 50px; height: 40px; border: 2px solid #ccc; border-radius: 8px; background: <%= @theme.text_color_dark || '#f4f8ff' %>; flex-shrink: 0;"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= form.label :text_color_muted, "Tekst kleur (gedempt, licht)", style: "color: #0c1729 !important;" %>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <%= form.color_field :text_color_muted, value: @theme.text_color_muted || '#6C757D', class: 'color-picker-input', style: "width: 60px; height: 40px; border: 1px solid #ccc; border-radius: 4px;" %>
+            <%= form.text_field :text_color_muted, class: 'form-control color-text-input', placeholder: '#6C757D', style: "color: #0c1729 !important; background: #ffffff !important; flex: 1;" %>
+            <div class="color-preview" data-color="<%= @theme.text_color_muted || '#6C757D' %>" style="width: 50px; height: 40px; border: 2px solid #ccc; border-radius: 8px; background: <%= @theme.text_color_muted || '#6C757D' %>; flex-shrink: 0;"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= form.label :text_color_muted_dark, "Tekst kleur (gedempt, donker)", style: "color: #0c1729 !important;" %>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <%= form.color_field :text_color_muted_dark, value: @theme.text_color_muted_dark || '#B0B0B0', class: 'color-picker-input', style: "width: 60px; height: 40px; border: 1px solid #ccc; border-radius: 4px;" %>
+            <%= form.text_field :text_color_muted_dark, class: 'form-control color-text-input', placeholder: '#B0B0B0', style: "color: #0c1729 !important; background: #ffffff !important; flex: 1;" %>
+            <div class="color-preview" data-color="<%= @theme.text_color_muted_dark || '#B0B0B0' %>" style="width: 50px; height: 40px; border: 2px solid #ccc; border-radius: 8px; background: <%= @theme.text_color_muted_dark || '#B0B0B0' %>; flex-shrink: 0;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Borders -->
+    <section class="theme-form-section">
+      <h2>Borders</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <%= form.label :border_color, "Border kleur (licht)", style: "color: #0c1729 !important;" %>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <%= form.color_field :border_color, value: @theme.border_color || '#E9ECEF', class: 'color-picker-input', style: "width: 60px; height: 40px; border: 1px solid #ccc; border-radius: 4px;" %>
+            <%= form.text_field :border_color, class: 'form-control color-text-input', placeholder: '#E9ECEF', style: "color: #0c1729 !important; background: #ffffff !important; flex: 1;" %>
+            <div class="color-preview" data-color="<%= @theme.border_color || '#E9ECEF' %>" style="width: 50px; height: 40px; border: 2px solid #ccc; border-radius: 8px; background: <%= @theme.border_color || '#E9ECEF' %>; flex-shrink: 0;"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= form.label :border_color_dark, "Border kleur (donker)", style: "color: #0c1729 !important;" %>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <%= form.color_field :border_color_dark, value: @theme.border_color_dark || '#2D2D2D', class: 'color-picker-input', style: "width: 60px; height: 40px; border: 1px solid #ccc; border-radius: 4px;" %>
+            <%= form.text_field :border_color_dark, class: 'form-control color-text-input', placeholder: '#2D2D2D', style: "color: #0c1729 !important; background: #ffffff !important; flex: 1;" %>
+            <div class="color-preview" data-color="<%= @theme.border_color_dark || '#2D2D2D' %>" style="width: 50px; height: 40px; border: 2px solid #ccc; border-radius: 8px; background: <%= @theme.border_color_dark || '#2D2D2D' %>; flex-shrink: 0;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Typography -->
+    <section class="theme-form-section">
+      <h2>Typography</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <%= form.label :font_family, "Primaire font familie", style: "color: #0c1729 !important;" %>
+          <%= form.text_field :font_family, class: 'form-control', placeholder: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto', style: "color: #0c1729 !important; background: #ffffff !important;" %>
+        </div>
+        <div class="form-group">
+          <%= form.label :font_family_secondary, "Secundaire font familie", style: "color: #0c1729 !important;" %>
+          <%= form.text_field :font_family_secondary, class: 'form-control', placeholder: 'Roboto, -apple-system, BlinkMacSystemFont', style: "color: #0c1729 !important; background: #ffffff !important;" %>
+        </div>
+        <div class="form-group">
+          <%= form.label :font_size_base, "Basis font grootte", style: "color: #0c1729 !important;" %>
+          <%= form.text_field :font_size_base, class: 'form-control', placeholder: '1rem', style: "color: #0c1729 !important; background: #ffffff !important;" %>
+        </div>
+        <div class="form-group">
+          <%= form.label :font_weight_normal, "Font gewicht (normaal)", style: "color: #0c1729 !important;" %>
+          <%= form.text_field :font_weight_normal, class: 'form-control', placeholder: '400', style: "color: #0c1729 !important; background: #ffffff !important;" %>
+        </div>
+        <div class="form-group">
+          <%= form.label :font_weight_semibold, "Font gewicht (semi-bold)", style: "color: #0c1729 !important;" %>
+          <%= form.text_field :font_weight_semibold, class: 'form-control', placeholder: '600', style: "color: #0c1729 !important; background: #ffffff !important;" %>
+        </div>
+        <div class="form-group">
+          <%= form.label :font_weight_bold, "Font gewicht (bold)", style: "color: #0c1729 !important;" %>
+          <%= form.text_field :font_weight_bold, class: 'form-control', placeholder: '700', style: "color: #0c1729 !important; background: #ffffff !important;" %>
+        </div>
+      </div>
+    </section>
+
+    <!-- Spacing & Borders -->
+    <section class="theme-form-section">
+      <h2>Spacing & Borders</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <%= form.label :spacing_unit, "Spacing eenheid", style: "color: #0c1729 !important;" %>
+          <%= form.text_field :spacing_unit, class: 'form-control', placeholder: '0.5rem', style: "color: #0c1729 !important; background: #ffffff !important;" %>
+        </div>
+        <div class="form-group">
+          <%= form.label :border_radius_small, "Border radius (klein)", style: "color: #0c1729 !important;" %>
+          <%= form.text_field :border_radius_small, class: 'form-control', placeholder: '8px', style: "color: #0c1729 !important; background: #ffffff !important;" %>
+        </div>
+        <div class="form-group">
+          <%= form.label :border_radius_medium, "Border radius (medium)", style: "color: #0c1729 !important;" %>
+          <%= form.text_field :border_radius_medium, class: 'form-control', placeholder: '12px', style: "color: #0c1729 !important; background: #ffffff !important;" %>
+        </div>
+        <div class="form-group">
+          <%= form.label :border_radius_large, "Border radius (groot)", style: "color: #0c1729 !important;" %>
+          <%= form.text_field :border_radius_large, class: 'form-control', placeholder: '20px', style: "color: #0c1729 !important; background: #ffffff !important;" %>
+        </div>
+      </div>
+    </section>
+
+    <!-- Shadows -->
+    <section class="theme-form-section">
+      <h2>Shadows</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <%= form.label :shadow_small, "Shadow (klein)", style: "color: #0c1729 !important;" %>
+          <%= form.text_field :shadow_small, class: 'form-control', placeholder: '0 2px 8px rgba(0, 0, 0, 0.1)', style: "color: #0c1729 !important; background: #ffffff !important;" %>
+        </div>
+        <div class="form-group">
+          <%= form.label :shadow_medium, "Shadow (medium)", style: "color: #0c1729 !important;" %>
+          <%= form.text_field :shadow_medium, class: 'form-control', placeholder: '0 4px 20px rgba(0, 0, 0, 0.15)', style: "color: #0c1729 !important; background: #ffffff !important;" %>
+        </div>
+        <div class="form-group">
+          <%= form.label :shadow_large, "Shadow (groot)", style: "color: #0c1729 !important;" %>
+          <%= form.text_field :shadow_large, class: 'form-control', placeholder: '0 8px 32px rgba(0, 0, 0, 0.2)', style: "color: #0c1729 !important; background: #ffffff !important;" %>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Custom CSS -->
+    <section class="theme-form-section">
+      <h2>Custom CSS</h2>
+      <p style="color: #0c1729; margin-bottom: 1rem;">
+        Voeg hier aangepaste CSS toe om het thema verder aan te passen. Deze CSS wordt toegepast na alle andere styling.
+      </p>
+      <div class="form-group">
+        <%= form.label :custom_css, "Aangepaste CSS", style: "color: #0c1729 !important;" %>
+        <%= form.text_area :custom_css, 
+            class: 'form-control', 
+            rows: 20,
+            placeholder: "/* Voorbeeld: Dropdown menu styling */\n.dropdown-menu {\n  background: #0e1935 !important;\n  border: 1px solid rgba(255, 255, 255, 0.2) !important;\n}\n\n.dropdown-item {\n  color: #f7fbff !important;\n}",
+            style: "color: #0c1729 !important; background: #ffffff !important; font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 13px;" %>
+        <small style="color: #666; display: block; margin-top: 0.5rem;">
+          💡 Tip: Gebruik !important om bestaande styling te overschrijven. De huidige dropdown styling staat al klaar als voorbeeld.
+        </small>
+      </div>
+    </section>
+  </div>
+
+  <div class="form-actions" style="margin-top: 2rem; display: flex; gap: 1rem;">
+    <%= form.submit 'Opslaan', class: 'theme-btn track-btn--glow' %>
+    <%= link_to 'Annuleren', admin_themes_path, class: 'theme-btn', style: 'background: #e74c3c;' %>
+  </div>
+<% end %>
+
+<style>
+.theme-form-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.theme-form-section {
+  background: #ffffff;
+  border: 1px solid rgba(12, 23, 41, 0.12);
+  border-radius: 16px;
+  padding: 1.5rem;
+  color: #0c1729 !important;
+}
+
+.theme-form-section h2 {
+  color: #0c1729 !important;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  color: #0c1729 !important;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.form-control {
+  padding: 0.65rem 0.85rem;
+  border: 1px solid rgba(12, 23, 41, 0.2);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #0c1729 !important;
+  background: #ffffff !important;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--color-primary, #FC4C02);
+  box-shadow: 0 0 0 3px rgba(252, 76, 2, 0.1);
+}
+
+/* Kleurenpalet Modal */
+.color-palette-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.color-palette-modal.active {
+  display: flex;
+}
+
+.color-palette-content {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.color-palette-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.color-palette-header h3 {
+  margin: 0;
+  color: #0c1729;
+  font-size: 1.25rem;
+}
+
+.color-palette-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #0c1729;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.color-palette-close:hover {
+  background: #f0f0f0;
+}
+
+.color-palette-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.color-palette-swatch {
+  width: 100%;
+  aspect-ratio: 1;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.color-palette-swatch:hover {
+  transform: scale(1.1);
+  border-color: #333;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.color-palette-swatch.selected {
+  border-color: #FC4C02;
+  border-width: 3px;
+  box-shadow: 0 0 0 2px rgba(252, 76, 2, 0.3);
+}
+
+.color-palette-section {
+  margin-bottom: 24px;
+}
+
+.color-palette-section h4 {
+  margin: 0 0 12px 0;
+  color: #0c1729;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.color-palette-swatch-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.color-palette-swatch-code {
+  font-size: 10px;
+  color: #666;
+  font-family: monospace;
+  text-align: center;
+  min-height: 14px;
+}
+
+.color-palette-current {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+}
+
+.color-palette-current-label {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.color-palette-current-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.color-palette-current-swatch {
+  width: 60px;
+  height: 60px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.color-palette-current-code {
+  font-family: monospace;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #0c1729;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Synchroniseer color picker, text field en color preview
+  const colorFields = document.querySelectorAll('input[type="color"]');
+  colorFields.forEach(function(colorInput) {
+    const container = colorInput.parentElement;
+    const textInput = container.querySelector('input[type="text"]');
+    const preview = container.querySelector('.color-preview');
+    
+    // Functie om preview bij te werken
+    function updatePreview(color) {
+      if (preview && /^#[0-9A-Fa-f]{6}$/.test(color)) {
+        preview.style.background = color;
+        preview.setAttribute('data-color', color);
+      }
+    }
+    
+    if (textInput) {
+      // Color picker -> text field -> preview
+      colorInput.addEventListener('input', function() {
+        textInput.value = colorInput.value;
+        updatePreview(colorInput.value);
+      });
+      
+      // Text field -> color picker -> preview (met validatie)
+      textInput.addEventListener('input', function() {
+        const hex = textInput.value.trim();
+        if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+          colorInput.value = hex;
+          updatePreview(hex);
+        }
+      });
+      
+      // Initialiseer color picker en preview met text field waarde
+      if (textInput.value && /^#[0-9A-Fa-f]{6}$/.test(textInput.value.trim())) {
+        const hex = textInput.value.trim();
+        colorInput.value = hex;
+        updatePreview(hex);
+      }
+    }
+  });
+
+  // Kleurenpalet functionaliteit
+  const colorPalette = {
+    colors: {
+      primair: ['#FC4C02', '#FF6B35', '#E63900', '#FF8C42', '#FF5722', '#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800'],
+      secundair: ['#00B4DB', '#00D4FF', '#0099CC', '#0088AA', '#0077BB', '#0066AA', '#005599', '#004488', '#003377', '#002266', '#1E88E5', '#1976D2', '#1565C0', '#0D47A1', '#0277BD', '#0288D1', '#039BE5', '#03A9F4', '#00ACC1', '#0097A7'],
+      accent: ['#FFD23F', '#FFE066', '#FFD700', '#FFC107', '#FFB300', '#FFA000', '#FF8F00', '#FF6F00', '#FF5722', '#FF3D00', '#FF1744', '#E91E63', '#C2185B', '#AD1457', '#880E4F', '#4A148C', '#6A1B9A', '#7B1FA2', '#8E24AA', '#AB47BC'],
+      neutraal: ['#FFFFFF', '#F8F9FA', '#E9ECEF', '#DEE2E6', '#CED4DA', '#ADB5BD', '#6C757D', '#495057', '#343A40', '#212529', '#0c1729', '#1E1E1E', '#2D2D2D', '#3D3D3D', '#4D4D4D', '#5D5D5D', '#6D6D6D', '#7D7D7D', '#8D8D8D', '#9D9D9D'],
+      succes: ['#28A745', '#34CE57', '#1E7E34', '#155724', '#0F5132', '#198754', '#20C997', '#0DCAF0', '#0DCAF0', '#0AA2C0', '#4CAF50', '#66BB6A', '#81C784', '#A5D6A7', '#C8E6C9', '#E8F5E9'],
+      waarschuwing: ['#FFC107', '#FFD54F', '#FFCA28', '#FFB300', '#FFA000', '#FF8F00', '#FF6F00', '#FF5722', '#FF3D00', '#FF1744', '#FF9800', '#FFA726', '#FFB74D', '#FFCC80', '#FFE0B2', '#FFF3E0'],
+      fout: ['#DC3545', '#E74C3C', '#C82333', '#BD2130', '#A71E2A', '#F44336', '#EF5350', '#E57373', '#EF9A9A', '#FFCDD2', '#FFEBEE', '#B71C1C', '#C62828', '#D32F2F', '#E53935', '#F44336']
+    },
+    modal: null,
+    currentField: null,
+    init: function() {
+      // Maak modal
+      this.createModal();
+      // Voeg palet knoppen toe aan alle color previews
+      this.addPaletteButtons();
+      // Event listeners
+      this.setupEventListeners();
+    },
+    createModal: function() {
+      const modal = document.createElement('div');
+      modal.className = 'color-palette-modal';
+      modal.innerHTML = `
+        <div class="color-palette-content">
+          <div class="color-palette-header">
+            <h3>Kies een kleur</h3>
+            <button class="color-palette-close" type="button">×</button>
+          </div>
+          <div class="color-palette-body"></div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      this.modal = modal;
+    },
+    addPaletteButtons: function() {
+      const previews = document.querySelectorAll('.color-preview');
+      previews.forEach((preview) => {
+        // Check of er al een wrapper is
+        if (preview.parentElement.classList.contains('color-preview-wrapper')) {
+          return;
+        }
+        
+        // Maak wrapper
+        const wrapper = document.createElement('div');
+        wrapper.className = 'color-preview-wrapper';
+        wrapper.style.cssText = 'display: flex; gap: 0.25rem; align-items: center;';
+        
+        // Voeg cursor toe aan preview
+        preview.style.cursor = 'pointer';
+        preview.setAttribute('title', 'Klik voor kleurenpalet');
+        
+        // Maak palet knop
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'color-palette-btn';
+        btn.innerHTML = '🎨';
+        btn.style.cssText = 'width: 32px; height: 32px; border: 1px solid #ccc; border-radius: 6px; background: #f8f9fa; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; padding: 0;';
+        btn.setAttribute('title', 'Kleurenpalet');
+        
+        // Vind het bijbehorende input field
+        const container = preview.closest('.form-group').querySelector('input[type="text"]');
+        if (container) {
+          const fieldName = container.name.match(/\[(\w+)\]$/);
+          if (fieldName) {
+            btn.setAttribute('data-field-name', fieldName[1]);
+          }
+        }
+        
+        // Wrap preview en voeg knop toe
+        preview.parentNode.insertBefore(wrapper, preview);
+        wrapper.appendChild(preview);
+        wrapper.appendChild(btn);
+      });
+    },
+    setupEventListeners: function() {
+      // Open palet bij klik op preview of knop
+      document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('color-preview') || e.target.classList.contains('color-palette-btn')) {
+          const btn = e.target.classList.contains('color-palette-btn') ? e.target : e.target.nextElementSibling;
+          const fieldName = btn.getAttribute('data-field-name');
+          if (fieldName) {
+            this.openPalette(fieldName);
+          }
+        }
+      });
+      
+      // Sluit modal
+      this.modal.querySelector('.color-palette-close').addEventListener('click', () => this.closePalette());
+      this.modal.addEventListener('click', (e) => {
+        if (e.target === this.modal) {
+          this.closePalette();
+        }
+      });
+      
+      // ESC toets
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && this.modal.classList.contains('active')) {
+          this.closePalette();
+        }
+      });
+    },
+    getFieldLabel: function(fieldName) {
+      const labels = {
+        'primary_color': 'Primaire kleur',
+        'secondary_color': 'Secundaire kleur',
+        'accent_color': 'Accent kleur',
+        'success_color': 'Succes kleur',
+        'warning_color': 'Waarschuwing kleur',
+        'danger_color': 'Fout kleur',
+        'background_color': 'Hoofd achtergrond',
+        'background_color_alt': 'Alternatieve achtergrond',
+        'header_background': 'Header achtergrond',
+        'card_background': 'Card achtergrond (licht)',
+        'card_background_dark': 'Card achtergrond (donker)',
+        'text_color_light': 'Tekst kleur (lichte achtergrond)',
+        'text_color_dark': 'Tekst kleur (donkere achtergrond)',
+        'text_color_muted': 'Tekst kleur (gedempt, licht)',
+        'text_color_muted_dark': 'Tekst kleur (gedempt, donker)',
+        'border_color': 'Border kleur (licht)',
+        'border_color_dark': 'Border kleur (donker)'
+      };
+      return labels[fieldName] || fieldName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    },
+    getCurrentColor: function(fieldName) {
+      const input = document.querySelector(`input[name*="[${fieldName}]"]`);
+      if (input && input.value && /^#[0-9A-Fa-f]{6}$/.test(input.value.trim())) {
+        return input.value.trim().toUpperCase();
+      }
+      return null;
+    },
+    openPalette: function(fieldName) {
+      this.currentField = fieldName;
+      const body = this.modal.querySelector('.color-palette-body');
+      const header = this.modal.querySelector('.color-palette-header h3');
+      body.innerHTML = '';
+      
+      // Update header met veldnaam
+      const fieldLabel = this.getFieldLabel(fieldName);
+      header.textContent = `Kies een kleur: ${fieldLabel}`;
+      
+      // Haal huidige kleur op
+      const currentColor = this.getCurrentColor(fieldName);
+      
+      // Toon huidige kleur
+      if (currentColor) {
+        const currentDiv = document.createElement('div');
+        currentDiv.className = 'color-palette-current';
+        currentDiv.innerHTML = `
+          <div class="color-palette-current-label">Huidige kleur:</div>
+          <div class="color-palette-current-preview">
+            <div class="color-palette-current-swatch" style="background: ${currentColor};"></div>
+            <div class="color-palette-current-code">${currentColor}</div>
+          </div>
+        `;
+        body.appendChild(currentDiv);
+      }
+      
+      // Bepaal welke kleuren te tonen op basis van field name
+      let colorSet = 'neutraal';
+      if (fieldName.includes('primary')) colorSet = 'primair';
+      else if (fieldName.includes('secondary')) colorSet = 'secundair';
+      else if (fieldName.includes('accent')) colorSet = 'accent';
+      else if (fieldName.includes('success')) colorSet = 'succes';
+      else if (fieldName.includes('warning')) colorSet = 'waarschuwing';
+      else if (fieldName.includes('danger')) colorSet = 'fout';
+      else if (fieldName.includes('background') || fieldName.includes('card')) colorSet = 'neutraal';
+      else if (fieldName.includes('text')) colorSet = 'neutraal';
+      else if (fieldName.includes('border')) colorSet = 'neutraal';
+      
+      // Toon alle kleuren sets
+      Object.keys(this.colors).forEach((setName) => {
+        const section = document.createElement('div');
+        section.className = 'color-palette-section';
+        section.innerHTML = `<h4>${setName.charAt(0).toUpperCase() + setName.slice(1)}</h4>`;
+        const grid = document.createElement('div');
+        grid.className = 'color-palette-grid';
+        
+        this.colors[setName].forEach((color) => {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'color-palette-swatch-wrapper';
+          
+          const swatch = document.createElement('div');
+          swatch.className = 'color-palette-swatch';
+          swatch.style.background = color;
+          swatch.setAttribute('data-color', color);
+          swatch.setAttribute('title', color);
+          
+          // Markeer huidige kleur
+          if (currentColor && color.toUpperCase() === currentColor) {
+            swatch.classList.add('selected');
+          }
+          
+          swatch.addEventListener('click', () => this.selectColor(color));
+          
+          const code = document.createElement('div');
+          code.className = 'color-palette-swatch-code';
+          code.textContent = color.toUpperCase();
+          
+          wrapper.appendChild(swatch);
+          wrapper.appendChild(code);
+          grid.appendChild(wrapper);
+        });
+        
+        section.appendChild(grid);
+        body.appendChild(section);
+      });
+      
+      this.modal.classList.add('active');
+    },
+    selectColor: function(color) {
+      if (!this.currentField) return;
+      
+      // Vind het input field
+      const input = document.querySelector(`input[name*="[${this.currentField}]"]`);
+      const colorInput = input?.parentElement.querySelector('input[type="color"]');
+      const preview = input?.parentElement.querySelector('.color-preview');
+      
+      if (input) {
+        input.value = color;
+        if (colorInput) colorInput.value = color;
+        if (preview) {
+          preview.style.background = color;
+          preview.setAttribute('data-color', color);
+        }
+      }
+      
+      this.closePalette();
+    },
+    closePalette: function() {
+      this.modal.classList.remove('active');
+      this.currentField = null;
+    }
+  };
+  
+  // Initialiseer palet
+  colorPalette.init();
+});
+</script>
+

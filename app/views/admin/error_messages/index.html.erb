@@ -1,0 +1,102 @@
+<div class="container-fluid py-4" style="background: #ffffff !important; min-height: 100vh !important;">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 style="color: #212529 !important; font-weight: 700 !important; font-size: 2.5rem !important;">
+        💬 Foutmelding Beheer
+      </h1>
+      <p style="color: #495057 !important; font-size: 1.1rem !important; font-weight: 600 !important;">
+        Maak gebruikersvriendelijke foutmeldingen die gebruikers zien in plaats van technische errors
+      </p>
+    </div>
+  </div>
+
+  <!-- Uitleg -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div style="background: #e7f7f5 !important; border: 3px solid #0c7c6f !important; border-radius: 12px !important; padding: 1.5rem !important;">
+        <h4 style="color: #0c7c6f !important; font-weight: 700 !important; margin-bottom: 1rem !important;">💡 Hoe werkt het?</h4>
+        <div style="color: #212529 !important; line-height: 1.8 !important; font-weight: 600 !important;">
+          <p style="margin-bottom: 0.75rem !important;">
+            <strong style="color: #0c7c6f !important;">1.</strong> Bekijk de foutcodes in de lijst hieronder
+          </p>
+          <p style="margin-bottom: 0.75rem !important;">
+            <strong style="color: #0c7c6f !important;">2.</strong> Klik op een foutcode om een gebruikersvriendelijke melding toe te voegen
+          </p>
+          <p style="margin-bottom: 0.75rem !important;">
+            <strong style="color: #0c7c6f !important;">3.</strong> Deze melding zien gebruikers in plaats van de technische error
+          </p>
+          <p style="margin: 0 !important;">
+            <strong style="color: #0c7c6f !important;">4.</strong> Je kunt ook uitleg geven wat ze moeten doen
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Codes Lijst -->
+  <div class="row">
+    <div class="col-12">
+      <div style="border: 3px solid #FC4C02 !important; border-radius: 12px !important; overflow-x: auto !important; overflow-y: visible !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important; -webkit-overflow-scrolling: touch !important;">
+        <table style="margin: 0 !important; background: #ffffff !important; min-width: 1200px !important;">
+          <thead style="background: #f8f9fa !important; border-bottom: 3px solid #FC4C02 !important;">
+            <tr>
+              <th style="padding: 1.25rem !important; border-right: 2px solid #dee2e6 !important; color: #212529 !important; font-weight: 700 !important; font-size: 1rem !important; min-width: 160px !important;">Foutcode</th>
+              <th style="padding: 1.25rem !important; border-right: 2px solid #dee2e6 !important; color: #212529 !important; font-weight: 700 !important; font-size: 1rem !important; min-width: 300px !important;">Technische Fout</th>
+              <th style="padding: 1.25rem !important; border-right: 2px solid #dee2e6 !important; color: #212529 !important; font-weight: 700 !important; font-size: 1rem !important; min-width: 400px !important;">Gebruikersmelding</th>
+              <th style="padding: 1.25rem !important; color: #212529 !important; font-weight: 700 !important; font-size: 1rem !important; min-width: 150px !important;">Acties</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @error_logs.each_with_index do |log, index| %>
+              <tr style="border-top: 2px solid #dee2e6 !important; background: <%= index.even? ? '#ffffff' : '#f8f9fa' %> !important;">
+                <!-- Foutcode -->
+                <td style="padding: 1.25rem !important; border-right: 2px solid #dee2e6 !important;">
+                  <code style="background: #fff3e0 !important; color: #d63900 !important; padding: 0.5rem 0.85rem !important; border-radius: 6px !important; font-weight: 700 !important; border: 2px solid #d63900 !important; font-size: 0.95rem !important;">
+                    <%= log.code %>
+                  </code>
+                </td>
+                
+                <!-- Technische Fout -->
+                <td style="padding: 1.25rem !important; border-right: 2px solid #dee2e6 !important;">
+                  <div style="color: #0c7c6f !important; font-weight: 700 !important; font-size: 0.9rem !important; margin-bottom: 0.25rem !important;">
+                    <%= log.error_class&.split('::')&.last || 'Unknown' %>
+                  </div>
+                  <div style="color: #495057 !important; font-size: 0.85rem !important; font-weight: 600 !important;">
+                    <%= log.short_message %>
+                  </div>
+                </td>
+                
+                <!-- Gebruikersmelding -->
+                <td style="padding: 1.25rem !important; border-right: 2px solid #dee2e6 !important;">
+                  <% if log.notes.present? %>
+                    <div style="background: #d4edda !important; border: 2px solid #28a745 !important; padding: 0.75rem !important; border-radius: 6px !important; color: #155724 !important; font-weight: 600 !important; font-size: 0.9rem !important; margin-bottom: 0.5rem !important;">
+                      <strong>Aangepast:</strong> <%= log.notes.truncate(100) %>
+                    </div>
+                  <% end %>
+                  <% if log.user_friendly_description.present? %>
+                    <div style="background: #e7f7f5 !important; border: 2px solid #0c7c6f !important; padding: 0.75rem !important; border-radius: 6px !important; color: #0c7c6f !important; font-weight: 600 !important; font-size: 0.9rem !important;">
+                      <strong>Auto:</strong> <%= log.user_friendly_description.truncate(100) %>
+                    </div>
+                  <% end %>
+                  <% if log.notes.blank? && log.user_friendly_description.blank? %>
+                    <div style="color: #6c757d !important; font-style: italic !important; font-size: 0.9rem !important;">
+                      Geen gebruikersmelding
+                    </div>
+                  <% end %>
+                </td>
+                
+                <!-- Acties -->
+                <td style="padding: 1.25rem !important;">
+                  <%= link_to 'Bewerk Melding', edit_admin_error_message_path(log), 
+                    style: "display: inline-block !important; background: #0c7c6f !important; color: #ffffff !important; padding: 0.6rem 1.2rem !important; border-radius: 6px !important; text-decoration: none !important; font-weight: 700 !important; border: 2px solid #0c7c6f !important; box-shadow: 0 2px 8px rgba(12, 124, 111, 0.3) !important;"
+                  %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+

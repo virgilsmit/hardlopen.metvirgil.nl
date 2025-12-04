@@ -2,6 +2,13 @@
 <% if @schema_name %>
   <p class="schema-subtitle">Mijn schema: <strong><%= @schema_name %></strong></p>
 <% end %>
+
+<% if current_user&.admin? %>
+  <div class="alert alert-info" style="padding: 1rem; background: #e3f2fd; border-left: 4px solid #2196f3; margin: 1rem 0;">
+    <p><strong>Beheerder:</strong> Klik op een schema naam of beschrijving om deze te bewerken.</p>
+  </div>
+<% end %>
+
 <table style="width:100%; border-collapse:collapse; margin-top:1rem;">
   <thead>
     <tr>
@@ -9,22 +16,160 @@
       <th style="text-align:left; padding:8px;">Omschrijving</th>
       <th style="text-align:left; padding:8px;">Aantal sessies</th>
       <th style="text-align:left; padding:8px;">Eerste trainer</th>
+      <% if current_user&.admin? %>
+        <th style="text-align:left; padding:8px;">Acties</th>
+      <% end %>
     </tr>
   </thead>
   <tbody>
     <% Array(@schemas).each do |schema| %>
       <tr>
-        <td style="padding:8px;"><%= link_to schema.name, schema_volledig_path(id: schema.id) %></td>
-        <td style="padding:8px;"><%= schema.description %></td>
+        <td style="padding:8px;">
+          <% if current_user&.admin? %>
+            <div class="editable-field" data-schema-id="<%= schema.id %>" data-field="name">
+              <span class="field-value"><%= schema.name %></span>
+              <button class="edit-btn" onclick="editField(this)" style="margin-left: 8px; padding: 4px 8px; font-size: 12px; background: #FC4C02; color: white; border: none; border-radius: 4px; cursor: pointer;">✏️ Bewerk</button>
+            </div>
+          <% else %>
+            <%= link_to schema.name, schema_volledig_path(id: schema.id) %>
+          <% end %>
+        </td>
+        <td style="padding:8px;">
+          <% if current_user&.admin? %>
+            <div class="editable-field" data-schema-id="<%= schema.id %>" data-field="description">
+              <span class="field-value"><%= schema.description %></span>
+              <button class="edit-btn" onclick="editField(this)" style="margin-left: 8px; padding: 4px 8px; font-size: 12px; background: #FC4C02; color: white; border: none; border-radius: 4px; cursor: pointer;">✏️ Bewerk</button>
+            </div>
+          <% else %>
+            <%= schema.description %>
+          <% end %>
+        </td>
         <td style="padding:8px;"><%= schema.training_sessions.count %></td>
         <td style="padding:8px;">
-          <% eerste = schema.training_sessions.order(:date).detect(&:trainer) %>
-          <%= eerste&.trainer&.name || '-' %>
+          <% if current_user&.admin? %>
+            <% eerste = schema.training_sessions.order(:date).first %>
+            <% if eerste %>
+              <%= form_with model: eerste, url: training_session_path(eerste), method: :patch, local: true, style: 'display: inline-flex; align-items: center; gap: 8px;' do |f| %>
+                <%= f.collection_select :trainer_id, User.with_role(:trainer), :id, :name, { include_blank: '(geen trainer)', selected: eerste.trainer_id }, { style: 'padding: 4px 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 14px;' } %>
+                <%= f.submit '✓', class: 'theme-btn', style: 'padding: 4px 12px; font-size: 14px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer;' %>
+              <% end %>
+            <% else %>
+              -
+            <% end %>
+          <% else %>
+            <% eerste = schema.training_sessions.order(:date).detect(&:trainer) %>
+            <%= eerste&.trainer&.name || '-' %>
+          <% end %>
         </td>
+        <% if current_user&.admin? %>
+          <td style="padding:8px;">
+            <%= link_to 'Bekijk', schema_volledig_path(id: schema.id), style: 'padding: 4px 12px; background: #0EA5E9; color: white; border-radius: 4px; text-decoration: none; font-size: 12px;' %>
+          </td>
+        <% end %>
       </tr>
     <% end %>
   </tbody>
 </table>
+
+<script>
+function editField(button) {
+  const container = button.closest('.editable-field');
+  const schemaId = container.dataset.schemaId;
+  const field = container.dataset.field;
+  const valueSpan = container.querySelector('.field-value');
+  const currentValue = valueSpan.textContent;
+  
+  // Verberg de knop en toon input
+  button.style.display = 'none';
+  
+  // Maak input field
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = currentValue;
+  input.style.cssText = 'padding: 6px 12px; border: 2px solid #FC4C02; border-radius: 4px; font-size: 14px; width: 300px; max-width: 100%;';
+  
+  // Maak save en cancel knoppen
+  const saveBtn = document.createElement('button');
+  saveBtn.textContent = '✓ Opslaan';
+  saveBtn.style.cssText = 'margin-left: 8px; padding: 6px 12px; background: #22C55E; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;';
+  
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = '✕ Annuleren';
+  cancelBtn.style.cssText = 'margin-left: 4px; padding: 6px 12px; background: #6B7280; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;';
+  
+  // Vervang content
+  valueSpan.style.display = 'none';
+  container.appendChild(input);
+  container.appendChild(saveBtn);
+  container.appendChild(cancelBtn);
+  
+  input.focus();
+  input.select();
+  
+  // Save functie
+  saveBtn.onclick = async function() {
+    const newValue = input.value.trim();
+    if (newValue === '') {
+      alert('Naam mag niet leeg zijn');
+      return;
+    }
+    
+    try {
+      const response = await fetch(`/training_schemas/${schemaId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+          training_schema: {
+            [field]: newValue
+          }
+        })
+      });
+      
+      if (response.ok) {
+        valueSpan.textContent = newValue;
+        valueSpan.style.display = '';
+        input.remove();
+        saveBtn.remove();
+        cancelBtn.remove();
+        button.style.display = '';
+        
+        // Toon success feedback
+        const feedback = document.createElement('span');
+        feedback.textContent = '✓ Opgeslagen';
+        feedback.style.cssText = 'margin-left: 8px; color: #22C55E; font-size: 12px; font-weight: 600;';
+        container.appendChild(feedback);
+        setTimeout(() => feedback.remove(), 2000);
+      } else {
+        alert('Fout bij opslaan. Probeer opnieuw.');
+      }
+    } catch (error) {
+      alert('Fout bij opslaan: ' + error.message);
+    }
+  };
+  
+  // Cancel functie
+  cancelBtn.onclick = function() {
+    valueSpan.style.display = '';
+    input.remove();
+    saveBtn.remove();
+    cancelBtn.remove();
+    button.style.display = '';
+  };
+  
+  // Enter = save, Escape = cancel
+  input.onkeydown = function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      saveBtn.click();
+    } else if (e.key === 'Escape') {
+      cancelBtn.click();
+    }
+  };
+}
+</script>
 
 <h1>Trainingsschema</h1>
 <div class="theme-cards">

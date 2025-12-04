@@ -17,6 +17,13 @@ gem 'bcrypt', '~> 3.1.7'
 gem 'simple_form'
 gem 'rack', '~> 2.2'
 
+# Excel file reading
+gem 'roo', '~> 2.10'
+gem 'roo-xls', '~> 1.2'
+
+# Paginatie
+gem 'kaminari', '~> 1.2'
+
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
 end

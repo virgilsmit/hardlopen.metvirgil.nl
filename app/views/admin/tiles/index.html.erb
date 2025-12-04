@@ -1,136 +1,240 @@
-<h1 class="page-heading">Tegels per rol beheren</h1>
-<p class="section-subtitle">Wijzig de zichtbaarheid, titel en volgorde van tegels. Klik op <b>Opslaan</b> om je wijzigingen op te slaan, of <b>Annuleer</b> om terug te keren naar de laatst opgeslagen situatie.</p>
-<div class="tile-admin-grid">
-  <% @roles.each do |role| %>
-    <div class="tile-admin-column">
-      <h3 class="tile-admin-column__title"><%= role %></h3>
-      <form class="tile-form" data-role="<%= role %>">
-        <table class="tile-admin-table">
-          <tr>
-            <th></th>
-            <th>Dashboard</th>
-            <th>Menu</th>
-            <th>Apple Watch</th>
-            <th style="text-align:left;">Titel</th>
-          </tr>
-        </table>
-        <ul class="tile-sortable" data-role="<%= role %>">
-          <% sorted_tiles = @tiles.map { |tile| [tile, (@tile_assignments[[role, tile[:key]]]&.first)] }
-            .sort_by { |tile, assignment| assignment&.position || 999 } %>
-          <% sorted_tiles.each do |tile, assignment| %>
-            <li class="tile-sortable-item" data-tile="<%= tile[:key] %>">
-              <span class="tile-sortable-handle" aria-hidden="true">☰</span>
-              <span class="tile-admin-toggle">
-                <label class="switch">
-                  <input type="hidden" name="visible" value="0">
-                  <input type="checkbox" name="visible" data-role="<%= role %>" data-tile="<%= tile[:key] %>" value="1" <%= assignment&.visible != false ? 'checked' : '' %>>
-                  <span class="slider round"></span>
-                </label>
-              </span>
-              <span class="tile-admin-toggle">
-                <label class="switch">
-                  <input type="hidden" name="show_in_menu" value="0">
-                  <input type="checkbox" name="show_in_menu" data-role="<%= role %>" data-tile="<%= tile[:key] %>" value="1" <%= assignment&.show_in_menu != false ? 'checked' : '' %>>
-                  <span class="slider round"></span>
-                </label>
-              </span>
-              <span class="tile-admin-toggle">
-                <label class="switch">
-                  <input type="hidden" name="apple_watch_download" value="0">
-                  <input type="checkbox" name="apple_watch_download" data-role="<%= role %>" data-tile="<%= tile[:key] %>" value="1" <%= (assignment&.respond_to?(:show_apple_watch_download) && assignment&.show_apple_watch_download != false) ? 'checked' : '' %>>
-                  <span class="slider round"></span>
-                </label>
-              </span>
-              <input type="text" name="custom_label" class="tile-label-input" data-role="<%= role %>" data-tile="<%= tile[:key] %>" value="<%= assignment&.custom_label.presence || tile[:label] %>">
-            </li>
-          <% end %>
-        </ul>
-        <div class="tile-form__actions">
-          <button type="submit" class="theme-btn">Opslaan</button>
-          <button type="button" class="theme-btn" onclick="window.location.reload();" style="background:#e74c3c;">Annuleer</button>
+<div class="container-fluid py-4 bg-dark">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="display-4" style="color: #ffffff !important; font-weight: 800; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">🧩 Menu Beheren</h1>
+      <p style="color: #c9d1d9 !important; font-size: 1.1rem; font-weight: 600;">Bepaal welke pagina's zichtbaar zijn per rol en hoe menu's worden gegroepeerd</p>
+    </div>
+  </div>
+
+  <!-- Uitleg Box -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div style="background: rgba(252, 76, 2, 0.15); border: 3px solid rgba(252, 76, 2, 0.5); border-radius: 12px; padding: 1.5rem;">
+        <h4 style="color: #FC4C02 !important; margin-bottom: 1rem; font-weight: 800; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">💡 Hoe werkt het?</h4>
+        <div style="color: #ffffff !important; line-height: 1.8; font-weight: 600;">
+          <p style="margin-bottom: 0.75rem;"><strong style="color: #1ee3cf;">In Menu:</strong> Toon in het hoofdmenu (in een dropdown onder de groep)</p>
+          <p style="margin-bottom: 0.75rem;"><strong style="color: #1ee3cf;">Menu Label:</strong> Aangepaste naam voor het menu item (leeg = standaard label)</p>
+          <p style="margin-bottom: 0.75rem;"><strong style="color: #1ee3cf;">Menu Groep:</strong> Bepaalt onder welke dropdown het item verschijnt (Training, Beheer, Trainers, Admin)</p>
+          <hr style="border: none; border-top: 1px solid rgba(252, 76, 2, 0.3); margin: 1rem 0;">
+          <p style="margin: 0;"><strong>Tip:</strong> Vink "In Menu" uit om een item te verbergen voor een specifieke rol.</p>
         </div>
-      </form>
+      </div>
+    </div>
+  </div>
+
+  <% if flash[:notice] %>
+    <div class="alert alert-success mb-4" style="background: rgba(40, 167, 69, 0.1); border: 2px solid rgba(40, 167, 69, 0.3); color: #28a745;">
+      ✓ <%= flash[:notice] %>
+    </div>
+  <% end %>
+
+  <% if flash[:alert] %>
+    <div class="alert alert-danger mb-4" style="background: rgba(220, 53, 69, 0.1); border: 2px solid rgba(220, 53, 69, 0.3); color: #dc3545;">
+      ⚠️ <%= flash[:alert] %>
+    </div>
+  <% end %>
+
+  <!-- Tab navigatie -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div style="display: flex; gap: 1rem; border-bottom: 2px solid rgba(255, 255, 255, 0.1);">
+        <% @roles.each_with_index do |role, index| %>
+          <button 
+            type="button"
+            onclick="showRoleTab('<%= role %>')" 
+            id="tab-<%= role %>" 
+            class="role-tab-button" 
+            style="padding: 1rem 2rem; background: <%= index == 0 ? 'rgba(252, 76, 2, 0.2)' : 'transparent' %>; border: none; border-bottom: 3px solid <%= index == 0 ? '#FC4C02' : 'transparent' %>; font-weight: 700; color: <%= index == 0 ? '#FC4C02' : 'rgba(244, 248, 255, 0.6)' %>; cursor: pointer; font-size: 1.1rem; transition: all 0.3s;">
+            <%= role == 'user' ? '👤 Gebruiker' : role == 'trainer' ? '🧑‍🏫 Trainer' : '🛠️ Admin' %>
+          </button>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content per rol -->
+  <% @roles.each_with_index do |role, index| %>
+    <div id="content-<%= role %>" class="role-tab-content" style="display: <%= index == 0 ? 'block' : 'none' %>;">
+      <%= form_with url: save_all_admin_tiles_path, method: :post, local: true do |f| %>
+        <%= f.hidden_field :role, value: role %>
+        
+        <!-- Per Menu Groep -->
+        <% @menu_groups.each do |group_name| %>
+          <% group_tiles = @tiles_by_group[group_name] || [] %>
+          <% next if group_tiles.empty? %>
+          
+          <div class="row mb-4">
+            <div class="col-12">
+              <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; overflow: hidden;">
+                <!-- Groep Header -->
+                <div style="background: rgba(0, 0, 0, 0.3); padding: 1.25rem; border-bottom: 2px solid rgba(252, 76, 2, 0.3); display: flex; justify-content: space-between; align-items: center;">
+                  <h3 style="color: #FC4C02; margin: 0; font-weight: 700; font-size: 1.3rem;">
+                    <%= case group_name
+                        when 'Training' then '🏃‍♂️'
+                        when 'Beheer' then '⚙️'
+                        when 'Trainers' then '🧑‍🏫'
+                        when 'Admin' then '🛠️'
+                        when 'Menu Labels' then '🏷️'
+                        else '📋'
+                        end %> <%= group_name %>
+                  </h3>
+                  <% if ['Training', 'Beheer', 'Trainers', 'Admin'].include?(group_name) %>
+                    <small style="color: #1ee3cf; font-weight: 600; font-size: 0.9rem;">
+                      💡 Tip: Pas de dropdown titel aan via "Menu Labels" sectie
+                    </small>
+                  <% end %>
+                </div>
+                
+                <!-- Groep Tiles -->
+                <div style="padding: 1.5rem;">
+                  <table class="table table-hover" style="margin: 0; background: #000000; border: 3px solid rgba(252, 76, 2, 0.4);">
+                    <thead style="background: #000000; border-bottom: 4px solid #FC4C02;">
+                      <tr>
+                        <th style="padding: 1.25rem 1rem; border-right: 2px solid rgba(255, 255, 255, 0.15); font-weight: 800; width: 25%; color: #ffffff !important; font-size: 1rem; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);">Pagina</th>
+                        <th style="padding: 1.25rem 1rem; border-right: 2px solid rgba(255, 255, 255, 0.15); font-weight: 800; text-align: center; width: 10%; color: #ffffff !important; font-size: 1rem; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);">In Menu</th>
+                        <th style="padding: 1.25rem 1rem; border-right: 2px solid rgba(255, 255, 255, 0.15); font-weight: 800; width: 25%; color: #ffffff !important; font-size: 1rem; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);">Menu Label (optioneel)</th>
+                        <th style="padding: 1.25rem 1rem; border-right: 2px solid rgba(255, 255, 255, 0.15); font-weight: 800; width: 25%; color: #ffffff !important; font-size: 1rem; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);">Categorie</th>
+                        <th style="padding: 1.25rem 1rem; font-weight: 800; width: 15%; color: #ffffff !important; font-size: 1rem; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);">Positie</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% group_tiles.each_with_index do |tile, tile_index| %>
+                        <% assignment = @tile_assignments[[role, tile[:key]]]&.first %>
+                        <% field_prefix = "tiles[#{group_name}_#{tile_index}]" %>
+                        
+                        <tr style="border-top: 3px solid rgba(255, 255, 255, 0.2); background: <%= tile_index.even? ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.08)' %>;">
+                          <!-- Tile Key (hidden) -->
+                          <%= hidden_field_tag "#{field_prefix}[key]", tile[:key] %>
+                          
+                          <!-- Pagina Naam -->
+                          <td style="padding: 1.25rem 1rem; border-right: 2px solid rgba(255, 255, 255, 0.1);">
+                            <div>
+                              <strong style="color: #ffffff !important; font-size: 1rem; font-weight: 700; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);"><%= tile[:label] %></strong>
+                              <div style="color: #c9d1d9 !important; font-size: 0.9rem; margin-top: 0.25rem; font-weight: 500;">
+                                <%= tile[:desc] %>
+                              </div>
+                              <code style="background: rgba(30, 227, 207, 0.2); color: #1ee3cf !important; padding: 0.35rem 0.65rem; border-radius: 4px; font-size: 0.8rem; margin-top: 0.5rem; display: inline-block; border: 1px solid rgba(30, 227, 207, 0.4); font-weight: 700;">
+                                <%= tile[:url] %>
+                              </code>
+                            </div>
+                          </td>
+                          
+                          <!-- In Menu Checkbox -->
+                          <td style="padding: 1.25rem 1rem; border-right: 2px solid rgba(255, 255, 255, 0.1); text-align: center;">
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                              <label class="custom-checkbox" style="position: relative; display: inline-block; cursor: pointer;">
+                                <%= check_box_tag "#{field_prefix}[show_in_menu]", "1", 
+                                  assignment&.show_in_menu || false,
+                                  style: "width: 26px; height: 26px; cursor: pointer; accent-color: #FC4C02; border: 3px solid rgba(255, 255, 255, 0.5);",
+                                  class: "menu-checkbox"
+                                %>
+                              </label>
+                            </div>
+                          </td>
+                          
+                          <!-- Menu Label -->
+                          <td style="padding: 1.25rem 1rem; border-right: 2px solid rgba(255, 255, 255, 0.1);">
+                            <%= text_field_tag "#{field_prefix}[custom_menu_label]", 
+                              assignment&.custom_menu_label,
+                              placeholder: tile[:label],
+                              style: "width: 100%; background: rgba(255, 255, 255, 0.15) !important; color: #ffffff !important; border: 2px solid rgba(255, 255, 255, 0.3) !important; border-radius: 6px; padding: 0.75rem; font-size: 1rem; font-weight: 700;",
+                              class: "form-control"
+                            %>
+                          </td>
+                          
+                          <!-- Categorie / Parent Menu -->
+                          <td style="padding: 1.25rem 1rem; border-right: 2px solid rgba(255, 255, 255, 0.1);">
+                            <%= select_tag "#{field_prefix}[parent_menu]",
+                              options_for_select([
+                                ['Training 🏃‍♂️', 'menu_training'],
+                                ['Beheer ⚙️', 'menu_beheer'],
+                                ['Trainers 🧑‍🏫', 'menu_trainers'],
+                                ['Admin 🛠️', 'menu_admin'],
+                                ['Geen dropdown', '']
+                              ], assignment&.parent_menu || "menu_#{group_name.downcase}"),
+                              class: 'form-control',
+                              style: 'background: rgba(255, 255, 255, 0.15) !important; color: #ffffff !important; border: 2px solid rgba(255, 255, 255, 0.3) !important; border-radius: 6px; padding: 0.75rem; font-weight: 600;'
+                            %>
+                          </td>
+                          
+                          <!-- Positie -->
+                          <td style="padding: 1.25rem 1rem;">
+                            <%= number_field_tag "#{field_prefix}[position]", 
+                              assignment&.position || (tile_index * 10),
+                              style: "width: 90px; background: rgba(255, 255, 255, 0.15) !important; color: #ffffff !important; border: 2px solid rgba(255, 255, 255, 0.3) !important; border-radius: 6px; padding: 0.75rem; text-align: center; font-weight: 700; font-size: 1rem;",
+                              class: "form-control"
+                            %>
+                          </td>
+                        </tr>
+                        
+                        <!-- Hidden fields -->
+                        <%= hidden_field_tag "#{field_prefix}[visible]", "1" %>
+                        <%= hidden_field_tag "#{field_prefix}[custom_label]", tile[:label] %>
+                      <% end %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        
+        <!-- Opslaan Button -->
+        <div class="row">
+          <div class="col-12">
+            <div style="background: rgba(255, 255, 255, 0.05); padding: 1.5rem; border-radius: 12px; text-align: center;">
+              <%= f.submit "💾 Opslaan voor #{role == 'user' ? 'Gebruikers' : role == 'trainer' ? 'Trainers' : 'Admins'}", 
+                class: 'btn btn-lg',
+                style: 'background: linear-gradient(135deg, #FC4C02 0%, #FF6B35 100%); color: white; border: none; font-weight: 700; padding: 1rem 3rem; font-size: 1.2rem; box-shadow: 0 4px 15px rgba(252, 76, 2, 0.3);',
+                data: { confirm: "Weet je zeker dat je de menu instellingen wilt opslaan voor rol '#{role}'?" }
+              %>
+            </div>
+          </div>
+        </div>
+      <% end %>
     </div>
   <% end %>
 </div>
-<div id="tile-feedback" class="tile-feedback tile-feedback--success">Opgeslagen!</div>
+
+<style>
+  .form-control:focus {
+    background: rgba(0, 0, 0, 0.4) !important;
+    border-color: #1ee3cf !important;
+    color: #f4f8ff !important;
+    box-shadow: 0 0 0 0.2rem rgba(30, 227, 207, 0.25) !important;
+  }
+  
+  .role-tab-button:hover {
+    background: rgba(252, 76, 2, 0.1) !important;
+    color: #FC4C02 !important;
+  }
+  
+  .menu-checkbox:checked {
+    background-color: #FC4C02;
+  }
+</style>
 
 <script>
-// Drag & drop sortering
-function sortableInit() {
-  document.querySelectorAll('.tile-sortable').forEach(function(list) {
-    let draggingEl;
-    list.querySelectorAll('.tile-sortable-item').forEach(function(item) {
-      item.draggable = true;
-      item.addEventListener('dragstart', function(e) {
-        draggingEl = item;
-        item.classList.add('dragging');
-        e.dataTransfer.effectAllowed = 'move';
-      });
-      item.addEventListener('dragend', function() {
-        draggingEl = null;
-        item.classList.remove('dragging');
-      });
-    });
-    list.addEventListener('dragover', function(e) {
-      e.preventDefault();
-      const afterEl = getDragAfterElement(list, e.clientY);
-      if (afterEl == null) {
-        list.appendChild(draggingEl);
-      } else {
-        list.insertBefore(draggingEl, afterEl);
-      }
-    });
+function showRoleTab(role) {
+  // Verberg alle tabs
+  document.querySelectorAll('.role-tab-content').forEach(content => {
+    content.style.display = 'none';
   });
-}
-function getDragAfterElement(list, y) {
-  const items = [...list.querySelectorAll('.tile-sortable-item:not(.dragging)')];
-  return items.reduce((closest, child) => {
-    const box = child.getBoundingClientRect();
-    const offset = y - box.top - box.height / 2;
-    if (offset < 0 && offset > closest.offset) {
-      return { offset: offset, element: child };
-    } else {
-      return closest;
-    }
-  }, { offset: -Infinity }).element;
-}
-document.addEventListener('DOMContentLoaded', function() {
-  sortableInit();
-  document.querySelectorAll('.tile-form').forEach(function(form) {
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
-      var role = form.getAttribute('data-role');
-      var tiles = Array.from(form.querySelectorAll('.tile-sortable-item')).map(function(item) {
-        var key = item.getAttribute('data-tile');
-        var visible = item.querySelector('input[type=checkbox][name=visible]').checked;
-        var show_in_menu = item.querySelector('input[type=checkbox][name=show_in_menu]').checked;
-        var apple_watch_download = item.querySelector('input[type=checkbox][name=apple_watch_download]').checked;
-        var custom_label = item.querySelector('input[type=text]').value;
-        return { key: key, visible: visible, show_in_menu: show_in_menu, apple_watch_download: apple_watch_download, custom_label: custom_label };
-      });
-      fetch('/admin/tiles/save_all', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').content },
-        body: JSON.stringify({ role: role, tiles: tiles })
-      })
-      .then(function(response) { return response.json(); })
-      .then(function(data) {
-        var feedback = document.getElementById('tile-feedback');
-        if (data.success) {
-          feedback.classList.remove('tile-feedback--error');
-          feedback.classList.add('tile-feedback--success');
-          feedback.style.display = 'block';
-          feedback.textContent = 'Opgeslagen!';
-          setTimeout(function(){ feedback.style.display = 'none'; window.location.reload(); }, 1200);
-        } else {
-          feedback.classList.remove('tile-feedback--success');
-          feedback.classList.add('tile-feedback--error');
-          feedback.style.display = 'block';
-          feedback.textContent = 'Fout: ' + (data.error || 'Onbekend');
-        }
-      });
-    });
+  
+  // Reset alle tab buttons
+  document.querySelectorAll('.role-tab-button').forEach(button => {
+    button.style.background = 'transparent';
+    button.style.borderBottom = '3px solid transparent';
+    button.style.color = 'rgba(244, 248, 255, 0.6)';
   });
-});
-</script> 
+  
+  // Toon geselecteerde tab
+  document.getElementById('content-' + role).style.display = 'block';
+  
+  // Highlight geselecteerde button
+  const selectedButton = document.getElementById('tab-' + role);
+  selectedButton.style.background = 'rgba(252, 76, 2, 0.2)';
+  selectedButton.style.borderBottom = '3px solid #FC4C02';
+  selectedButton.style.color = '#FC4C02';
+}
+</script>

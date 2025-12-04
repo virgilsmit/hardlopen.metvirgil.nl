@@ -1,0 +1,30 @@
+{
+  "appId": "nl.metvirgil.hardlopen",
+  "appName": "Run for Fun",
+  "webDir": "../public",
+  "server": {
+    "url": "https://hardlopen.metvirgil.nl",
+    "cleartext": false,
+    "allowNavigation": [
+      "hardlopen.metvirgil.nl"
+    ]
+  },
+  "ios": {
+    "contentInset": "automatic",
+    "scheme": "https",
+    "limitsNavigationsToAppBoundDomains": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#FC4C02",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "dark",
+      "backgroundColor": "#FC4C02"
+    }
+  }
+}
+
+

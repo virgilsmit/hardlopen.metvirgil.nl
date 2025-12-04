@@ -1,10 +1,15 @@
-<h1>Editing performance</h1>
+<div class="zones-page surface-dark">
+  <h1 class="page-heading">Prestatie bewerken</h1>
 
-<%= render "form", performance: @performance %>
+  <div class="card-surface">
+    <%= render "form", performance: @performance %>
+  </div>
 
-<br>
-
-<div>
-  <%= link_to "Show this performance", @performance %> |
-  <%= link_to "Back to prestaties", user_path(@performance.user_id) %>
+  <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+    <% if request.referer&.include?('zones') %>
+      <%= link_to "← Terug naar Zones", user_zones_path(@performance.user_id), class: 'theme-btn track-btn--outline' %>
+    <% else %>
+      <%= link_to "← Terug naar Profiel", user_path(@performance.user_id), class: 'theme-btn track-btn--outline' %>
+    <% end %>
+  </div>
 </div>

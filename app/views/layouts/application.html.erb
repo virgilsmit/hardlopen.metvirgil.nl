@@ -1,30 +1,467 @@
 <!DOCTYPE html>
-<html>
+<html lang="nl">
   <head>
-    <title></title>
+    <title>Hardlopen met Virgil - Run for Fun</title>
+    
+    <!-- Standard Cache Headers -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <!-- PWA Meta Tags -->
     <meta name="viewport" content="width=device-width,initial-scale=1, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#FC4C02">
+    <meta name="description" content="Blessurevrij hardlopen met ASM-methode. Trainingsschema's, presentielijsten en persoonlijke begeleiding.">
+    <meta name="keywords" content="hardlopen, training, ASM methode, loopgroep, run for fun">
+    
+    <!-- Apple iOS Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Hardlopen">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Run for Fun">
+    <link rel="apple-touch-icon" href="/icon-192x192.svg">
+    <link rel="apple-touch-icon" sizes="192x192" href="/icon-192x192.svg">
+    <link rel="icon" type="image/svg+xml" href="/icon-192x192.svg">
+    
+    <!-- Android/Chrome Meta Tags -->
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Run for Fun">
+    
+    <!-- Microsoft Meta Tags -->
     <meta name="msapplication-TileColor" content="#FC4C02">
+    <meta name="msapplication-TileImage" content="/icon-192x192.png">
     <meta name="msapplication-tap-highlight" content="no">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
     
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
-    <link rel="manifest" href="/manifest.json">
-    <link rel="apple-touch-icon" href="/icon-192x192.png">
     
+    <!-- Direct inline CSS om flits te voorkomen - moet vóór andere CSS -->
+    <style>
+      /* Direct zwarte tekst op witte achtergronden - voorkomt flits */
+      *[style*="background:#fff"],
+      *[style*="background: #fff"],
+      *[style*="background:#ffffff"],
+      *[style*="background: #ffffff"],
+      *[style*="background-color:#fff"],
+      *[style*="background-color: #fff"],
+      *[style*="background-color:#ffffff"],
+      *[style*="background-color: #ffffff"],
+      *[style*="background:white"],
+      *[style*="background: white"],
+      *[style*="background-color:white"],
+      *[style*="background-color: white"] {
+        color: #0c1729 !important;
+      }
+      *[style*="background:#fff"] *,
+      *[style*="background: #fff"] *,
+      *[style*="background:#ffffff"] *,
+      *[style*="background: #ffffff"] *,
+      *[style*="background-color:#fff"] *,
+      *[style*="background-color: #fff"] *,
+      *[style*="background-color:#ffffff"] *,
+      *[style*="background-color: #ffffff"] *,
+      *[style*="background:white"] *,
+      *[style*="background: white"] *,
+      *[style*="background-color:white"] *,
+      *[style*="background-color: white"] * {
+        color: #0c1729 !important;
+      }
+      *[style*="background:#fff"] input:not([type="checkbox"]):not([type="radio"]),
+      *[style*="background: #fff"] input:not([type="checkbox"]):not([type="radio"]),
+      *[style*="background:#ffffff"] input:not([type="checkbox"]):not([type="radio"]),
+      *[style*="background: #ffffff"] input:not([type="checkbox"]):not([type="radio"]),
+      *[style*="background-color:#fff"] input:not([type="checkbox"]):not([type="radio"]),
+      *[style*="background-color: #fff"] input:not([type="checkbox"]):not([type="radio"]),
+      *[style*="background-color:#ffffff"] input:not([type="checkbox"]):not([type="radio"]),
+      *[style*="background-color: #ffffff"] input:not([type="checkbox"]):not([type="radio"]),
+      *[style*="background:white"] input:not([type="checkbox"]):not([type="radio"]),
+      *[style*="background: white"] input:not([type="checkbox"]):not([type="radio"]),
+      *[style*="background-color:white"] input:not([type="checkbox"]):not([type="radio"]),
+      *[style*="background-color: white"] input:not([type="checkbox"]):not([type="radio"]),
+      *[style*="background:#fff"] textarea,
+      *[style*="background: #fff"] textarea,
+      *[style*="background:#ffffff"] textarea,
+      *[style*="background: #ffffff"] textarea,
+      *[style*="background-color:#fff"] textarea,
+      *[style*="background-color: #fff"] textarea,
+      *[style*="background-color:#ffffff"] textarea,
+      *[style*="background-color: #ffffff"] textarea,
+      *[style*="background:white"] textarea,
+      *[style*="background: white"] textarea,
+      *[style*="background-color:white"] textarea,
+      *[style*="background-color: white"] textarea {
+        color: #0c1729 !important;
+        background: #ffffff !important;
+      }
+    </style>
+    
+    <%= theme_css_variables %>
     <%= stylesheet_link_tag "application", media: "all", "data-turbo-track": "reload" %>
+    
+    <!-- App Version for Cache Busting -->
+    <meta name="app-version" content="<%= defined?(APP_VERSION) ? APP_VERSION : Time.current.to_i %>">
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js?v=<%= Time.current.to_i %>')
+            .then(function(registration) {
+              console.log('[SW] Registered:', registration.scope);
+              
+              // Check for updates every 30 seconds
+              setInterval(function() {
+                registration.update();
+              }, 30000);
+            })
+            .catch(function(error) {
+              console.log('[SW] Registration failed:', error);
+            });
+        });
+      }
+    </script>
+    
+    <!-- CRITICAL CSS OVERRIDES v4 - Force dropdown styling met witte tekst -->
+    <style id="force-dropdown-fix">
+      /* DROPDOWN VOLLEDIG ONDOORZICHTIG MET WITTE TEKST */
+      .dropdown-menu,
+      nav .dropdown-menu,
+      .theme-menu .dropdown-menu,
+      div.dropdown-menu,
+      [class*="dropdown-menu"] {
+        background: #0e1935 !important;
+        background-color: #0e1935 !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        opacity: 1 !important;
+      }
+      
+      .dropdown-item,
+      .dropdown-menu a,
+      .dropdown-menu .dropdown-item {
+        color: #f7fbff !important;
+        background: transparent !important;
+      }
+      
+      .dropdown-item:hover,
+      .dropdown-item:focus,
+      .dropdown-menu a:hover,
+      .dropdown-menu a:focus {
+        background: rgba(255, 107, 53, 0.25) !important;
+        background-color: rgba(255, 107, 53, 0.25) !important;
+        color: #ffb193 !important;
+      }
+      
+      /* Menu buttons - less transparent */
+      .theme-menu a,
+      .theme-menu button {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+      }
+      
+      .theme-menu {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+      }
+      
+      .theme-menu .theme-btn,
+      .theme-menu .dropdown-toggle {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+      }
+      
+      /* Profile page headings */
+      .profile-page .profile-title,
+      .profile-page h1,
+      .profile-page h2,
+      .profile-page h3,
+      .profile-page h4,
+      .profile-page h5,
+      .profile-page h6 {
+        color: #212529 !important;
+        font-weight: 700 !important;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+      }
+      
+      .profile-page .profile-stat {
+        color: #212529 !important;
+        font-weight: 500 !important;
+      }
+      
+      /* ═══════════════════════════════════════════════════════════
+         MOBILE MENU - ULTRA HIGH CONTRAST - v<%= Time.current.to_i %>
+         MAXIMUM PRIORITY - OVERSCHRIJFT ALLES!
+         ═══════════════════════════════════════════════════════════ */
+      
+      .mobile-menu,
+      .mobile-menu-overlay,
+      #mobile-menu-overlay,
+      div[class*="mobile-menu"] {
+        background: #000000 !important;
+        background-color: #000000 !important;
+      }
+      
+      .mobile-menu__header h3,
+      .mobile-menu .mobile-menu__header h3 {
+        color: #212529 !important;
+        font-weight: 800 !important;
+        font-size: 1.5rem !important;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+      }
+      
+      .mobile-menu__section,
+      .mobile-menu .mobile-menu__section {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 2px solid rgba(255, 255, 255, 0.2) !important;
+        margin: 1rem !important;
+        padding: 1rem !important;
+        border-radius: 8px !important;
+      }
+      
+      .mobile-menu__section h4,
+      .mobile-menu .mobile-menu__section h4,
+      .mobile-menu__section > h4 {
+        color: #FC4C02 !important;
+        font-weight: 800 !important;
+        font-size: 1.2rem !important;
+        margin-bottom: 0.75rem !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+      }
+      
+      .mobile-menu__item,
+      .mobile-menu .mobile-menu__item,
+      a.mobile-menu__item {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 3px solid rgba(255, 255, 255, 0.3) !important;
+        border-radius: 8px !important;
+        padding: 1.25rem 1.5rem !important;
+        margin: 0.5rem 0 !important;
+        color: #212529 !important;
+        font-weight: 800 !important;
+        font-size: 1.1rem !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+        display: flex !important;
+        align-items: center !important;
+      }
+      
+      .mobile-menu__item:hover,
+      .mobile-menu__item:active,
+      .mobile-menu__item:focus {
+        background: rgba(252, 76, 2, 0.3) !important;
+        border-color: #FC4C02 !important;
+      }
+      
+      .mobile-menu__item span,
+      .mobile-menu__item > span,
+      .mobile-menu .mobile-menu__item span {
+        color: #212529 !important;
+        font-weight: 800 !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+      }
+      
+      .mobile-menu__icon,
+      .mobile-menu__item .mobile-menu__icon,
+      span.mobile-menu__icon {
+        font-size: 1.3rem !important;
+        margin-right: 0.75rem !important;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5)) !important;
+      }
+      
+      /* EXTRA AGGRESSIVE - Target by attribute */
+      [class*="mobile-menu__item"] {
+        color: #212529 !important;
+        font-weight: 800 !important;
+      }
+      
+      [class*="mobile-menu__item"] span {
+        color: #212529 !important;
+        font-weight: 800 !important;
+      }
+      
+      [class*="mobile-menu__section"] h4 {
+        color: #FC4C02 !important;
+        font-weight: 800 !important;
+      }
+    </style>
+    
+    <!-- JAVASCRIPT FORCE FIX - Apply immediately on load -->
+    <script>
+      (function() {
+        // NUCLEAR OPTION: DISABLE ALL EXTERNAL CSS FOR MOBILE MENU
+        function disableExternalCSS() {
+          const stylesheets = document.querySelectorAll('link[rel="stylesheet"]');
+          stylesheets.forEach(function(sheet) {
+            if (sheet.href && sheet.href.includes('/assets/')) {
+              sheet.disabled = true;
+              console.log('[NUCLEAR] Disabled stylesheet:', sheet.href);
+            }
+          });
+        }
+        
+        // MOBILE MENU ULTRA FORCE FIX
+        function forceMobileMenuContrast() {
+          console.log('[MOBILE FIX] ========================================');
+          console.log('[MOBILE FIX] ULTRA AGGRESSIVE FIX STARTING...');
+          console.log('[MOBILE FIX] ========================================');
+          
+          // Step 1: Disable external CSS temporarily
+          // disableExternalCSS();
+          
+          // Step 2: Fix mobile menu background
+          const mobileMenu = document.querySelector('.mobile-menu');
+          const mobileOverlay = document.querySelector('.mobile-menu-overlay');
+          const mobileMenuContent = document.querySelector('.mobile-menu__content');
+          
+          if (mobileMenu) {
+            mobileMenu.style.cssText = 'background: #000000 !important; background-color: #000000 !important;';
+            console.log('[MOBILE FIX] ✓ Mobile menu background → BLACK');
+          }
+          if (mobileOverlay) {
+            mobileOverlay.style.cssText = 'background: #000000 !important; background-color: #000000 !important;';
+          }
+          if (mobileMenuContent) {
+            mobileMenuContent.style.cssText = 'background: #000000 !important;';
+          }
+          
+          // Step 3: Fix ALL text elements with MAXIMUM specificity
+          const allTextElements = document.querySelectorAll(
+            '.mobile-menu__item, ' +
+            '.mobile-menu__item span, ' +
+            '.mobile-menu__item a, ' +
+            '.mobile-menu span, ' +
+            '.mobile-menu a, ' +
+            '.mobile-menu div, ' +
+            '.mobile-menu p, ' +
+            '.mobile-menu__content span, ' +
+            '.mobile-menu__content a'
+          );
+          
+          console.log('[MOBILE FIX] Found ' + allTextElements.length + ' text elements');
+          
+          let fixedCount = 0;
+          allTextElements.forEach(function(item) {
+            // FORCE exact desktop styling
+            item.style.setProperty('color', '#f7fbff', 'important');
+            item.style.setProperty('font-weight', '500', 'important');
+            item.style.setProperty('font-size', '1rem', 'important');
+            item.style.setProperty('letter-spacing', '0.025em', 'important');
+            
+            // Extra check for links
+            if (item.tagName === 'A' && item.classList.contains('mobile-menu__item')) {
+              item.style.setProperty('background', 'rgba(255, 255, 255, 0.1)', 'important');
+              item.style.setProperty('border', '3px solid rgba(255, 255, 255, 0.3)', 'important');
+              item.style.setProperty('border-radius', '8px', 'important');
+              item.style.setProperty('padding', '1.25rem 1.5rem', 'important');
+              item.style.setProperty('display', 'flex', 'important');
+              item.style.setProperty('align-items', 'center', 'important');
+            }
+            fixedCount++;
+          });
+          
+          console.log('[MOBILE FIX] ✓ Fixed ' + fixedCount + ' text elements → WHITE & BOLD');
+          
+          // Step 4: Fix section headers (TRAINING, BEHEER, etc) - EXACT DESKTOP STYLE
+          const sectionHeaders = document.querySelectorAll('.mobile-menu__section h4, .mobile-menu h4');
+          console.log('[MOBILE FIX] Found ' + sectionHeaders.length + ' section headers');
+          sectionHeaders.forEach(function(header) {
+            header.style.setProperty('color', '#f7fbff', 'important');
+            header.style.setProperty('font-weight', '500', 'important');
+            header.style.setProperty('font-size', '0.9rem', 'important');
+            header.style.setProperty('text-transform', 'uppercase', 'important');
+            header.style.setProperty('letter-spacing', '0.1em', 'important');
+            header.style.setProperty('margin-bottom', '0.75rem', 'important');
+          });
+          console.log('[MOBILE FIX] ✓ Headers → EXACT DESKTOP STYLE');
+          
+          // Step 5: Fix sections
+          const sections = document.querySelectorAll('.mobile-menu__section');
+          sections.forEach(function(section) {
+            section.style.cssText = 'background: rgba(255, 255, 255, 0.05) !important; border: 2px solid rgba(255, 255, 255, 0.2) !important; border-radius: 8px !important; margin: 1rem !important; padding: 1rem !important;';
+          });
+          console.log('[MOBILE FIX] ✓ Sections → BORDERED');
+          
+          console.log('[MOBILE FIX] ========================================');
+          console.log('[MOBILE FIX] COMPLETE! Check if text is WHITE & BOLD');
+          console.log('[MOBILE FIX] ========================================');
+        }
+        
+        function forceDropdownFix() {
+          var dropdowns = document.querySelectorAll('.dropdown-menu, [class*="dropdown-menu"]');
+          dropdowns.forEach(function(dropdown) {
+            dropdown.style.setProperty('background', '#0e1935', 'important');
+            dropdown.style.setProperty('background-color', '#0e1935', 'important');
+            dropdown.style.setProperty('opacity', '1', 'important');
+            dropdown.style.setProperty('backdrop-filter', 'none', 'important');
+            dropdown.style.setProperty('-webkit-backdrop-filter', 'none', 'important');
+            
+            // Fix all dropdown items text color
+            var items = dropdown.querySelectorAll('.dropdown-item, a');
+            items.forEach(function(item) {
+              item.style.setProperty('color', '#f7fbff', 'important');
+            });
+          });
+        }
+        
+        // Run immediately
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', forceDropdownFix);
+        } else {
+          forceDropdownFix();
+        }
+        
+        // Run again after a short delay to catch dynamically added elements
+        setTimeout(forceDropdownFix, 100);
+        setTimeout(forceDropdownFix, 500);
+        setTimeout(forceDropdownFix, 1000);
+        
+        // Watch for new dropdowns
+        var observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            mutation.addedNodes.forEach(function(node) {
+              if (node.nodeType === 1) {
+                if (node.classList && (node.classList.contains('dropdown-menu') || node.className.includes('dropdown-menu'))) {
+                  node.style.setProperty('background', '#0e1935', 'important');
+                  node.style.setProperty('background-color', '#0e1935', 'important');
+                  var items = node.querySelectorAll('.dropdown-item, a');
+                  items.forEach(function(item) {
+                    item.style.setProperty('color', '#f7fbff', 'important');
+                  });
+                }
+                var menus = node.querySelectorAll ? node.querySelectorAll('.dropdown-menu') : [];
+                menus.forEach(function(menu) {
+                  menu.style.setProperty('background', '#0e1935', 'important');
+                  menu.style.setProperty('background-color', '#0e1935', 'important');
+                  var items = menu.querySelectorAll('.dropdown-item, a');
+                  items.forEach(function(item) {
+                    item.style.setProperty('color', '#f7fbff', 'important');
+                  });
+                });
+              }
+            });
+          });
+        });
+        
+        if (document.body) {
+          observer.observe(document.body, { childList: true, subtree: true });
+        } else {
+          document.addEventListener('DOMContentLoaded', function() {
+            observer.observe(document.body, { childList: true, subtree: true });
+          });
+        }
+      })();
+    </script>
+    
     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
     <%= favicon_link_tag 'RunForFun-zwart.svg' %>
+    
   </head>
 
-  <body>
-    <div class="app-container">
+  <body class="readable-body">
+    <div class="app-container readable-container">
       <header class="theme-header">
         <%= link_to root_path, class: 'theme-header__logo-link' do %>
           <%= image_tag 'RunForFun-zwart.svg', alt: 'Run For Fun logo', class: 'theme-header__logo', size: '48x48' %>
@@ -33,9 +470,7 @@
         
         <!-- Mobile menu button -->
         <button id="mobile-menu-toggle" class="mobile-menu-toggle" aria-label="Toggle menu">
-          <span></span>
-          <span></span>
-          <span></span>
+          ☰
         </button>
         
         <button id="install-button" class="app-btn" style="display: none; font-size: 0.8rem; padding: 0.5rem 1rem;">Installeer App</button>
@@ -44,28 +479,35 @@
       <!-- Desktop Navigation -->
       <nav class="theme-menu desktop-menu">
         <div class="theme-menu__inner">
-          <a href="/" class="theme-btn">🏠 Home</a>
+          <% home_tile = visible_tiles_for_menu(current_user).find { |t| t[:key] == 'home' } %>
+          <a href="/" class="theme-btn"><%= home_tile ? home_tile[:label] : '🏠 Home' %></a>
           
           <% if logged_in? %>
-            <% training_tiles = visible_tiles_for_menu(current_user).select { |t| ['dezeweek', 'all_trainings', 'schema', 'vandaag'].include?(t[:key]) } %>
-            <% if training_tiles.any? %>
+            <!-- Training dropdown -->
+            <% training_dropdown_tiles = tiles_for_dropdown(current_user, 'menu_training') %>
+            <% if training_dropdown_tiles.any? %>
               <div class="dropdown">
-                <button type="button" class="theme-btn dropdown-toggle" aria-expanded="false">🏃‍♂️ Training</button>
+                <button type="button" class="theme-btn dropdown-toggle" aria-expanded="false"><%= menu_label_for(current_user, 'menu_training', '🏃‍♂️ Training') %></button>
                 <div class="dropdown-menu">
-                  <% training_tiles.each do |tile| %>
+                  <% training_dropdown_tiles.each do |tile| %>
                     <a href="<%= tile[:url] %>" class="dropdown-item"><%= tile[:label] %></a>
                   <% end %>
                 </div>
               </div>
             <% end %>
             
+            <!-- Shortcuts (dynamisch) -->
+            <% shortcut_tiles_for_menu(current_user).each do |tile| %>
+              <a href="<%= tile[:url] %>" class="theme-btn">💓 <%= tile[:label] %></a>
+            <% end %>
+            
             <!-- Beheer -->
-            <% beheer_tiles = visible_tiles_for_menu(current_user).select { |t| ['groups', 'users', 'profielen', 'photos', 'statuses'].include?(t[:key]) } %>
-            <% if beheer_tiles.any? %>
+            <% beheer_dropdown_tiles = tiles_for_dropdown(current_user, 'menu_beheer') %>
+            <% if beheer_dropdown_tiles.any? %>
               <div class="dropdown">
-                <button type="button" class="theme-btn dropdown-toggle" aria-expanded="false">⚙️ Beheer</button>
+                <button type="button" class="theme-btn dropdown-toggle" aria-expanded="false"><%= menu_label_for(current_user, 'menu_beheer', '⚙️ Beheer') %></button>
                 <div class="dropdown-menu">
-                  <% beheer_tiles.each do |tile| %>
+                  <% beheer_dropdown_tiles.each do |tile| %>
                     <a href="<%= tile[:url] %>" class="dropdown-item"><%= tile[:label] %></a>
                   <% end %>
                 </div>
@@ -73,11 +515,12 @@
             <% end %>
             
             <!-- Trainers -->
-            <% if visible_tiles_for_menu(current_user).any? { |t| ['trainers', 'trainers_overzicht', 'ad_gemiddelden', 'birthdays', 'birthdays_30'].include?(t[:key]) } %>
+            <% trainers_dropdown_tiles = tiles_for_dropdown(current_user, 'menu_trainers') %>
+            <% if trainers_dropdown_tiles.any? %>
               <div class="dropdown">
-                <button type="button" class="theme-btn dropdown-toggle" aria-expanded="false">👨‍🏫 Trainers</button>
+                <button type="button" class="theme-btn dropdown-toggle" aria-expanded="false"><%= menu_label_for(current_user, 'menu_trainers', '🧑‍🏫 Trainers') %></button>
                 <div class="dropdown-menu">
-                  <% visible_tiles_for_menu(current_user).select { |t| ['trainers', 'trainers_overzicht', 'ad_gemiddelden', 'birthdays', 'birthdays_30'].include?(t[:key]) }.each do |tile| %>
+                  <% trainers_dropdown_tiles.each do |tile| %>
                     <a href="<%= tile[:url] %>" class="dropdown-item"><%= tile[:label] %></a>
                   <% end %>
                 </div>
@@ -91,12 +534,12 @@
             <% end %>
 
             <!-- Admin -->
-            <% admin_tiles = visible_tiles_for_menu(current_user).select { |t| ['admin', 'tiles', 'import', 'intakes'].include?(t[:key]) } %>
-            <% if admin_tiles.any? %>
+            <% admin_dropdown_tiles = tiles_for_dropdown(current_user, 'menu_admin') %>
+            <% if admin_dropdown_tiles.any? %>
               <div class="dropdown">
-                <button type="button" class="theme-btn dropdown-toggle" aria-expanded="false">🛠️ Admin</button>
+                <button type="button" class="theme-btn dropdown-toggle" aria-expanded="false"><%= menu_label_for(current_user, 'menu_admin', '🛠️ Admin') %></button>
                 <div class="dropdown-menu">
-                  <% admin_tiles.each do |tile| %>
+                  <% admin_dropdown_tiles.each do |tile| %>
                     <a href="<%= tile[:url] %>" class="dropdown-item"><%= tile[:label] %></a>
                   <% end %>
                 </div>
@@ -105,9 +548,21 @@
             
             <!-- Profiel & Logout -->
             <div class="dropdown">
-              <button type="button" class="theme-btn dropdown-toggle" aria-expanded="false">👤 <%= current_user.name %></button>
+              <button type="button" class="theme-btn dropdown-toggle user-profile-btn" aria-expanded="false">
+                <span class="user-profile-info">
+                  <span class="user-profile-name">👤 <%= current_user.name %></span>
+                  <span class="user-profile-role"><%= user_role_display(current_user) %></span>
+                </span>
+              </button>
               <div class="dropdown-menu">
-                <a href="/profile" class="dropdown-item">Mijn Profiel</a>
+                <% profile_tile = visible_tiles_for_menu(current_user).find { |t| t[:key] == 'profile' } %>
+                <% if profile_tile %>
+                  <a href="<%= profile_tile[:url] %>" class="dropdown-item"><%= profile_tile[:label] %></a>
+                <% end %>
+                <% zones_tile = visible_tiles_for_menu(current_user).find { |t| t[:key] == 'zones' } %>
+                <% if zones_tile %>
+                  <a href="<%= zones_tile[:url] %>" class="dropdown-item">💓 <%= zones_tile[:label] %></a>
+                <% end %>
                 <%= link_to "Logout", logout_path, method: :delete, class: "dropdown-item" %>
               </div>
             </div>
@@ -127,28 +582,32 @@
         </div>
       </nav>
 
-      <!-- Mobile Navigation Overlay -->
-      <div id="mobile-menu-overlay" class="mobile-menu-overlay">
-        <nav class="mobile-menu">
-          <div class="mobile-menu__header">
-            <h3>Menu</h3>
-            <button id="mobile-menu-close" class="mobile-menu-close">✕</button>
+      <!-- Mobile Navigation Overlay - WHITE BACKGROUND -->
+      <div id="mobile-menu-overlay" style="position: fixed !important; top: 0 !important; right: -100% !important; width: 85% !important; max-width: 400px !important; height: 100vh !important; background: #ffffff !important; z-index: 9999 !important; transition: right 0.3s ease !important; overflow-y: auto !important; box-shadow: -4px 0 20px rgba(0,0,0,0.3) !important;">
+        <nav style="background: #ffffff !important; height: 100% !important; padding: 0 !important;">
+          <div style="background: #FC4C02 !important; padding: 1.5rem !important; border-bottom: 3px solid #ff6b35 !important; display: flex !important; justify-content: space-between !important; align-items: center !important; position: relative !important;">
+            <!-- VERSION BADGE -->
+            <div style="position: absolute !important; top: 5px !important; left: 5px !important; background: #FF00FF !important; color: #FFFFFF !important; padding: 0.25rem 0.5rem !important; border-radius: 4px !important; font-size: 0.7rem !important; font-weight: 800 !important; z-index: 99999 !important; box-shadow: 0 0 10px #FF00FF !important;">
+              v<%= current_version_time %>
+            </div>
+            <h3 style="color: #ffffff !important; font-weight: 700 !important; font-size: 1.5rem !important; margin: 0 !important;">Menu</h3>
+            <button id="mobile-menu-close" style="background: rgba(255,255,255,0.2) !important; border: 2px solid rgba(255,255,255,0.5) !important; color: #ffffff !important; font-size: 1.5rem !important; font-weight: 700 !important; width: 40px !important; height: 40px !important; border-radius: 8px !important; cursor: pointer !important;">✕</button>
           </div>
           
-          <div class="mobile-menu__content">
-            <a href="/" class="mobile-menu__item">
-              <span class="mobile-menu__icon">🏠</span>
-              <span>Home</span>
+          <div style="padding: 1rem !important; background: #ffffff !important;">
+            <a href="/" style="display: flex !important; align-items: center !important; padding: 1rem 1.25rem !important; margin: 0.5rem 0 !important; background: #f8f9fa !important; border: 2px solid #dee2e6 !important; border-radius: 8px !important; text-decoration: none !important; color: #212529 !important; font-weight: 500 !important; font-size: 1rem !important; letter-spacing: 0.025em !important;">
+              <span style="font-size: 1.2rem !important; margin-right: 0.75rem !important; color: #212529 !important;">🏠</span>
+              <span style="color: #212529 !important; font-weight: 600 !important;">Home</span>
             </a>
             
             <% if logged_in? %>
               <% mobile_training_tiles = visible_tiles_for_menu(current_user).select { |t| ['dezeweek', 'all_trainings', 'schema', 'vandaag'].include?(t[:key]) } %>
               <% if mobile_training_tiles.any? %>
-                <div class="mobile-menu__section">
-                  <h4>🏃‍♂️ Training</h4>
+                <div style="background: #ffffff !important; border: 2px solid #e9ecef !important; margin: 0.5rem 0 !important; padding: 1rem !important; border-radius: 8px !important;">
+                  <h4 style="color: #212529 !important; font-weight: 700 !important; font-size: 0.9rem !important; text-transform: uppercase !important; letter-spacing: 0.1em !important; margin: 0 0 0.75rem 0 !important;">🏃‍♂️ TRAINING</h4>
                   <% mobile_training_tiles.each do |tile| %>
-                    <a href="<%= tile[:url] %>" class="mobile-menu__item">
-                      <span class="mobile-menu__icon">
+                    <a href="<%= tile[:url] %>" style="display: flex !important; align-items: center !important; padding: 1rem 1.25rem !important; margin: 0.5rem 0 !important; background: #f8f9fa !important; border: 2px solid #dee2e6 !important; border-radius: 8px !important; text-decoration: none !important; color: #212529 !important; font-weight: 500 !important; font-size: 1rem !important; letter-spacing: 0.025em !important;">
+                      <span style="font-size: 1.2rem !important; margin-right: 0.75rem !important; color: #212529 !important;">
                         <% case tile[:key] %>
                         <% when 'dezeweek' %>
                           📅
@@ -162,7 +621,7 @@
                           🏃
                         <% end %>
                       </span>
-                      <span><%= tile[:label] %></span>
+                      <span style="color: #212529 !important; font-weight: 600 !important;"><%= tile[:label] %></span>
                     </a>
                   <% end %>
                 </div>
@@ -171,11 +630,11 @@
               <!-- Beheer Section -->
               <% mobile_beheer_tiles = visible_tiles_for_menu(current_user).select { |t| ['groups', 'users', 'profielen', 'photos', 'statuses'].include?(t[:key]) } %>
               <% if mobile_beheer_tiles.any? %>
-                <div class="mobile-menu__section">
-                  <h4>⚙️ Beheer</h4>
+                <div style="background: #ffffff !important; border: 2px solid #e9ecef !important; margin: 0.5rem 0 !important; padding: 1rem !important; border-radius: 8px !important;">
+                  <h4 style="color: #212529 !important; font-weight: 700 !important; font-size: 0.9rem !important; text-transform: uppercase !important; letter-spacing: 0.1em !important; margin: 0 0 0.75rem 0 !important;">⚙️ BEHEER</h4>
                   <% mobile_beheer_tiles.each do |tile| %>
-                    <a href="<%= tile[:url] %>" class="mobile-menu__item">
-                      <span class="mobile-menu__icon">
+                    <a href="<%= tile[:url] %>" style="display: flex !important; align-items: center !important; padding: 1rem 1.25rem !important; margin: 0.5rem 0 !important; background: #f8f9fa !important; border: 2px solid #dee2e6 !important; border-radius: 8px !important; text-decoration: none !important; color: #212529 !important; font-weight: 500 !important; font-size: 1rem !important; letter-spacing: 0.025em !important;">
+                      <span style="font-size: 1.2rem !important; margin-right: 0.75rem !important; color: #212529 !important;">
                         <% case tile[:key] %>
                         <% when 'groups' %>
                           👥
@@ -189,7 +648,7 @@
                           ⚙️
                         <% end %>
                       </span>
-                      <span><%= tile[:label] %></span>
+                      <span style="color: #212529 !important; font-weight: 600 !important;"><%= tile[:label] %></span>
                     </a>
                   <% end %>
                 </div>
@@ -197,11 +656,11 @@
               
               <!-- Trainers Section -->
               <% if visible_tiles_for_menu(current_user).any? { |t| ['trainers', 'trainers_overzicht', 'ad_gemiddelden', 'birthdays', 'birthdays_30'].include?(t[:key]) } %>
-                <div class="mobile-menu__section">
-                  <h4>👨‍🏫 Trainers</h4>
+                <div style="background: #ffffff !important; border: 2px solid #e9ecef !important; margin: 0.5rem 0; padding: 1rem; border-radius: 8px;">
+                  <h4 style="color: #212529 !important; font-weight: 500; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 0.75rem 0;">👨‍🏫 TRAINERS</h4>
                   <% visible_tiles_for_menu(current_user).select { |t| ['trainers', 'trainers_overzicht', 'ad_gemiddelden', 'birthdays', 'birthdays_30'].include?(t[:key]) }.each do |tile| %>
-                    <a href="<%= tile[:url] %>" class="mobile-menu__item">
-                      <span class="mobile-menu__icon">
+                    <a href="<%= tile[:url] %>" style="display: flex; align-items: center; padding: 1rem 1.25rem; margin: 0.5rem 0; background: #f8f9fa !important; border: 2px solid #dee2e6 !important; border-radius: 8px; text-decoration: none; color: #212529 !important; font-weight: 500; font-size: 1rem; letter-spacing: 0.025em;">
+                      <span style="font-size: 1.2rem; margin-right: 0.75rem; color: #212529 !important;">
                         <% case tile[:key] %>
                         <% when 'trainers' %>
                           👨‍🏫
@@ -215,7 +674,7 @@
                           👨‍🏫
                         <% end %>
                       </span>
-                      <span><%= tile[:label] %></span>
+                      <span style="color: #212529 !important; font-weight: 500;"><%= tile[:label] %></span>
                     </a>
                   <% end %>
                 </div>
@@ -223,71 +682,90 @@
               
               <% mobile_intake_tile = visible_tiles_for_menu(current_user).find { |t| t[:key] == 'intake' } %>
               <% if mobile_intake_tile %>
-                <a href="<%= mobile_intake_tile[:url] %>" class="mobile-menu__item">
-                  <span class="mobile-menu__icon">📝</span>
-                  <span><%= mobile_intake_tile[:label] %></span>
+                <a href="<%= mobile_intake_tile[:url] %>" style="display: flex; align-items: center; padding: 1rem 1.25rem; margin: 0.5rem 0; background: #f8f9fa !important; border: 2px solid #dee2e6 !important; border-radius: 8px; text-decoration: none; color: #212529 !important; font-weight: 500; font-size: 1rem; letter-spacing: 0.025em;">
+                  <span style="font-size: 1.2rem; margin-right: 0.75rem; color: #212529 !important;">📝</span>
+                  <span style="color: #212529 !important; font-weight: 500;"><%= mobile_intake_tile[:label] %></span>
                 </a>
               <% end %>
 
               <!-- Admin Section -->
-              <% mobile_admin_tiles = visible_tiles_for_menu(current_user).select { |t| ['admin', 'tiles', 'import', 'intakes'].include?(t[:key]) } %>
+              <% mobile_admin_tiles = visible_tiles_for_menu(current_user).select { |t| ['admin', 'tiles', 'themes', 'import', 'intakes', 'login_logs', 'error_logs', 'error_messages'].include?(t[:key]) } %>
               <% if mobile_admin_tiles.any? %>
-                <div class="mobile-menu__section">
-                  <h4>🛠️ Admin</h4>
+                <div style="background: #ffffff !important; border: 2px solid #e9ecef !important; margin: 0.5rem 0; padding: 1rem; border-radius: 8px;">
+                  <h4 style="color: #212529 !important; font-weight: 500; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 0.75rem 0;">🛠️ ADMIN</h4>
                   <% mobile_admin_tiles.each do |tile| %>
-                    <a href="<%= tile[:url] %>" class="mobile-menu__item">
-                      <span class="mobile-menu__icon">
+                    <a href="<%= tile[:url] %>" style="display: flex; align-items: center; padding: 1rem 1.25rem; margin: 0.5rem 0; background: #f8f9fa !important; border: 2px solid #dee2e6 !important; border-radius: 8px; text-decoration: none; color: #212529 !important; font-weight: 500; font-size: 1rem; letter-spacing: 0.025em;">
+                      <span style="font-size: 1.2rem; margin-right: 0.75rem; color: #212529 !important;">
                         <% case tile[:key] %>
                         <% when 'admin' %>
                           🛠️
                         <% when 'tiles' %>
                           🧩
+                        <% when 'themes' %>
+                          🎨
                         <% when 'import' %>
                           📥
                         <% when 'intakes' %>
                           📋
+                        <% when 'error_logs' %>
+                          🚨
+                        <% when 'error_messages' %>
+                          💬
                         <% else %>
                           ⚙️
                         <% end %>
                       </span>
-                      <span><%= tile[:label] %></span>
+                      <span style="color: #212529 !important; font-weight: 500;"><%= tile[:label] %></span>
                     </a>
                   <% end %>
                 </div>
               <% end %>
               
               <!-- Profiel Section -->
-              <div class="mobile-menu__section">
-                <h4>👤 <%= current_user.name %></h4>
-                <a href="/profile" class="mobile-menu__item">
-                  <span class="mobile-menu__icon">👤</span>
-                  <span>Mijn Profiel</span>
-                </a>
-                <%= link_to logout_path, method: :delete, class: "mobile-menu__item" do %>
-                  <span class="mobile-menu__icon">🚪</span>
-                  <span>Logout</span>
+              <div style="background: #ffffff !important; border: 2px solid #e9ecef !important; margin: 0.5rem 0; padding: 1rem; border-radius: 8px;">
+                <h4 style="color: #212529 !important; font-weight: 500; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 0.75rem 0;">
+                  <span style="color: #212529 !important; font-weight: 500;">👤 <%= current_user.name %></span>
+                  <span style="color: #cccccc !important; font-weight: 400; font-size: 0.8rem; margin-left: 0.5rem;"><%= user_role_display(current_user) %></span>
+                </h4>
+                <% mobile_profile_tile = visible_tiles_for_menu(current_user).find { |t| t[:key] == 'profile' } %>
+                <% if mobile_profile_tile %>
+                  <a href="<%= mobile_profile_tile[:url] %>" style="display: flex; align-items: center; padding: 1rem 1.25rem; margin: 0.5rem 0; background: #f8f9fa !important; border: 2px solid #dee2e6 !important; border-radius: 8px; text-decoration: none; color: #212529 !important; font-weight: 500; font-size: 1rem; letter-spacing: 0.025em;">
+                    <span style="font-size: 1.2rem; margin-right: 0.75rem; color: #212529 !important;">👤</span>
+                    <span style="color: #212529 !important; font-weight: 500;"><%= mobile_profile_tile[:label] %></span>
+                  </a>
+                <% end %>
+                <% mobile_zones_tile = visible_tiles_for_menu(current_user).find { |t| t[:key] == 'zones' } %>
+                <% if mobile_zones_tile %>
+                  <a href="<%= mobile_zones_tile[:url] %>" style="display: flex; align-items: center; padding: 1rem 1.25rem; margin: 0.5rem 0; background: #f8f9fa !important; border: 2px solid #dee2e6 !important; border-radius: 8px; text-decoration: none; color: #212529 !important; font-weight: 500; font-size: 1rem; letter-spacing: 0.025em;">
+                    <span style="font-size: 1.2rem; margin-right: 0.75rem; color: #212529 !important;">💓</span>
+                    <span style="color: #212529 !important; font-weight: 500;"><%= mobile_zones_tile[:label] %></span>
+                  </a>
+                <% end %>
+                <%= link_to logout_path, method: :delete, style: "display: flex; align-items: center; padding: 1rem 1.25rem; margin: 0.5rem 0; background: rgba(220, 53, 69, 0.15) !important; border: 2px solid rgba(220, 53, 69, 0.4); border-radius: 8px; text-decoration: none; color: #212529 !important; font-weight: 500; font-size: 1rem; letter-spacing: 0.025em;" do %>
+                  <span style="font-size: 1.2rem; margin-right: 0.75rem; color: #212529 !important;">🚪</span>
+                  <span style="color: #212529 !important; font-weight: 500;">Logout</span>
                 <% end %>
               </div>
             <% else %>
-              <div class="mobile-menu__section">
+              <div style="background: #ffffff !important; border: 2px solid #e9ecef !important; margin: 0.5rem 0; padding: 1rem; border-radius: 8px;">
                 <% # Voor niet-ingelogde gebruikers: check standaard tile assignments %>
                 <% guest_tiles = TileAssignment.where(role: 'user').where(show_in_menu: true).pluck(:tile_key) %>
                 <% if guest_tiles.include?('login') || guest_tiles.empty? %>
-                  <a href="/login" class="mobile-menu__item">
-                    <span class="mobile-menu__icon">🔑</span>
-                    <span>Login</span>
+                  <a href="/login" style="display: flex; align-items: center; padding: 1rem 1.25rem; margin: 0.5rem 0; background: rgba(255,255,255,0.1); border: 2px solid #dee2e6 !important; border-radius: 8px; text-decoration: none; color: #212529 !important; font-weight: 500; font-size: 1rem; letter-spacing: 0.025em;">
+                    <span style="font-size: 1.2rem; margin-right: 0.75rem;">🔑</span>
+                    <span style="color: #212529 !important; font-weight: 500;">Login</span>
                   </a>
                 <% end %>
                 <% if guest_tiles.include?('register') || guest_tiles.empty? %>
-                  <a href="/register" class="mobile-menu__item">
-                    <span class="mobile-menu__icon">📝</span>
-                    <span>Register</span>
+                  <a href="/register" style="display: flex; align-items: center; padding: 1rem 1.25rem; margin: 0.5rem 0; background: rgba(255,255,255,0.1); border: 2px solid #dee2e6 !important; border-radius: 8px; text-decoration: none; color: #212529 !important; font-weight: 500; font-size: 1rem; letter-spacing: 0.025em;">
+                    <span style="font-size: 1.2rem; margin-right: 0.75rem;">📝</span>
+                    <span style="color: #212529 !important; font-weight: 500;">Register</span>
                   </a>
                 <% end %>
                 <% if guest_tiles.include?('intake') || guest_tiles.empty? %>
-                  <a href="<%= intake_path %>" class="mobile-menu__item">
-                    <span class="mobile-menu__icon">📝</span>
-                    <span>Intake</span>
+                  <a href="<%= intake_path %>" style="display: flex; align-items: center; padding: 1rem 1.25rem; margin: 0.5rem 0; background: rgba(255,255,255,0.1); border: 2px solid #dee2e6 !important; border-radius: 8px; text-decoration: none; color: #212529 !important; font-weight: 500; font-size: 1rem; letter-spacing: 0.025em;">
+                    <span style="font-size: 1.2rem; margin-right: 0.75rem;">📝</span>
+                    <span style="color: #212529 !important; font-weight: 500;">Intake</span>
                   </a>
                 <% end %>
               </div>
@@ -295,6 +773,37 @@
           </div>
         </nav>
       </div>
+      
+      <!-- Mobile Menu Toggle JavaScript -->
+      <script>
+        (function() {
+          const overlay = document.getElementById('mobile-menu-overlay');
+          const closeBtn = document.getElementById('mobile-menu-close');
+          const toggleBtn = document.getElementById('mobile-menu-toggle');
+          
+          if (toggleBtn) {
+            toggleBtn.addEventListener('click', function() {
+              overlay.style.right = '0';
+              console.log('[MENU] Opened mobile menu');
+            });
+          }
+          
+          if (closeBtn) {
+            closeBtn.addEventListener('click', function() {
+              overlay.style.right = '-100%';
+              console.log('[MENU] Closed mobile menu');
+            });
+          }
+          
+          if (overlay) {
+            overlay.addEventListener('click', function(e) {
+              if (e.target === overlay) {
+                overlay.style.right = '-100%';
+              }
+            });
+          }
+        })();
+      </script>
       
       <main class="theme-main surface-dark">
         <% if flash[:notice] %>
@@ -334,9 +843,12 @@
 
               </a>
             <% end %>
-            <a href="/profile" class="app-bottom-nav__item">
-              <div class="app-bottom-nav__icon">👤</div>
-            </a>
+            <% bottom_profile_tile = visible_tiles_for_menu(current_user).find { |t| t[:key] == 'profile' } %>
+            <% if bottom_profile_tile %>
+              <a href="<%= bottom_profile_tile[:url] %>" class="app-bottom-nav__item">
+                <div class="app-bottom-nav__icon">👤</div>
+              </a>
+            <% end %>
           <% else %>
             <a href="/login" class="app-bottom-nav__item">
               <div class="app-bottom-nav__icon">🔑</div>
@@ -352,6 +864,11 @@
         <p>&copy; 2025 Hardlopen met Virgil. Alle rechten voorbehouden.</p>
       </footer>
     </div>
+    
+    <!-- Mobile Bottom Navigation (only on mobile) -->
+    <div class="mobile-only">
+      <%= render 'layouts/mobile_nav' %>
+    </div>
 
     <script>
       // Mobile menu + dropdown functionality
@@ -364,6 +881,18 @@
         function openMobileMenu() {
           mobileMenuOverlay.classList.add('active');
           document.body.style.overflow = 'hidden';
+          
+          // Force mobile menu contrast fix when opening
+          setTimeout(function() {
+            if (typeof forceMobileMenuContrast === 'function') {
+              forceMobileMenuContrast();
+            }
+          }, 50);
+          setTimeout(function() {
+            if (typeof forceMobileMenuContrast === 'function') {
+              forceMobileMenuContrast();
+            }
+          }, 200);
         }
 
         function closeMobileMenu() {
@@ -384,6 +913,7 @@
         function closeAllDropdowns() {
           dropdowns.forEach(function(dropdown) {
             dropdown.classList.remove('open');
+            dropdown.classList.remove('pinned'); // Verwijder pinned status
             const toggle = dropdown.querySelector('.dropdown-toggle');
             if (toggle) toggle.setAttribute('aria-expanded', 'false');
           });
@@ -393,14 +923,31 @@
           const toggle = dropdown.querySelector('.dropdown-toggle');
           if (!toggle) return;
 
+          // Klik = toggle pinned state (blijft open zonder hover)
           toggle.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
 
-            const isOpen = dropdown.classList.contains('open');
-            closeAllDropdowns();
+            const isPinned = dropdown.classList.contains('pinned');
+            
+            // Sluit alle andere dropdowns
+            dropdowns.forEach(function(otherDropdown) {
+              if (otherDropdown !== dropdown) {
+                otherDropdown.classList.remove('open');
+                otherDropdown.classList.remove('pinned');
+                const otherToggle = otherDropdown.querySelector('.dropdown-toggle');
+                if (otherToggle) otherToggle.setAttribute('aria-expanded', 'false');
+              }
+            });
 
-            if (!isOpen) {
+            if (isPinned) {
+              // Als al gepinned, unpin het
+              dropdown.classList.remove('pinned');
+              dropdown.classList.remove('open');
+              toggle.setAttribute('aria-expanded', 'false');
+            } else {
+              // Pin de dropdown (blijft open)
+              dropdown.classList.add('pinned');
               dropdown.classList.add('open');
               toggle.setAttribute('aria-expanded', 'true');
             }
@@ -408,8 +955,17 @@
         });
 
         document.addEventListener('click', function(e) {
+          // Alleen sluiten als er buiten een dropdown wordt geklikt EN de dropdown is gepinned
           if (!e.target.closest('.theme-menu .dropdown')) {
-            closeAllDropdowns();
+            // Sluit alleen gepinde dropdowns
+            dropdowns.forEach(function(dropdown) {
+              if (dropdown.classList.contains('pinned')) {
+                dropdown.classList.remove('pinned');
+                dropdown.classList.remove('open');
+                const toggle = dropdown.querySelector('.dropdown-toggle');
+                if (toggle) toggle.setAttribute('aria-expanded', 'false');
+              }
+            });
           }
         });
 
@@ -419,6 +975,424 @@
             closeAllDropdowns();
           }
         });
+
+        // Voorkom dat dropdowns sluiten tijdens scrollen
+        let scrollTimeout;
+        window.addEventListener('scroll', function() {
+          // Gebruik een timeout om te voorkomen dat de dropdown direct sluit bij scrollen
+          clearTimeout(scrollTimeout);
+          scrollTimeout = setTimeout(function() {
+            // Dropdown blijft open tijdens en na scrollen
+          }, 100);
+        }, { passive: true });
+      });
+
+      // ============================================
+      // GLOBALE REGEL: Alle witte achtergronden krijgen automatisch zwarte tekst
+      // Dit werkt via JavaScript om alle elementen te detecteren en direct aan te passen
+      // ============================================
+      window.isWhiteBackground = function(bgColor) {
+        if (!bgColor) return false;
+        
+        // Direct witte achtergronden
+        if (bgColor === 'rgb(255, 255, 255)' || 
+            bgColor === '#ffffff' || 
+            bgColor === '#fff' ||
+            bgColor === 'white') {
+          return true;
+        }
+        
+        // rgba/rgb met 255,255,255 (ook met alpha)
+        if (bgColor.startsWith('rgba(255, 255, 255') ||
+            bgColor.startsWith('rgb(255, 255, 255')) {
+          return true;
+        }
+        
+        // Bijna-witte achtergronden (alpha > 0.9)
+        const rgbaMatch = bgColor.match(/rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)/);
+        if (rgbaMatch) {
+          const r = parseInt(rgbaMatch[1]);
+          const g = parseInt(rgbaMatch[2]);
+          const b = parseInt(rgbaMatch[3]);
+          const a = parseFloat(rgbaMatch[4]);
+          if (r >= 240 && g >= 240 && b >= 240 && a > 0.8) {
+            return true;
+          }
+        }
+        
+        return false;
+      }
+      
+      window.isDarkBackground = function(bgColor) {
+        if (!bgColor) return false;
+        
+        // Transparant = niet donker
+        if (bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent') {
+          return false;
+        }
+        
+        // Parse RGB/RGBA waarden
+        const rgbMatch = bgColor.match(/(?:rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)|#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2}))/);
+        if (rgbMatch) {
+          let r, g, b;
+          if (rgbMatch[1]) {
+            // RGB/RGBA format
+            r = parseInt(rgbMatch[1]);
+            g = parseInt(rgbMatch[2]);
+            b = parseInt(rgbMatch[3]);
+          } else if (rgbMatch[4]) {
+            // Hex format
+            r = parseInt(rgbMatch[4], 16);
+            g = parseInt(rgbMatch[5], 16);
+            b = parseInt(rgbMatch[6], 16);
+          } else {
+            return false;
+          }
+          
+          // Bereken luminantie (lichtheid)
+          const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+          
+          // Als luminantie < 0.5, is het donker
+          return luminance < 0.5;
+        }
+        
+        return false;
+      }
+      
+      function applyBlackTextToElement(el, blackColor) {
+        // Skip specifieke elementen
+        if (el.tagName === 'SCRIPT' || el.tagName === 'STYLE' || el.tagName === 'NOSCRIPT' || 
+            el.tagName === 'SVG' || el.tagName === 'PATH') {
+          return;
+        }
+        
+        // Skip als al zwarte tekst is toegepast (om performance te verbeteren)
+        if (el.dataset.blackTextApplied === 'true') {
+          return;
+        }
+        
+        const computedStyle = window.getComputedStyle(el);
+        const bgColor = computedStyle.backgroundColor;
+        
+        // Check of element witte/lichte achtergrond heeft
+        if (isWhiteBackground(bgColor)) {
+          // Markeer als verwerkt
+          el.dataset.blackTextApplied = 'true';
+          
+          // Pas zwarte tekst toe op het element zelf
+          el.style.setProperty('color', blackColor, 'important');
+          
+          // Pas zwarte tekst toe op alle directe child elementen (alleen als die ook witte achtergrond hebben)
+          Array.from(el.children).forEach(function(child) {
+            if (child.tagName !== 'SCRIPT' && child.tagName !== 'STYLE' && child.tagName !== 'NOSCRIPT') {
+              const childStyle = window.getComputedStyle(child);
+              const childBg = childStyle.backgroundColor;
+              // Alleen als child ook witte achtergrond heeft OF als child transparant is (erft van parent)
+              if (isWhiteBackground(childBg) || childBg === 'rgba(0, 0, 0, 0)' || childBg === 'transparent') {
+                child.style.setProperty('color', blackColor, 'important');
+                child.dataset.blackTextApplied = 'true';
+              }
+            }
+          });
+          
+          // Pas zwarte tekst toe op alle nested elementen (alleen als die ook witte achtergrond hebben of transparant zijn)
+          const allChildren = el.querySelectorAll('*:not(script):not(style):not(noscript):not(svg):not(path)');
+          allChildren.forEach(function(child) {
+            const childStyle = window.getComputedStyle(child);
+            const childBg = childStyle.backgroundColor;
+            // Alleen als child ook witte achtergrond heeft OF als child transparant is (erft van parent)
+            if (isWhiteBackground(childBg) || childBg === 'rgba(0, 0, 0, 0)' || childBg === 'transparent') {
+              child.style.setProperty('color', blackColor, 'important');
+              child.dataset.blackTextApplied = 'true';
+            }
+          });
+          
+          // Voor inputs, textareas en selects binnen witte containers: zwarte tekst op witte achtergrond
+          const formElements = el.querySelectorAll('input:not([type="checkbox"]):not([type="radio"]), textarea, select');
+          formElements.forEach(function(formEl) {
+            formEl.style.setProperty('color', blackColor, 'important');
+            formEl.style.setProperty('background-color', '#ffffff', 'important');
+          });
+        }
+      }
+      
+      function applyTextColorBasedOnBackground() {
+        const blackColor = '#0c1729';
+        const whiteColor = '#f4f8ff';
+        const allElements = document.querySelectorAll('*');
+        
+        allElements.forEach(function(el) {
+          // Skip specifieke elementen
+          if (el.tagName === 'SCRIPT' || el.tagName === 'STYLE' || el.tagName === 'NOSCRIPT' || 
+              el.tagName === 'SVG' || el.tagName === 'PATH' || el.tagName === 'HEAD') {
+            return;
+          }
+          
+          try {
+            const computedStyle = window.getComputedStyle(el);
+            const bgColor = computedStyle.backgroundColor;
+            
+            // Check of element witte/lichte achtergrond heeft → zwarte tekst
+            if (isWhiteBackground(bgColor)) {
+              // Pas direct zwarte tekst toe op element zelf
+              el.style.setProperty('color', blackColor, 'important');
+              
+              // Pas zwarte tekst toe op ALLE child elementen (behalve die met donkere achtergrond)
+              const children = el.querySelectorAll('*');
+              children.forEach(function(child) {
+                if (child.tagName === 'SCRIPT' || child.tagName === 'STYLE' || child.tagName === 'NOSCRIPT' || 
+                    child.tagName === 'SVG' || child.tagName === 'PATH') {
+                  return;
+                }
+                
+                try {
+                  const childStyle = window.getComputedStyle(child);
+                  const childBg = childStyle.backgroundColor;
+                  
+                  // Als child transparant is of witte achtergrond heeft, pas zwarte tekst toe
+                  if (childBg === 'rgba(0, 0, 0, 0)' || childBg === 'transparent' || isWhiteBackground(childBg)) {
+                    child.style.setProperty('color', blackColor, 'important');
+                  }
+                  
+                  // Voor form elementen: altijd zwarte tekst op witte achtergrond
+                  if (child.tagName === 'INPUT' || child.tagName === 'TEXTAREA' || child.tagName === 'SELECT') {
+                    if (child.type !== 'checkbox' && child.type !== 'radio') {
+                      child.style.setProperty('color', blackColor, 'important');
+                      child.style.setProperty('background-color', '#ffffff', 'important');
+                    }
+                  }
+                } catch(e) {
+                  // Ignore errors
+                }
+              });
+            }
+            // Check of element donkere achtergrond heeft → witte tekst
+            // Maar alleen als de tekst nog niet expliciet is ingesteld
+            else if (isDarkBackground(bgColor)) {
+              const currentColor = computedStyle.color;
+              // Alleen toepassen als de huidige kleur niet al wit/licht is
+              if (currentColor && !currentColor.includes('255') && !currentColor.includes('244')) {
+                // Pas direct witte tekst toe op element zelf
+                el.style.setProperty('color', whiteColor, 'important');
+              }
+              
+              // Pas witte tekst toe op ALLE child elementen (behalve die met witte achtergrond)
+              const children = el.querySelectorAll('*');
+              children.forEach(function(child) {
+                if (child.tagName === 'SCRIPT' || child.tagName === 'STYLE' || child.tagName === 'NOSCRIPT' || 
+                    child.tagName === 'SVG' || child.tagName === 'PATH') {
+                  return;
+                }
+                
+                try {
+                  const childStyle = window.getComputedStyle(child);
+                  const childBg = childStyle.backgroundColor;
+                  const childColor = childStyle.color;
+                  
+                  // Als child transparant is of donkere achtergrond heeft, pas witte tekst toe
+                  if (childBg === 'rgba(0, 0, 0, 0)' || childBg === 'transparent' || isDarkBackground(childBg)) {
+                    // Maar niet als child zelf een witte achtergrond heeft
+                    if (!isWhiteBackground(childBg)) {
+                      // Alleen toepassen als de huidige kleur niet al wit/licht is
+                      if (!childColor || (!childColor.includes('255') && !childColor.includes('244'))) {
+                        child.style.setProperty('color', whiteColor, 'important');
+                      }
+                    }
+                  }
+                } catch(e) {
+                  // Ignore errors
+                }
+              });
+            }
+          } catch(e) {
+            // Ignore errors
+          }
+        });
+      }
+      
+      // Alias voor backwards compatibility
+      function applyBlackTextToWhiteBackgrounds() {
+        applyTextColorBasedOnBackground();
+      }
+
+      // Voer DIRECT uit zodra script laadt (zonder delay) om flits te voorkomen
+      if (document.body) {
+        applyBlackTextToWhiteBackgrounds();
+      }
+      
+      // Voer uit bij DOM ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          requestAnimationFrame(function() {
+            applyBlackTextToWhiteBackgrounds();
+          });
+        });
+      } else {
+        requestAnimationFrame(function() {
+          applyBlackTextToWhiteBackgrounds();
+        });
+      }
+
+      // Voer een paar keer uit voor dynamische content (maar minder vaak)
+      requestAnimationFrame(function() {
+        setTimeout(applyBlackTextToWhiteBackgrounds, 0);
+        setTimeout(applyBlackTextToWhiteBackgrounds, 10);
+        setTimeout(applyBlackTextToWhiteBackgrounds, 50);
+      });
+
+      // Debounce functie om te voorkomen dat het te vaak wordt uitgevoerd
+      let debounceTimer;
+      function debounceApplyBlackText() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(function() {
+          applyBlackTextToWhiteBackgrounds();
+        }, 100);
+      }
+      
+      // Voer uit bij mutaties (voor dynamisch geladen content)
+      const observer = new MutationObserver(function(mutations) {
+        // Reset flags zodat nieuwe elementen worden verwerkt
+        let hasNewNodes = false;
+        mutations.forEach(function(mutation) {
+          if (mutation.addedNodes && mutation.addedNodes.length > 0) {
+            hasNewNodes = true;
+            mutation.addedNodes.forEach(function(node) {
+              if (node.nodeType === 1) { // Element node
+                if (node.dataset) {
+                  delete node.dataset.blackTextApplied;
+                }
+                const children = node.querySelectorAll('[data-black-text-applied="true"]');
+                children.forEach(function(child) {
+                  delete child.dataset.blackTextApplied;
+                });
+              }
+            });
+          }
+        });
+        if (hasNewNodes) {
+          debounceApplyBlackText();
+        }
+      });
+      
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['style', 'class', 'data-black-text-applied']
+      });
+      
+      // Voer ook uit bij window load
+      window.addEventListener('load', function() {
+        setTimeout(applyBlackTextToWhiteBackgrounds, 10);
+      });
+    </script>
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+      // SERVICE WORKER COMPLETELY DISABLED
+      if ('serviceWorker' in navigator) {
+        // Unregister ALL service workers IMMEDIATELY
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          registrations.forEach(function(reg) {
+            reg.unregister();
+            console.log('[PWA] ✓ Unregistered Service Worker:', reg.scope);
+          });
+        });
+        
+        // Delete ALL caches
+        if ('caches' in window) {
+          caches.keys().then(function(names) {
+            names.forEach(function(name) {
+              caches.delete(name);
+              console.log('[PWA] ✓ Deleted cache:', name);
+            });
+          });
+        }
+        
+        console.log('[PWA] ✓✓✓ SERVICE WORKER DISABLED - NO CACHING ✓✓✓');
+        console.log('[PWA] All HTML/CSS/JS loaded directly from server');
+      }
+      
+      // DO NOT REGISTER SERVICE WORKER ANYMORE
+      if (false && 'serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js?v=4.0', { scope: '/' })
+                .then(function(registration) {
+                  console.log('[PWA] Service Worker v3.0 registered:', registration.scope);
+              
+                  // FORCE UPDATE IMMEDIATELY
+                  registration.update().then(function() {
+                    console.log('[PWA] Forced Service Worker update check');
+                  });
+              
+              // Check for updates periodically
+              setInterval(function() {
+                registration.update();
+              }, 60000); // Check every minute
+              
+              // Handle updates
+              registration.addEventListener('updatefound', function() {
+                const newWorker = registration.installing;
+                newWorker.addEventListener('statechange', function() {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    console.log('[PWA] Nieuwe versie beschikbaar');
+                    // Auto-update zonder gebruiker te storen
+                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                  }
+                });
+              });
+            })
+            .catch(function(error) {
+              console.log('[PWA] Service Worker registratie mislukt:', error);
+            });
+            
+          // Reload page when new service worker takes control
+          navigator.serviceWorker.addEventListener('controllerchange', function() {
+            console.log('[PWA] Nieuwe service worker actief');
+          });
+        });
+        
+        // Listen for messages from service worker
+        navigator.serviceWorker.addEventListener('message', function(event) {
+          if (event.data && event.data.type === 'CACHE_CLEARED') {
+            console.log('[PWA] Cache is geleegd');
+          }
+        });
+      }
+      
+      // Install prompt handler
+      let deferredPrompt;
+      window.addEventListener('beforeinstallprompt', function(e) {
+        console.log('[PWA] Install prompt beschikbaar');
+        // Prevent the mini-infobar from appearing on mobile
+        e.preventDefault();
+        // Stash the event so it can be triggered later
+        deferredPrompt = e;
+        
+        // Optioneel: toon eigen install button
+        const installBtn = document.getElementById('pwa-install-btn');
+        if (installBtn) {
+          installBtn.style.display = 'block';
+          installBtn.addEventListener('click', function() {
+            if (deferredPrompt) {
+              deferredPrompt.prompt();
+              deferredPrompt.userChoice.then(function(choiceResult) {
+                if (choiceResult.outcome === 'accepted') {
+                  console.log('[PWA] App geïnstalleerd');
+                }
+                deferredPrompt = null;
+              });
+            }
+          });
+        }
+      });
+      
+      // Detect if running as installed PWA
+      window.addEventListener('load', function() {
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+          console.log('[PWA] App draait in standalone mode');
+          document.body.classList.add('pwa-mode');
+        }
       });
     </script>
   </body>

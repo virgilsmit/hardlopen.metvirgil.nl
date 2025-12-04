@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Cache Refresh</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #0a152b;
+      color: #f4f8ff;
+      text-align: center;
+    }
+    .status {
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+    button {
+      background: linear-gradient(135deg, #FC4C02 0%, #FF6B35 100%);
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    .success {
+      color: #6ee75a;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔄 Browser Cache Refresh</h1>
+  <div class="status" id="status">
+    Cache wordt gecleared...
+  </div>
+  
+  <button onclick="location.reload(true)">Hard Refresh</button>
+  <button onclick="clearAndGo()">Clear & Ga naar Home</button>
+  
+  <script>
+    // Unregister all service workers
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for(let registration of registrations) {
+          registration.unregister();
+        }
+      });
+    }
+    
+    // Clear all caches
+    if ('caches' in window) {
+      caches.keys().then(function(names) {
+        for (let name of names) {
+          caches.delete(name);
+        }
+      });
+    }
+    
+    // Clear local storage
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    setTimeout(function() {
+      document.getElementById('status').innerHTML = 
+        '<span class="success">✓ Cache gecleared!</span><br>' +
+        '<small>Druk nu op Ctrl+Shift+R (Windows) of Cmd+Shift+R (Mac) voor een harde refresh</small>';
+    }, 1000);
+    
+    function clearAndGo() {
+      // Force a hard reload and go to home
+      window.location.href = '/?t=' + Date.now();
+    }
+  </script>
+</body>
+</html>
+
+

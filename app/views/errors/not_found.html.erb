@@ -1,0 +1,66 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div style="background: linear-gradient(135deg, rgba(108, 117, 125, 0.1) 0%, rgba(108, 117, 125, 0.05) 100%); border: 2px solid rgba(108, 117, 125, 0.3); padding: 3rem; border-radius: 20px; text-align: center; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);">
+        <!-- Error Icon -->
+        <div style="font-size: 6rem; margin-bottom: 1.5rem;">🔍</div>
+        
+        <!-- Titel -->
+        <h1 style="color: #6c757d; font-weight: 700; margin-bottom: 1rem; font-size: 2.5rem;">
+          404
+        </h1>
+        
+        <h2 style="color: #f4f8ff; font-weight: 600; margin-bottom: 1rem;">
+          Pagina Niet Gevonden
+        </h2>
+        
+        <!-- Subtitel -->
+        <p style="color: rgba(244, 248, 255, 0.7); font-size: 1.1rem; margin-bottom: 2rem;">
+          De pagina die je zoekt bestaat niet of is verplaatst.
+        </p>
+        
+        <!-- Foutcode Card (optioneel) -->
+        <% if @error_code.present? %>
+          <div style="background: rgba(0, 0, 0, 0.4); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div style="color: rgba(244, 248, 255, 0.7); font-size: 0.85rem; margin-bottom: 0.5rem;">
+              Referentiecode:
+            </div>
+            <code style="background: rgba(108, 117, 125, 0.2); color: #6c757d; padding: 0.5rem 1rem; border-radius: 6px; font-size: 1rem; font-weight: 600; display: inline-block;">
+              <%= @error_code %>
+            </code>
+          </div>
+        <% end %>
+        
+        <!-- Suggesties -->
+        <div style="background: rgba(30, 227, 207, 0.1); border: 1px solid rgba(30, 227, 207, 0.3); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; text-align: left;">
+          <h5 style="color: #1ee3cf; font-weight: 700; margin-bottom: 1rem;">💡 Suggesties</h5>
+          <ul style="color: rgba(244, 248, 255, 0.8); margin: 0; padding-left: 1.5rem;">
+            <li style="margin-bottom: 0.5rem;">Controleer of de URL correct is getypt</li>
+            <li style="margin-bottom: 0.5rem;">Ga terug naar de homepage</li>
+            <li style="margin-bottom: 0.5rem;">Gebruik het menu om te navigeren</li>
+          </ul>
+        </div>
+        
+        <!-- Actie Knoppen -->
+        <div class="d-flex flex-column gap-3">
+          <%= link_to '🏠 Naar Homepage', root_path, 
+            class: 'btn btn-lg',
+            style: 'background: linear-gradient(135deg, #FC4C02 0%, #FF6B35 100%); color: white; border: none; font-weight: 600; padding: 1rem;'
+          %>
+          
+          <a href="javascript:history.back()" class="btn btn-lg" style="background: rgba(255, 255, 255, 0.1); color: #f4f8ff; border: 1px solid rgba(255, 255, 255, 0.2); font-weight: 600; padding: 1rem;">
+            ← Vorige Pagina
+          </a>
+        </div>
+        
+        <!-- Fun Element -->
+        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+          <p style="color: rgba(244, 248, 255, 0.5); font-size: 0.9rem; margin: 0;">
+            "Niet alle die dwalen zijn verdwaald..." - maar deze pagina is het wel 😅
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

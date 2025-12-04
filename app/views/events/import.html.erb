@@ -1,0 +1,78 @@
+<div style="max-width: 800px; margin: 0 auto; padding: 2rem;">
+  <h1 style="color: #ffffff !important; font-weight: 700 !important; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important; margin-bottom: 2rem;">
+    📁 Importeer Evenementen vanuit Excel
+  </h1>
+  
+  <div class="card-surface" style="padding: 2rem;">
+    <!-- Instructions -->
+    <div style="background: rgba(30, 227, 207, 0.1); border-left: 4px solid #1ee3cf; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+      <h3 style="color: #1ee3cf; margin-bottom: 1rem;">📋 Excel Formaat</h3>
+      <p style="color: rgba(244, 248, 255, 0.9); margin-bottom: 0.75rem;">
+        Je Excel bestand moet de volgende kolommen hebben (eerste rij = headers):
+      </p>
+      <div style="background: rgba(0, 0, 0, 0.2); padding: 1rem; border-radius: 8px; font-family: monospace; font-size: 0.9rem;">
+        <div style="color: #1ee3cf; margin-bottom: 0.5rem;"><strong>Formaat A (Loopjes 2026):</strong></div>
+        <div style="color: rgba(244, 248, 255, 0.8); margin-left: 1rem; margin-bottom: 0.5rem;">Kolom 1: Datum</div>
+        <div style="color: rgba(244, 248, 255, 0.8); margin-left: 1rem; margin-bottom: 0.5rem;">Kolom 2: Run (naam)</div>
+        <div style="color: rgba(244, 248, 255, 0.8); margin-left: 1rem; margin-bottom: 0.5rem;">Kolom 3: Informatie</div>
+        <div style="color: rgba(244, 248, 255, 0.8); margin-left: 1rem; margin-bottom: 1rem;">Kolom 4: Afstand</div>
+        
+        <div style="color: #ffc107; margin-bottom: 0.5rem;"><strong>Formaat B (Uitgebreid):</strong></div>
+        <div style="color: rgba(244, 248, 255, 0.8); margin-left: 1rem; margin-bottom: 0.5rem;">Kolom 1: Naam</div>
+        <div style="color: rgba(244, 248, 255, 0.8); margin-left: 1rem; margin-bottom: 0.5rem;">Kolom 2: Datum</div>
+        <div style="color: rgba(244, 248, 255, 0.8); margin-left: 1rem; margin-bottom: 0.5rem;">Kolom 3: Locatie</div>
+        <div style="color: rgba(244, 248, 255, 0.8); margin-left: 1rem; margin-bottom: 0.5rem;">Kolom 4: Afstand</div>
+        <div style="color: rgba(244, 248, 255, 0.8); margin-left: 1rem; margin-bottom: 0.5rem;">Kolom 5: Organisator</div>
+        <div style="color: rgba(244, 248, 255, 0.8); margin-left: 1rem; margin-bottom: 0.5rem;">Kolom 6: URL</div>
+        <div style="color: rgba(244, 248, 255, 0.8); margin-left: 1rem; margin-bottom: 0.5rem;">Kolom 7: Beschrijving</div>
+        <div style="color: rgba(244, 248, 255, 0.8); margin-left: 1rem; margin-bottom: 0.5rem;">Kolom 8: Prijs</div>
+        <div style="color: rgba(244, 248, 255, 0.8); margin-left: 1rem;">Kolom 9: Inschrijfdeadline</div>
+      </div>
+    </div>
+    
+    <!-- Upload Form -->
+    <%= form_with url: do_import_events_path, method: :post, multipart: true, local: true do |f| %>
+      <div style="margin-bottom: 2rem;">
+        <label style="color: #ffffff; font-weight: 600; display: block; margin-bottom: 1rem; font-size: 1.1rem;">
+          📂 Selecteer Excel Bestand
+        </label>
+        
+        <div style="background: rgba(255, 255, 255, 0.05); border: 2px dashed rgba(255, 255, 255, 0.3); border-radius: 12px; padding: 2rem; text-align: center;">
+          <%= file_field_tag :file, accept: '.xlsx,.xls', style: "width: 100%; padding: 1rem; border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 1rem; cursor: pointer;" %>
+          
+          <p style="color: rgba(244, 248, 255, 0.6); margin-top: 1rem; font-size: 0.9rem;">
+            Toegestane formaten: .xlsx, .xls
+          </p>
+        </div>
+      </div>
+      
+      <!-- Example File -->
+      <div style="background: rgba(255, 193, 7, 0.15); border-left: 4px solid #ffc107; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+        <h3 style="color: #ffc107; margin-bottom: 0.75rem;">💡 Voorbeeld Bestand</h3>
+        <p style="color: rgba(244, 248, 255, 0.9); margin-bottom: 0.5rem;">
+          Je hebt al een bestand: <code style="background: rgba(0, 0, 0, 0.3); padding: 2px 8px; border-radius: 4px;">Loopjes 2026.xlsx</code>
+        </p>
+        <p style="color: rgba(244, 248, 255, 0.7); font-size: 0.9rem;">
+          Locatie: <code style="background: rgba(0, 0, 0, 0.3); padding: 2px 8px; border-radius: 4px;">/app/Imports/Loopjes 2026.xlsx</code>
+        </p>
+      </div>
+      
+      <!-- Actions -->
+      <div style="display: flex; gap: 1rem;">
+        <%= f.submit 'Importeren', class: 'theme-btn', style: 'background: linear-gradient(135deg, #1ee3cf, #34c759); color: #0c1730; padding: 1rem 2rem; font-weight: 700; font-size: 1.1rem;' %>
+        <%= link_to 'Annuleren', events_path, class: 'theme-btn', style: 'background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); padding: 1rem 2rem;' %>
+      </div>
+    <% end %>
+  </div>
+  
+  <!-- Quick Import from Loopjes 2026.xlsx -->
+  <div class="card-surface" style="padding: 2rem; margin-top: 2rem;">
+    <h3 style="color: #ffffff; margin-bottom: 1rem;">⚡ Snelle Import</h3>
+    <p style="color: rgba(244, 248, 255, 0.8); margin-bottom: 1.5rem;">
+      Importeer direct vanuit het bestaande "Loopjes 2026.xlsx" bestand:
+    </p>
+    
+    <%= button_to 'Importeer Loopjes 2026.xlsx', do_import_loopjes_2026_events_path, method: :post, data: { confirm: 'Weet je zeker dat je alle evenementen uit Loopjes 2026.xlsx wilt importeren?' }, class: 'theme-btn', style: 'background: linear-gradient(135deg, #FC4C02, #FF6B35); color: white; padding: 1rem 2rem; font-weight: 700; width: auto;' %>
+  </div>
+</div>
+

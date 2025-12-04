@@ -1,0 +1,42 @@
+{
+  "name": "Afmelden Training - Run for Fun",
+  "short_name": "Afmelden",
+  "description": "Snel afmelden voor je training zonder inloggen",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FC4C02",
+  "theme_color": "#FC4C02",
+  "orientation": "portrait",
+  "categories": ["sports", "fitness", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icon-afmelden-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-afmelden-192.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Afmelden vandaag",
+      "short_name": "Afmelden",
+      "description": "Meld je af voor de training van vandaag",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/icon-afmelden-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
+
+

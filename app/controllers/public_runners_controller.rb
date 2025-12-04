@@ -1,10 +1,45 @@
 class PublicRunnersController < ApplicationController
+  layout 'afmelden'
   protect_from_forgery except: :afmelden
 
   def afmelden
     @user = User.find_by(slug: params[:slug], public_token: params[:token])
     unless @user
       render plain: 'Ongeldige link of loper niet gevonden.', status: :not_found and return
+    end
+
+    # Handle webmanifest request
+    if request.format.webmanifest?
+      manifest = {
+        name: "Afmelden - #{@user.name}",
+        short_name: "Afmelden",
+        description: "Snel afmelden voor je training zonder inloggen",
+        start_url: public_afmelden_path(slug: @user.slug, token: @user.public_token),
+        scope: "/",
+        display: "standalone",
+        background_color: "#FC4C02",
+        theme_color: "#FC4C02",
+        orientation: "portrait",
+        categories: ["sports", "fitness", "lifestyle"],
+        icons: [
+          {
+            src: "/icon-afmelden-192.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "any"
+          },
+          {
+            src: "/icon-afmelden-512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "any maskable"
+          }
+        ]
+      }
+      
+      response.headers['Content-Type'] = 'application/manifest+json'
+      render json: manifest
+      return
     end
 
     today = Date.today

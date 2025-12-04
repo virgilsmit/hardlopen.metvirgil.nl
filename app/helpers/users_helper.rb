@@ -49,6 +49,15 @@ module UsersHelper
     end
   end
 
+  # Prognose 5 km volgens Riegel (exponent 1,06)
+  def prognose_5km(performance)
+    tijd = tijd_naar_seconden(performance.value)
+    afstand = performance.distance.to_f
+    return "" if tijd == 0 || afstand == 0
+    prognose = tijd * (5000.0 / afstand) ** 1.06
+    seconden_naar_tijd(prognose.round)
+  end
+
   # Prognose 10 km volgens Riegel (exponent 1,06)
   def prognose_10km(performance)
     tijd = tijd_naar_seconden(performance.value)

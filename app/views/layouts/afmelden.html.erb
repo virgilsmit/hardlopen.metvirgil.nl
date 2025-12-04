@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Afmelden Training - Run for Fun</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#FC4C02">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Afmelden">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    
+    <!-- PWA Manifest - Dynamic -->
+    <% if @user.present? %>
+      <link rel="manifest" href="<%= public_afmelden_path(slug: @user.slug, token: @user.public_token, format: :webmanifest) %>">
+    <% else %>
+      <link rel="manifest" href="/manifest_afmelden.json">
+    <% end %>
+    
+    <!-- App Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-afmelden-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-afmelden-512.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="/icon-afmelden-192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="/icon-afmelden-512.png">
+    
+    <style>
+      /* Dedicated afmelden app styling - LICHTE VERSIE v2.0 - FORCE REFRESH */
+      /* IMPORTANT: Lichte achtergrond met donkere tekst voor leesbaarheid */
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #F5F7FA;
+        color: #1a1a1a;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .afmelden-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 24px;
+        padding-top: max(24px, env(safe-area-inset-top));
+        padding-bottom: max(24px, env(safe-area-inset-bottom));
+      }
+      
+      .afmelden-header {
+        text-align: center;
+        margin-bottom: 24px;
+      }
+      
+      .afmelden-logo {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 16px;
+        background: linear-gradient(135deg, #FC4C02 0%, #FF6B35 100%);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        box-shadow: 0 8px 24px rgba(252, 76, 2, 0.3);
+      }
+      
+      .afmelden-title {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #1a1a1a;
+      }
+      
+      .afmelden-subtitle {
+        font-size: 14px;
+        color: #6B7280;
+      }
+      
+      .afmelden-card {
+        background: #FFFFFF;
+        border: 1px solid #E5E7EB;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      }
+      
+      .afmelden-btn {
+        width: 100%;
+        padding: 16px;
+        font-size: 16px;
+        font-weight: 600;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      
+      .afmelden-btn--primary {
+        background: linear-gradient(135deg, #FC4C02 0%, #FF6B35 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(252, 76, 2, 0.3);
+      }
+      
+      .afmelden-btn--primary:active {
+        transform: scale(0.98);
+      }
+      
+      .afmelden-btn--secondary {
+        background: #FFFFFF;
+        color: #1a1a1a;
+        border: 2px solid #E5E7EB;
+      }
+      
+      .afmelden-btn--secondary:active {
+        background: #F9FAFB;
+      }
+      
+      .afmelden-input {
+        width: 100%;
+        padding: 12px 16px;
+        font-size: 16px;
+        border: 2px solid #E5E7EB;
+        border-radius: 8px;
+        background: #FFFFFF;
+        color: #1a1a1a;
+        margin-top: 12px;
+      }
+      
+      .afmelden-input:focus {
+        outline: none;
+        border-color: #FC4C02;
+        box-shadow: 0 0 0 3px rgba(252, 76, 2, 0.1);
+      }
+      
+      .afmelden-input::placeholder {
+        color: #9CA3AF;
+      }
+      
+      .alert {
+        padding: 16px;
+        border-radius: 12px;
+        margin-bottom: 16px;
+        font-size: 14px;
+      }
+      
+      .alert-success {
+        background: #D1FAE5;
+        border: 1px solid #34D399;
+        color: #065F46;
+      }
+      
+      .alert-info {
+        background: #DBEAFE;
+        border: 1px solid #60A5FA;
+        color: #1E40AF;
+      }
+    </style>
+  </head>
+  
+  <body>
+    <!-- iOS Safari Install Prompt -->
+    <div id="ios-install-prompt" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); z-index: 10000; overflow-y: auto; -webkit-overflow-scrolling: touch;">
+      <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
+      <div style="background: white; border-radius: 20px; padding: 24px; max-width: 400px; width: 100%; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); margin: auto;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <div style="font-size: 64px; margin-bottom: 12px;">🏃</div>
+          <div style="font-weight: 700; font-size: 22px; margin-bottom: 8px; color: #1a1a1a;">
+            Voeg toe aan beginscherm
+          </div>
+          <div style="font-size: 15px; color: #6B7280; line-height: 1.5;">
+            Maak een snelkoppeling voor direct afmelden
+          </div>
+        </div>
+        
+        <div style="background: #F9FAFB; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+          <div style="font-size: 16px; color: #1a1a1a; font-weight: 700; margin-bottom: 16px; text-align: center;">
+            📱 Voor iPhone (Safari):
+          </div>
+          
+          <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; background: white; padding: 14px; border-radius: 10px; border: 2px solid #E5E7EB;">
+            <div style="font-size: 28px; flex-shrink: 0;">1️⃣</div>
+            <div style="color: #1a1a1a; font-size: 15px; line-height: 1.5;">
+              Tap op het <strong style="font-size: 28px; color: #0EA5E9;">📤</strong> <strong>Deel-icoon</strong><br>
+              <span style="font-size: 13px; color: #6B7280;">(Onderaan in het midden van je scherm)</span>
+            </div>
+          </div>
+          
+          <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; background: white; padding: 14px; border-radius: 10px; border: 2px solid #E5E7EB;">
+            <div style="font-size: 28px; flex-shrink: 0;">2️⃣</div>
+            <div style="color: #1a1a1a; font-size: 15px; line-height: 1.5;">
+              Scroll <strong>naar beneden</strong> in het menu dat verschijnt<br>
+              <span style="font-size: 13px; color: #6B7280;">(De optie staat vaak onderaan, na alle apps)</span>
+            </div>
+          </div>
+          
+          <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; background: white; padding: 14px; border-radius: 10px; border: 2px solid #E5E7EB;">
+            <div style="font-size: 28px; flex-shrink: 0;">2️⃣a</div>
+            <div style="color: #1a1a1a; font-size: 15px; line-height: 1.5;">
+              <strong>OF</strong> tap op <strong>"Wijzig taken"</strong> (onderaan)<br>
+              <span style="font-size: 13px; color: #6B7280;">En voeg "Zet op beginscherm" toe aan je favorieten</span>
+            </div>
+          </div>
+          
+          <div style="display: flex; align-items: flex-start; gap: 12px; background: white; padding: 14px; border-radius: 10px; border: 2px solid #E5E7EB;">
+            <div style="font-size: 28px; flex-shrink: 0;">3️⃣</div>
+            <div style="color: #1a1a1a; font-size: 15px; line-height: 1.5;">
+              Tap op <strong>"Zet op beginscherm"</strong> <span style="font-size: 20px;">➕</span><br>
+              <span style="font-size: 13px; color: #6B7280;">En dan op "Voeg toe"</span>
+            </div>
+          </div>
+        </div>
+        
+        <div style="background: #FEF3C7; border: 2px solid #F59E0B; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+          <div style="color: #92400E; font-weight: 700; font-size: 14px; margin-bottom: 8px;">
+            💡 Tip:
+          </div>
+          <div style="color: #78350F; font-size: 13px; line-height: 1.5;">
+            Zie je "Zet op beginscherm" niet?<br>
+            • Scroll helemaal naar beneden in het share menu<br>
+            • Of tap op "Wijzig taken" en voeg de optie toe<br>
+            • Zorg dat je Safari gebruikt (niet Chrome)
+          </div>
+        </div>
+        
+        <div style="background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%); border-radius: 12px; padding: 16px; margin-bottom: 16px; text-align: center;">
+          <div style="color: white; font-weight: 700; font-size: 16px; margin-bottom: 4px;">
+            ✅ Klaar!
+          </div>
+          <div style="color: rgba(255, 255, 255, 0.95); font-size: 13px;">
+            Je hebt nu een 🏃 icoon op je beginscherm
+          </div>
+        </div>
+        
+        <button onclick="closeInstallPrompt()" style="width: 100%; background: #F3F4F6; border: none; color: #1a1a1a; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 15px;">
+          Begrepen ✓
+        </button>
+      </div>
+      </div>
+    </div>
+    
+    <!-- Chrome/Android Install Prompt (Banner) -->
+    <div id="android-install-prompt" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, #FC4C02 0%, #FF6B35 100%); padding: 20px; padding-bottom: max(20px, env(safe-area-inset-bottom)); box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5); z-index: 10000; animation: slideUp 0.3s ease;">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div style="font-size: 40px;">🏃</div>
+        <div style="flex: 1;">
+          <div style="font-weight: 700; font-size: 16px; margin-bottom: 4px; color: white;">
+            Installeer Afmeld App
+          </div>
+          <div style="font-size: 13px; color: rgba(255, 255, 255, 0.9);">
+            Snel afmelden vanaf je beginscherm
+          </div>
+        </div>
+        <button id="install-btn" style="background: white; border: none; color: #FC4C02; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 14px;">
+          Installeer
+        </button>
+        <button onclick="closeInstallPrompt()" style="background: rgba(255, 255, 255, 0.2); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer; margin-left: -8px;">
+          ✕
+        </button>
+      </div>
+    </div>
+    
+    <!-- Chrome/Android Manual Instructions -->
+    <div id="chrome-install-instructions" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); z-index: 10000; overflow-y: auto; -webkit-overflow-scrolling: touch;">
+      <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
+      <div style="background: white; border-radius: 20px; padding: 24px; max-width: 400px; width: 100%; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); margin: auto;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <div style="font-size: 64px; margin-bottom: 12px;">🏃</div>
+          <div style="font-weight: 700; font-size: 22px; margin-bottom: 8px; color: #1a1a1a;">
+            Voeg toe aan beginscherm
+          </div>
+          <div style="font-size: 15px; color: #6B7280; line-height: 1.5;">
+            Maak een snelkoppeling voor direct afmelden
+          </div>
+        </div>
+        
+        <div style="background: #F9FAFB; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+          <div style="font-size: 16px; color: #1a1a1a; font-weight: 700; margin-bottom: 16px; text-align: center;">
+            📱 Voor Chrome (Android):
+          </div>
+          
+          <div style="background: white; padding: 16px; border-radius: 10px; border: 2px solid #E5E7EB; margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+              <div style="font-size: 32px;">📤</div>
+              <div style="font-size: 28px; color: #FC4C02;">1️⃣</div>
+            </div>
+            <div style="color: #1a1a1a; font-size: 16px; line-height: 1.5; font-weight: 600; margin-bottom: 8px;">
+              Tap op het <strong>delen-icoon</strong> 📤
+            </div>
+            <div style="font-size: 13px; color: #6B7280; margin-bottom: 8px;">
+              Rechtsboven in de adresbalk
+            </div>
+            <div style="background: #F9FAFB; padding: 10px; border-radius: 6px; margin-top: 8px;">
+              <div style="color: #6B7280; font-size: 12px; font-style: italic;">
+                OF tap op het menu ⋮ (3 puntjes)
+              </div>
+            </div>
+          </div>
+          
+          <div style="background: white; padding: 16px; border-radius: 10px; border: 2px solid #E5E7EB; margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+              <div style="font-size: 32px;">📲</div>
+              <div style="font-size: 28px; color: #FC4C02;">2️⃣</div>
+            </div>
+            <div style="color: #1a1a1a; font-size: 16px; line-height: 1.5; font-weight: 600; margin-bottom: 8px;">
+              Zoek naar een van deze opties:
+            </div>
+            <div style="background: #F9FAFB; padding: 10px; border-radius: 6px; margin-bottom: 6px;">
+              <div style="color: #1a1a1a; font-size: 14px; font-weight: 600;">
+                ✓ "App installeren"
+              </div>
+            </div>
+            <div style="background: #F9FAFB; padding: 10px; border-radius: 6px; margin-bottom: 6px;">
+              <div style="color: #1a1a1a; font-size: 14px; font-weight: 600;">
+                ✓ "Toevoegen aan startscherm"
+              </div>
+            </div>
+            <div style="background: #F9FAFB; padding: 10px; border-radius: 6px;">
+              <div style="color: #1a1a1a; font-size: 14px; font-weight: 600;">
+                ✓ "Install app"
+              </div>
+            </div>
+            <div style="font-size: 12px; color: #6B7280; margin-top: 8px;">
+              Staat vaak bovenaan in het menu
+            </div>
+          </div>
+          
+          <div style="background: white; padding: 16px; border-radius: 10px; border: 2px solid #E5E7EB;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+              <div style="font-size: 32px;">✅</div>
+              <div style="font-size: 28px; color: #FC4C02;">3️⃣</div>
+            </div>
+            <div style="color: #1a1a1a; font-size: 16px; line-height: 1.5; font-weight: 600; margin-bottom: 4px;">
+              Bevestig de installatie
+            </div>
+            <div style="font-size: 13px; color: #6B7280;">
+              Tap op "Installeren" of "Toevoegen"
+            </div>
+          </div>
+        </div>
+        
+        <div style="background: #FEF3C7; border: 2px solid #F59E0B; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+          <div style="color: #92400E; font-weight: 700; font-size: 15px; margin-bottom: 10px;">
+            ⚠️ Zie je de optie niet in het menu?
+          </div>
+          <div style="color: #78350F; font-size: 14px; line-height: 1.6; margin-bottom: 8px;">
+            <strong>Mogelijke oorzaken:</strong>
+          </div>
+          <div style="color: #78350F; font-size: 13px; line-height: 1.6;">
+            • Je hebt de app al geïnstalleerd<br>
+            • Je gebruikt niet de nieuwste Chrome versie<br>
+            • De pagina is niet via HTTPS geladen<br>
+            • Chrome ondersteunt het niet op dit apparaat
+          </div>
+          <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #F59E0B;">
+            <div style="color: #92400E; font-weight: 600; font-size: 13px;">
+              💡 Alternatief: Bookmark deze pagina en voeg de bookmark toe aan je beginscherm
+            </div>
+          </div>
+        </div>
+        
+        <div style="background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%); border-radius: 12px; padding: 16px; margin-bottom: 16px; text-align: center;">
+          <div style="color: white; font-weight: 700; font-size: 16px; margin-bottom: 4px;">
+            ✅ Klaar!
+          </div>
+          <div style="color: rgba(255, 255, 255, 0.95); font-size: 13px;">
+            Je hebt nu een 🏃 icoon op je beginscherm
+          </div>
+        </div>
+        
+        <button onclick="closeInstallPrompt()" style="width: 100%; background: #F3F4F6; border: none; color: #1a1a1a; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 15px;">
+          Begrepen ✓
+        </button>
+      </div>
+      </div>
+    </div>
+    
+    <style>
+      @keyframes slideUp {
+        from {
+          transform: translateY(100%);
+        }
+        to {
+          transform: translateY(0);
+        }
+      }
+    </style>
+    
+    <script>
+      // Debug logging
+      console.log('[PWA] User Agent:', navigator.userAgent);
+      console.log('[PWA] Is HTTPS:', window.location.protocol === 'https:');
+      console.log('[PWA] Service Worker support:', 'serviceWorker' in navigator);
+      
+      // Register Service Worker for PWA
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('[PWA] Service Worker registered:', registration);
+            })
+            .catch((error) => {
+              console.error('[PWA] Service Worker registration failed:', error);
+            });
+        });
+      }
+      
+      // PWA Install Prompt Handler
+      let deferredPrompt;
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+      const isAndroid = /Android/.test(navigator.userAgent);
+      const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
+      
+      console.log('[PWA] Is iOS:', isIOS);
+      console.log('[PWA] Is Chrome:', isChrome);
+      console.log('[PWA] Is Android:', isAndroid);
+      console.log('[PWA] Is Standalone:', isInStandaloneMode);
+      
+      // Function to close install prompt
+      window.closeInstallPrompt = function() {
+        const iosPrompt = document.getElementById('ios-install-prompt');
+        const androidPrompt = document.getElementById('android-install-prompt');
+        const chromeInstructions = document.getElementById('chrome-install-instructions');
+        if (iosPrompt) iosPrompt.style.display = 'none';
+        if (androidPrompt) androidPrompt.style.display = 'none';
+        if (chromeInstructions) chromeInstructions.style.display = 'none';
+        // Prevent body scroll lock
+        document.body.style.overflow = '';
+      };
+      
+      // Function to show install instructions
+      window.showInstallInstructions = function() {
+        if (isIOS) {
+          const prompt = document.getElementById('ios-install-prompt');
+          prompt.style.display = 'block';
+          // Prevent body scroll when modal is open
+          document.body.style.overflow = 'hidden';
+        } else {
+          // Show Chrome instructions popup
+          const chromeInstructions = document.getElementById('chrome-install-instructions');
+          chromeInstructions.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+        }
+      };
+      
+      // Close on overlay click
+      document.addEventListener('DOMContentLoaded', function() {
+        const iosPrompt = document.getElementById('ios-install-prompt');
+        const chromeInstructions = document.getElementById('chrome-install-instructions');
+        
+        if (iosPrompt) {
+          iosPrompt.addEventListener('click', function(e) {
+            if (e.target === iosPrompt) {
+              closeInstallPrompt();
+            }
+          });
+        }
+        
+        if (chromeInstructions) {
+          chromeInstructions.addEventListener('click', function(e) {
+            if (e.target === chromeInstructions) {
+              closeInstallPrompt();
+            }
+          });
+        }
+      });
+      
+      // Check if already installed
+      if (!isInStandaloneMode) {
+        // iOS Safari - Show prompt automatically after 3 seconds
+        if (isIOS) {
+          setTimeout(() => {
+            const iosPrompt = document.getElementById('ios-install-prompt');
+            if (iosPrompt && !sessionStorage.getItem('install-prompt-shown')) {
+              iosPrompt.style.display = 'block';
+              document.body.style.overflow = 'hidden';
+              sessionStorage.setItem('install-prompt-shown', 'true');
+            }
+          }, 3000);
+        } 
+        // Chrome/Android
+        else {
+          console.log('[PWA] Setting up beforeinstallprompt listener...');
+          
+          window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('[PWA] beforeinstallprompt event fired!', e);
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show install prompt after 3 seconds
+            setTimeout(() => {
+              const androidPrompt = document.getElementById('android-install-prompt');
+              if (androidPrompt && !sessionStorage.getItem('install-prompt-shown')) {
+                console.log('[PWA] Showing Android install prompt');
+                androidPrompt.style.display = 'block';
+                sessionStorage.setItem('install-prompt-shown', 'true');
+              } else {
+                console.log('[PWA] Not showing prompt - already shown or element not found');
+              }
+            }, 3000);
+          });
+          
+          // Install button click
+          const installBtn = document.getElementById('install-btn');
+          if (installBtn) {
+            installBtn.addEventListener('click', async () => {
+              console.log('[PWA] Install button clicked, deferredPrompt:', deferredPrompt);
+              if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log('[PWA] User choice:', outcome);
+                
+                if (outcome === 'accepted') {
+                  console.log('[PWA] App installed');
+                  document.getElementById('android-install-prompt').style.display = 'none';
+                  const banner = document.getElementById('add-to-home-banner');
+                  if (banner) banner.style.display = 'none';
+                }
+                
+                deferredPrompt = null;
+              } else {
+                console.log('[PWA] No deferredPrompt available');
+              }
+            });
+          }
+          
+          // Fallback: if no beforeinstallprompt after 5 seconds, show manual instructions
+          setTimeout(() => {
+            if (!deferredPrompt) {
+              console.log('[PWA] No beforeinstallprompt event received. Chrome may not support PWA install for this page.');
+              console.log('[PWA] Possible reasons: already installed, not HTTPS, manifest issues, or browser doesn\'t support it');
+            }
+          }, 5000);
+        }
+      } else {
+        // Already installed - hide banner
+        const banner = document.getElementById('add-to-home-banner');
+        if (banner) banner.style.display = 'none';
+      }
+      
+      // Track if installed
+      window.addEventListener('appinstalled', () => {
+        console.log('PWA installed successfully');
+        localStorage.setItem('pwa-installed', 'true');
+        const banner = document.getElementById('add-to-home-banner');
+        if (banner) banner.style.display = 'none';
+      });
+    </script>
+    
+    <%= yield %>
+  </body>
+</html>
+

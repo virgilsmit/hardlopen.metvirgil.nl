@@ -5,7 +5,10 @@
 <% end %>
 
 <h1 class="page-heading">Lopers</h1>
-<p class="section-subtitle accent-text"><strong>Actieve lopers:</strong> <%= @actieve_lopers_count %></p>
+<div class="section-subtitle accent-text" style="display: flex; gap: 2rem; flex-wrap: wrap; align-items: center;">
+  <p style="margin: 0;"><strong>Actieve lopers:</strong> <%= @actieve_lopers_count %></p>
+  <p style="margin: 0;"><strong>Totaal aantal lopers:</strong> <%= @totaal_lopers_count %></p>
+</div>
 
 <div id="lopers" class="surface-dark">
   <!-- Desktop Table -->

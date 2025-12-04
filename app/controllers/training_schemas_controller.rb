@@ -44,9 +44,26 @@ class TrainingSchemasController < ApplicationController
       schema = TrainingSchema.find_by(id: schema_id)
       if schema
         # Alle komende trainingen
-        @upcoming_sessions = schema.training_sessions.where('date >= ?', Date.today).order(:date)
+        all_upcoming = schema.training_sessions.where('date >= ?', Date.today).order(:date)
         # Alle verleden trainingen
-        @past_sessions = schema.training_sessions.where('date < ?', Date.today).order(date: :desc)
+        all_past = schema.training_sessions.where('date < ?', Date.today).order(date: :desc)
+        
+        # Filter op actieve trainingsdagen als de gebruiker die heeft ingesteld
+        if current_user&.training_days.present?
+          @upcoming_sessions = all_upcoming.select do |session|
+            # Gebruik de dag kolom uit de database (lowercase) en vergelijk met training_days (capitalized)
+            day_name = session.dag.to_s.capitalize
+            current_user.training_days.include?(day_name)
+          end
+          @past_sessions = all_past.select do |session|
+            day_name = session.dag.to_s.capitalize
+            current_user.training_days.include?(day_name)
+          end
+        else
+          @upcoming_sessions = all_upcoming
+          @past_sessions = all_past
+        end
+        
         # Voor backwards compatibility: week overzicht
         filtered_sessions = schema.training_sessions.select { |sessie| sessie.date && sessie.date.cweek == week && sessie.date.cwyear == jaar }
         @schemas = [OpenStruct.new(id: schema.id, name: schema.name, description: schema.description, training_sessions: filtered_sessions)]
@@ -86,12 +103,43 @@ class TrainingSchemasController < ApplicationController
       render 'admin/dashboard/training_schema_form', status: :unprocessable_entity, locals: { training_schema: @training_schema, groups: @groups }
     end
   end
+  
+  def update
+    @training_schema = TrainingSchema.find(params[:id])
+    
+    respond_to do |format|
+      if @training_schema.update(training_schema_params)
+        format.json { render json: { success: true, schema: @training_schema }, status: :ok }
+        format.html { redirect_to schema_path, notice: 'Schema bijgewerkt.' }
+      else
+        format.json { render json: { success: false, errors: @training_schema.errors }, status: :unprocessable_entity }
+        format.html { redirect_to schema_path, alert: 'Bijwerken mislukt.' }
+      end
+    end
+  end
 
   def all
     if current_user&.default_training_schema.present?
       schema = current_user.default_training_schema
-      @upcoming_sessions = schema.training_sessions.where('date >= ?', Date.today).order(:date)
-      @past_sessions = schema.training_sessions.where('date < ?', Date.today).order(date: :desc)
+      all_upcoming = schema.training_sessions.where('date >= ?', Date.today).order(:date)
+      all_past = schema.training_sessions.where('date < ?', Date.today).order(date: :desc)
+      
+      # Filter op trainingsdagen van de gebruiker
+      if current_user.training_days.present?
+        @upcoming_sessions = all_upcoming.select do |session|
+          day_name = (session.dag || I18n.l(session.date, format: '%A', locale: :nl)).capitalize
+          current_user.training_days.include?(day_name)
+        end
+        
+        @past_sessions = all_past.select do |session|
+          day_name = (session.dag || I18n.l(session.date, format: '%A', locale: :nl)).capitalize
+          current_user.training_days.include?(day_name)
+        end
+      else
+        @upcoming_sessions = all_upcoming
+        @past_sessions = all_past
+      end
+      
       @schema_name = schema.name
     else
       @upcoming_sessions = []
@@ -106,7 +154,24 @@ class TrainingSchemasController < ApplicationController
 
     if current_user&.default_training_schema.present?
       schema = current_user.default_training_schema
-      @week_sessions = schema.training_sessions.includes(:attendances, :trainer).where(date: Date.today.beginning_of_week..Date.today.end_of_week).order(:date)
+      
+      # Haal alle trainingen van HET SCHEMA van de gebruiker voor deze week
+      all_sessions = schema.training_sessions
+                           .includes(:attendances, :trainer)
+                           .where(date: Date.today.beginning_of_week..Date.today.end_of_week)
+                           .order(:date)
+      
+      # Filter op trainingsdagen van de gebruiker
+      if current_user.training_days.present?
+        @week_sessions = all_sessions.select do |session|
+          # Gebruik de dag kolom uit de database (in Nederlands) en capitalize voor matching
+          day_name = (session.dag || I18n.l(session.date, format: '%A', locale: :nl)).capitalize
+          current_user.training_days.include?(day_name)
+        end
+      else
+        @week_sessions = all_sessions
+      end
+      
       @schema_name = schema.name
     else
       @week_sessions = []

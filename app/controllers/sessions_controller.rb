@@ -63,6 +63,15 @@ class SessionsController < ApplicationController
     user = User.find_by(email: params[:email])
     if user&.authenticate(params[:password])
       session[:user_id] = user.id
+      
+      # Log de login
+      LoginLog.create(
+        user: user,
+        ip_address: request.remote_ip,
+        user_agent: request.user_agent,
+        logged_in_at: Time.current
+      )
+      
       redirect_to root_path, notice: 'Logged in successfully!'
     else
       flash.now[:alert] = 'Invalid email or password'

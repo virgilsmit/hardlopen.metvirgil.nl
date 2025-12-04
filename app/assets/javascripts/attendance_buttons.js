@@ -52,24 +52,68 @@ document.addEventListener("turbo:load", function() {
     });
   });
   
-  // Handle afwezig button clicks to show/hide note field
-  document.querySelectorAll(".afwezig-btn").forEach(function(btn) {
-    btn.addEventListener("click", function(e) {
-      var form = btn.closest("form");
+  // Enable/disable afwezig button based on note field input
+  function setupAfwezigButtonValidation() {
+    // For training_sessions/show.html.erb
+    document.querySelectorAll(".afwezig-btn.inactive").forEach(function(btn) {
       var sessionId = btn.getAttribute("data-session-id");
-      var noteField = document.getElementById("afwezig-note-" + sessionId);
-      if (noteField) {
-        noteField.style.display = "block";
+      var noteField = document.getElementById("attendance_note_" + sessionId);
+      var form = btn.closest("form");
+      
+      if (noteField && form) {
+        function updateButtonState() {
+          var noteValue = noteField.value.trim();
+          if (noteValue.length > 0) {
+            btn.disabled = false;
+            btn.style.opacity = "1";
+            btn.style.cursor = "pointer";
+          } else {
+            btn.disabled = true;
+            btn.style.opacity = "0.35";
+            btn.style.cursor = "not-allowed";
+          }
+        }
+        
+        noteField.addEventListener("input", updateButtonState);
+        noteField.addEventListener("change", updateButtonState);
+        updateButtonState(); // Initial state
       }
     });
+    
+    // For training_sessions/vandaag.html.erb
+    var vandaagNoteField = document.getElementById("attendance_note_vandaag");
+    var vandaagButton = document.getElementById("afwezig-btn-vandaag");
+    var vandaagForm = document.getElementById("afwezig-form-vandaag");
+    
+    if (vandaagNoteField && vandaagButton && vandaagForm && vandaagButton.disabled) {
+      function updateVandaagButtonState() {
+        var noteValue = vandaagNoteField.value.trim();
+        if (noteValue.length > 0) {
+          vandaagButton.disabled = false;
+          vandaagButton.style.opacity = "1";
+          vandaagButton.style.cursor = "pointer";
+        } else {
+          vandaagButton.disabled = true;
+          vandaagButton.style.opacity = "0.5";
+          vandaagButton.style.cursor = "not-allowed";
+        }
+      }
+      
+      vandaagNoteField.addEventListener("input", updateVandaagButtonState);
+      vandaagNoteField.addEventListener("change", updateVandaagButtonState);
+      updateVandaagButtonState(); // Initial state
+    }
+  }
+  
+  setupAfwezigButtonValidation();
+  
+  // Re-run on dynamic content changes
+  var observer = new MutationObserver(function(mutations) {
+    setupAfwezigButtonValidation();
   });
   
-  // Show note field if status is already afwezig
-  document.querySelectorAll(".afwezig-submit").forEach(function(btn) {
-    var sessionId = btn.getAttribute("data-session-id");
-    var noteField = document.getElementById("afwezig-note-" + sessionId);
-    if (noteField) {
-      noteField.style.display = "block";
-    }
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
   });
 }); 

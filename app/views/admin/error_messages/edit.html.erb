@@ -1,0 +1,125 @@
+<div class="container-fluid py-4" style="background: #050912; min-height: 100vh;">
+  <div class="row mb-4">
+    <div class="col-12">
+      <%= link_to '← Terug naar overzicht', admin_error_messages_path, style: "display: inline-block; background: rgba(255,255,255,0.1); color: #f4f8ff; padding: 0.75rem 1.5rem; border-radius: 6px; text-decoration: none; font-weight: 700; margin-bottom: 1rem;" %>
+      
+      <h1 style="color: #ffffff; font-weight: 800; font-size: 2.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+        ✏️ Bewerk Gebruikersmelding
+      </h1>
+      <p style="color: #c9d1d9; font-size: 1.1rem; font-weight: 600;">
+        Foutcode: <code style="background: rgba(252, 76, 2, 0.3); color: #FC4C02; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 800; border: 2px solid rgba(252, 76, 2, 0.6);"><%= @error_log.code %></code>
+      </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Linkerkant: Technische Info -->
+    <div class="col-lg-5 mb-4">
+      <div style="background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 12px; padding: 1.5rem;">
+        <h3 style="color: #1ee3cf; font-weight: 800; margin-bottom: 1rem;">🔍 Technische Info</h3>
+        
+        <div style="margin-bottom: 1.5rem;">
+          <label style="color: #c9d1d9; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Fout Type:</label>
+          <code style="background: rgba(30, 227, 207, 0.2); color: #1ee3cf; padding: 0.5rem; border-radius: 6px; font-weight: 700; display: block;">
+            <%= @error_log.error_class %>
+          </code>
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+          <label style="color: #c9d1d9; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Technische Melding:</label>
+          <div style="background: rgba(0, 0, 0, 0.4); padding: 1rem; border-radius: 6px; border-left: 4px solid #dc3545; color: #ffffff; font-family: monospace; font-size: 0.85rem; max-height: 200px; overflow-y: auto;">
+            <%= @error_log.error_message %>
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+          <label style="color: #c9d1d9; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">URL waar fout optrad:</label>
+          <code style="background: rgba(0, 0, 0, 0.4); color: #ffffff; padding: 0.75rem; border-radius: 6px; font-size: 0.8rem; display: block; word-break: break-all;">
+            <%= @error_log.url %>
+          </code>
+        </div>
+        
+        <div>
+          <label style="color: #c9d1d9; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Aantal keer voorgekomen:</label>
+          <div style="font-size: 2rem; font-weight: 800; color: #FC4C02;">
+            <%= ErrorLog.where(error_class: @error_log.error_class, error_message: @error_log.error_message).count %>x
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rechterkant: Gebruikersmelding Formulier -->
+    <div class="col-lg-7 mb-4">
+      <div style="background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 12px; padding: 1.5rem;">
+        <h3 style="color: #FC4C02; font-weight: 800; margin-bottom: 1rem;">✍️ Gebruikersvriendelijke Melding</h3>
+        
+        <p style="color: #c9d1d9; font-weight: 600; margin-bottom: 1.5rem;">
+          Schrijf een duidelijke melding die gebruikers begrijpen. Vermijd technisch jargon!
+        </p>
+        
+        <%= form_with url: admin_error_message_path(@error_log), method: :patch, local: true do |f| %>
+          <!-- Gebruikersmelding Textarea -->
+          <div style="margin-bottom: 1.5rem;">
+            <label style="color: #ffffff; font-weight: 800; font-size: 1rem; margin-bottom: 0.75rem; display: block;">
+              📝 Melding voor Gebruiker:
+            </label>
+            <%= text_area_tag :custom_message, @error_log.notes, 
+              rows: 8,
+              placeholder: "Voorbeeld:\n\nEr ging iets mis bij het laden van deze pagina.\n\nWat kun je doen:\n- Probeer de pagina opnieuw te laden\n- Ga terug naar de vorige pagina\n- Als het probleem blijft, neem dan contact op met de beheerder\n\nGeef deze foutcode door: #{@error_log.code}",
+              style: "width: 100%; background: rgba(255, 255, 255, 0.95); color: #1a1a1a; border: 3px solid rgba(30, 227, 207, 0.4); border-radius: 8px; padding: 1rem; font-size: 1rem; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;",
+              class: "form-control"
+            %>
+            <small style="color: #8b949e; font-size: 0.85rem; margin-top: 0.5rem; display: block;">
+              Deze tekst zien gebruikers op de error pagina. Wees duidelijk en behulpzaam!
+            </small>
+          </div>
+          
+          <!-- Preview Box -->
+          <div style="background: rgba(40, 167, 69, 0.1); border: 2px solid rgba(40, 167, 69, 0.4); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+            <h5 style="color: #28a745; font-weight: 800; margin-bottom: 1rem;">👁️ Preview voor Gebruiker:</h5>
+            <div style="background: #ffffff; color: #1a1a1a; padding: 2rem; border-radius: 8px; border: 2px solid rgba(0, 0, 0, 0.1);">
+              <div style="font-size: 2rem; margin-bottom: 1rem;">⚠️</div>
+              <h3 style="color: #1a1a1a; font-weight: 700; margin-bottom: 1rem;">Er ging iets mis</h3>
+              <div id="preview-text" style="color: #4a4a4a; font-size: 1rem; line-height: 1.6; white-space: pre-wrap;">
+                <%= @error_log.notes.presence || "Nog geen gebruikersvriendelijke melding ingesteld." %>
+              </div>
+              <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid rgba(0, 0, 0, 0.1);">
+                <div style="color: #6c757d; font-size: 0.9rem;">
+                  Foutcode voor beheerder: <strong style="color: #FC4C02;"><%= @error_log.code %></strong>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Opslaan Button -->
+          <div style="text-align: center;">
+            <%= f.submit '💾 Opslaan', 
+              style: "background: linear-gradient(135deg, #FC4C02 0%, #FF6B35 100%); color: white; border: none; font-weight: 800; padding: 1rem 3rem; font-size: 1.2rem; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(252, 76, 2, 0.4);"
+            %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Live preview van gebruikersmelding
+  const textarea = document.querySelector('textarea[name="custom_message"]');
+  const preview = document.getElementById('preview-text');
+  
+  if (textarea && preview) {
+    textarea.addEventListener('input', function() {
+      preview.textContent = this.value || 'Nog geen gebruikersvriendelijke melding ingesteld.';
+    });
+  }
+</script>
+
+<style>
+  textarea:focus {
+    background: #ffffff !important;
+    border-color: #1ee3cf !important;
+    box-shadow: 0 0 0 0.25rem rgba(30, 227, 207, 0.25) !important;
+  }
+</style>
+

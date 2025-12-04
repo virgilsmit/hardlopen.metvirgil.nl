@@ -1,11 +1,11 @@
 <h1>Register</h1>
 <%= form_with model: @user, scope: :user, url: register_path, local: true do |form| %>
   <% if @user.errors.any? %>
-    <div id="error_explanation" style="border: 2px solid red; padding: 10px; margin-bottom: 20px; background-color: #ffebeb;">
-      <h2 style="color: red;"><%= pluralize(@user.errors.count, "error") %> prohibited this user from being saved:</h2>
-      <ul style="color: red; margin-left: 20px;">
+    <div id="error_explanation" style="border: 2px solid #b42318; padding: 16px; margin-bottom: 24px; background-color: #ffffff !important; color: #0c1729 !important; border-radius: 12px; box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);">
+      <h2 style="color: #0c1729 !important; margin-top: 0;"><%= pluralize(@user.errors.count, "error") %> prohibited this user from being saved:</h2>
+      <ul style="color: #0c1729 !important; margin-left: 20px; font-weight: 600;">
         <% @user.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
+          <li style="color: #0c1729 !important;"><%= message %></li>
         <% end %>
       </ul>
     </div>

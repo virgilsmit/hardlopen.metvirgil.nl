@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PWA Iconen Genereren</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f8f9fa;
+    }
+    
+    h1 {
+      color: #FC4C02;
+    }
+    
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .icon-preview {
+      display: flex;
+      gap: 2rem;
+      margin: 2rem 0;
+      flex-wrap: wrap;
+    }
+    
+    .icon-box {
+      text-align: center;
+    }
+    
+    canvas {
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    button {
+      background: linear-gradient(135deg, #FC4C02 0%, #FF6B35 100%);
+      color: white;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 0.5rem;
+    }
+    
+    button:hover {
+      opacity: 0.9;
+    }
+    
+    .success {
+      background: #28a745;
+      color: white;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      display: none;
+    }
+    
+    .instructions {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 1rem;
+      margin-top: 2rem;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 PWA Iconen Genereren</h1>
+    <p>Genereer PWA iconen voor je hardloop app</p>
+    
+    <div class="icon-preview">
+      <div class="icon-box">
+        <canvas id="canvas192" width="192" height="192"></canvas>
+        <p><strong>192x192px</strong></p>
+        <button onclick="downloadIcon(192)">Download</button>
+      </div>
+      
+      <div class="icon-box">
+        <canvas id="canvas512" width="512" height="512"></canvas>
+        <p><strong>512x512px</strong></p>
+        <button onclick="downloadIcon(512)">Download</button>
+      </div>
+    </div>
+    
+    <button onclick="generateIcons()" style="width: 100%; font-size: 1.2rem;">
+      🚀 Genereer Alle Iconen
+    </button>
+    
+    <div id="success" class="success">
+      ✓ Iconen gegenereerd! Download ze en plaats ze in de /public map als:
+      <ul>
+        <li>icon-192x192.png</li>
+        <li>icon-512x512.png</li>
+        <li>apple-touch-icon.png (gebruik de 192x192)</li>
+      </ul>
+    </div>
+    
+    <div class="instructions">
+      <h3>📝 Instructies:</h3>
+      <ol>
+        <li>Klik op "Genereer Alle Iconen"</li>
+        <li>Download beide iconen</li>
+        <li>Hernoem en upload naar de <code>/public</code> map:
+          <ul>
+            <li><code>icon-192x192.png</code></li>
+            <li><code>icon-512x512.png</code></li>
+            <li><code>apple-touch-icon.png</code> (kopie van 192x192)</li>
+          </ul>
+        </li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    function generateIcons() {
+      drawIcon(192);
+      drawIcon(512);
+      document.getElementById('success').style.display = 'block';
+    }
+    
+    function drawIcon(size) {
+      const canvas = document.getElementById(`canvas${size}`);
+      const ctx = canvas.getContext('2d');
+      
+      // Background gradient
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#FC4C02');
+      gradient.addColorStop(1, '#FF6B35');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, size, size);
+      
+      // Runner emoji als placeholder
+      ctx.font = `${size * 0.5}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🏃‍♂️', size/2, size/2);
+      
+      // Text "RUN"
+      ctx.fillStyle = 'white';
+      ctx.font = `bold ${size * 0.15}px Arial`;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+      ctx.shadowBlur = 10;
+      ctx.fillText('RUN', size/2, size * 0.8);
+      
+      // Text "FOR FUN"
+      ctx.font = `bold ${size * 0.08}px Arial`;
+      ctx.fillText('FOR FUN', size/2, size * 0.92);
+    }
+    
+    function downloadIcon(size) {
+      const canvas = document.getElementById(`canvas${size}`);
+      const link = document.createElement('a');
+      link.download = `icon-${size}x${size}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+    
+    // Auto-generate on load
+    window.addEventListener('load', generateIcons);
+  </script>
+</body>
+</html>
+
+

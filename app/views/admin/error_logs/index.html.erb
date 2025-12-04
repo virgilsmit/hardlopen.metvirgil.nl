@@ -1,0 +1,355 @@
+<!-- Error Logs Index - High Contrast Design -->
+<div class="container-fluid py-4" style="background: #ffffff !important; min-height: 100vh !important;">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="display-4" style="color: #212529 !important; font-weight: 700 !important;">
+        🚨 Error Logs
+      </h1>
+      <p style="color: #495057 !important; font-size: 1.1rem !important; font-weight: 600 !important;">Volledige foutafhandeling en monitoring</p>
+    </div>
+  </div>
+
+  <!-- Tabs voor Actief / Archief -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div style="display: flex; gap: 1rem; border-bottom: 3px solid #dee2e6;">
+        <%= link_to admin_error_logs_path(tab: 'active'), 
+          style: "padding: 1rem 2rem; text-decoration: none; font-weight: 700; font-size: 1.1rem; border-bottom: 4px solid #{params[:tab] == 'archive' ? 'transparent' : '#FC4C02'}; color: #{params[:tab] == 'archive' ? '#6c757d' : '#FC4C02'} !important; transition: all 0.2s;" do %>
+          🔴 Actief <span style="background: #dc3545; color: white; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.9rem; margin-left: 0.5rem;"><%= @stats[:unresolved] %></span>
+        <% end %>
+        <%= link_to admin_error_logs_path(tab: 'archive'), 
+          style: "padding: 1rem 2rem; text-decoration: none; font-weight: 700; font-size: 1.1rem; border-bottom: 4px solid #{params[:tab] == 'archive' ? '#0c7c6f' : 'transparent'}; color: #{params[:tab] == 'archive' ? '#0c7c6f' : '#6c757d'} !important; transition: all 0.2s;" do %>
+          📦 Archief <span style="background: #28a745; color: white; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.9rem; margin-left: 0.5rem;"><%= ErrorLog.resolved.count %></span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistieken - Horizontale Tabel -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <table style="width: 100% !important; background: #f8f9fa !important; border: 2px solid #dee2e6 !important; border-radius: 12px !important; overflow: hidden !important;">
+        <tr>
+          <td style="padding: 1.5rem !important; text-align: center !important; border-right: 2px solid #dee2e6 !important;">
+            <div style="font-size: 2rem !important; font-weight: 700 !important; color: #FC4C02 !important;"><%= @stats[:total] %></div>
+            <div style="color: #495057 !important; font-size: 0.9rem !important; margin-top: 0.5rem !important; font-weight: 600 !important;">Totaal</div>
+          </td>
+          <td style="padding: 1.5rem !important; text-align: center !important; border-right: 2px solid #dee2e6 !important;">
+            <div style="font-size: 2rem !important; font-weight: 700 !important; color: #dc3545 !important;"><%= @stats[:unresolved] %></div>
+            <div style="color: #495057 !important; font-size: 0.9rem !important; margin-top: 0.5rem !important; font-weight: 600 !important;">⚠ Onopgelost</div>
+          </td>
+          <td style="padding: 1.5rem !important; text-align: center !important; border-right: 2px solid #dee2e6 !important;">
+            <div style="font-size: 2rem !important; font-weight: 700 !important; color: #0c7c6f !important;"><%= @stats[:today] %></div>
+            <div style="color: #495057 !important; font-size: 0.9rem !important; margin-top: 0.5rem !important; font-weight: 600 !important;">Vandaag</div>
+          </td>
+          <td style="padding: 1.5rem !important; text-align: center !important;">
+            <div style="font-size: 2rem !important; font-weight: 700 !important; color: #6c757d !important;"><%= @stats[:this_week] %></div>
+            <div style="color: #495057 !important; font-size: 0.9rem !important; margin-top: 0.5rem !important; font-weight: 600 !important;">Deze Week</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  
+  <!-- Meest Voorkomende Fouten -->
+  <% if @stats[:by_class].any? %>
+    <div class="row mb-4">
+      <div class="col-12">
+        <div style="background: #f8f9fa !important; border: 2px solid #dee2e6 !important; border-radius: 12px; padding: 1.5rem;">
+          <h4 style="color: #0c7c6f !important; margin-bottom: 1rem; font-weight: 700;">📊 Meest Voorkomende Fouten</h4>
+          <div class="row">
+            <% @stats[:by_class].first(6).each do |error_class, count| %>
+              <div class="col-md-4 mb-2">
+                <div style="background: #e9ecef !important; padding: 0.75rem; border-radius: 8px; border-left: 4px solid #FC4C02;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <code style="color: #212529 !important; font-size: 0.9rem; flex: 1; margin-right: 0.5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600;">
+                      <%= error_class&.split('::')&.last || 'Unknown' %>
+                    </code>
+                    <span style="background: rgba(252, 76, 2, 0.3); color: #FC4C02 !important; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 700; font-size: 0.9rem;">
+                      <%= count %>x
+                    </span>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Filters (alleen tonen in Actief tab) -->
+  <% if @active_tab != 'archive' %>
+    <div class="row mb-4">
+      <div class="col-12">
+        <div style="background: #f8f9fa !important; padding: 1.5rem; border-radius: 12px; border: 2px solid #dee2e6 !important;">
+          <h4 style="color: #212529 !important; margin-bottom: 1rem; font-weight: 700;">🔍 Filters</h4>
+          <%= form_with url: admin_error_logs_path, method: :get, local: true do |f| %>
+            <%= hidden_field_tag :tab, 'active' %>
+            <div class="row">
+            <div class="col-md-3 mb-2">
+              <label style="color: #495057 !important; font-weight: 600; margin-bottom: 0.5rem; display: block;">Status</label>
+              <%= f.select :status, 
+                options_for_select([
+                  ['Alle Fouten', ''],
+                  ['Onopgelost', 'unresolved'],
+                  ['Opgelost', 'resolved']
+                ], params[:status]),
+                {},
+                { class: 'form-control', style: 'background: #f8f9fa !important; color: #212529 !important; border: 1px solid rgba(255,255,255,0.3) !important; font-weight: 600;' }
+              %>
+            </div>
+            <div class="col-md-3 mb-2">
+              <label style="color: #495057 !important; font-weight: 600; margin-bottom: 0.5rem; display: block;">Periode</label>
+              <%= f.select :period,
+                options_for_select([
+                  ['Alle Periodes', ''],
+                  ['Vandaag', 'today'],
+                  ['Deze Week', 'week'],
+                  ['Deze Maand', 'month']
+                ], params[:period]),
+                {},
+                { class: 'form-control', style: 'background: #f8f9fa !important; color: #212529 !important; border: 1px solid rgba(255,255,255,0.3) !important; font-weight: 600;' }
+              %>
+            </div>
+            <div class="col-md-3 mb-2">
+              <label style="color: #495057 !important; font-weight: 600; margin-bottom: 0.5rem; display: block;">Fout Type</label>
+              <%= f.select :error_class,
+                options_for_select([['Alle Fout Types', '']] + @stats[:by_class].map { |k, v| ["#{k} (#{v})", k] }, params[:error_class]),
+                {},
+                { class: 'form-control', style: 'background: #f8f9fa !important; color: #212529 !important; border: 1px solid rgba(255,255,255,0.3) !important; font-weight: 600;' }
+              %>
+            </div>
+            <div class="col-md-3 mb-2" style="display: flex; align-items: flex-end;">
+              <%= f.submit 'Filteren', class: 'btn w-100', style: 'background: linear-gradient(135deg, #FC4C02 0%, #FF6B35 100%); color: white !important; border: none; font-weight: 700; padding: 0.75rem; font-size: 1rem;' %>
+            </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Bulk Acties -->
+  <% if @error_logs.any? %>
+    <div class="row mb-3">
+      <div class="col-12">
+        <div style="background: #f8f9fa !important; padding: 1rem; border-radius: 8px; border: 2px solid #dee2e6 !important;">
+          <%= form_with url: bulk_resolve_admin_error_logs_path, method: :post, local: true, id: 'bulk-form' do %>
+            <%= hidden_field_tag :tab, @active_tab %>
+            <div class="d-flex gap-2 align-items-center flex-wrap">
+              <% if @active_tab == 'active' %>
+                <button type="submit" class="btn btn-sm" style="background: #28a745; color: white !important; border: none; font-weight: 700;">
+                  ✓ Markeer Geselecteerd als Opgelost
+                </button>
+              <% end %>
+              <%= button_to 'Verwijder Geselecteerd', bulk_delete_admin_error_logs_path, 
+                method: :post, 
+                form: { id: 'bulk-delete-form' },
+                class: 'btn btn-sm',
+                style: 'background: #dc3545; color: white !important; font-weight: 700;',
+                data: { confirm: 'Weet je zeker dat je de geselecteerde fouten wilt verwijderen?' }
+              %>
+              <% if @active_tab == 'archive' %>
+                <%= button_to 'Verwijder Alle Gearchiveerde', clear_resolved_admin_error_logs_path,
+                  method: :delete,
+                  class: 'btn btn-sm',
+                  style: 'background: #6c757d; color: white !important; font-weight: 700;',
+                  data: { confirm: 'Weet je zeker dat je alle gearchiveerde fouten wilt verwijderen?' }
+                %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Error Logs Tabel - Ultra High Contrast Light Theme -->
+  <div class="row">
+    <div class="col-12">
+      <% if @error_logs.any? %>
+        <div style="border-radius: 12px !important; overflow-x: auto !important; overflow-y: visible !important; border: 3px solid #FC4C02 !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important; -webkit-overflow-scrolling: touch !important;">
+          <table class="table table-hover" style="margin: 0 !important; background: #ffffff !important; min-width: 1200px !important;">
+            <thead style="background: #f8f9fa !important; border-bottom: 3px solid #FC4C02 !important;">
+              <tr>
+                <th style="padding: 0.5rem !important; border-right: 2px solid #dee2e6 !important; color: #212529 !important; font-weight: 700 !important; font-size: 0.85rem !important; min-width: 50px !important;">
+                  <input type="checkbox" id="select-all" style="cursor: pointer !important; width: 18px !important; height: 18px !important; accent-color: #FC4C02 !important;">
+                </th>
+                <th style="padding: 0.5rem !important; border-right: 2px solid #dee2e6 !important; font-weight: 700 !important; color: #212529 !important; font-size: 0.85rem !important; min-width: 140px !important;">Foutcode</th>
+                <th style="padding: 0.5rem !important; border-right: 2px solid #dee2e6 !important; font-weight: 700 !important; color: #212529 !important; font-size: 0.85rem !important; min-width: 120px !important;">Datum</th>
+                <th style="padding: 0.5rem !important; border-right: 2px solid #dee2e6 !important; font-weight: 700 !important; color: #212529 !important; font-size: 0.85rem !important; min-width: 100px !important;">Type</th>
+                <th style="padding: 0.5rem !important; border-right: 2px solid #dee2e6 !important; font-weight: 700 !important; color: #212529 !important; font-size: 0.85rem !important; min-width: 250px !important;">Melding</th>
+                <th style="padding: 0.5rem !important; border-right: 2px solid #dee2e6 !important; font-weight: 700 !important; color: #212529 !important; font-size: 0.85rem !important; min-width: 150px !important;">Gebruiker</th>
+                <th style="padding: 0.5rem !important; border-right: 2px solid #dee2e6 !important; font-weight: 700 !important; color: #212529 !important; font-size: 0.85rem !important; min-width: 80px !important;">Status</th>
+                <th style="padding: 0.5rem !important; font-weight: 700 !important; color: #212529 !important; font-size: 0.85rem !important; min-width: 100px !important;">Acties</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @error_logs.each_with_index do |log, index| %>
+                <tr onclick="window.location.href='<%= admin_error_log_path(log) %>';" style="border-top: 2px solid #dee2e6 !important; background: <%= index.even? ? '#ffffff' : '#f8f9fa' %> !important; <%= 'border-left: 5px solid #dc3545 !important;' unless log.resolved? %> cursor: pointer !important; transition: background 0.2s ease !important;" onmouseover="this.style.background='#e9ecef'" onmouseout="this.style.background='<%= index.even? ? '#ffffff' : '#f8f9fa' %>'"
+                  <!-- 1. Checkbox -->
+                  <td style="padding: 0.5rem !important; border-right: 2px solid #dee2e6 !important;" onclick="event.stopPropagation();">
+                    <input type="checkbox" name="error_log_ids[]" value="<%= log.id %>" class="error-log-checkbox" form="bulk-form" style="cursor: pointer !important; width: 18px !important; height: 18px !important; accent-color: #FC4C02 !important;">
+                  </td>
+                  <!-- 2. Foutcode + Counter -->
+                  <td style="padding: 0.5rem !important; border-right: 2px solid #dee2e6 !important;">
+                    <div style="display: flex !important; align-items: center !important; gap: 0.5rem !important;">
+                      <code style="background: #fff3e0 !important; padding: 0.3rem 0.5rem !important; border-radius: 4px !important; color: #d63900 !important; font-weight: 700 !important; font-size: 0.8rem !important; border: 2px solid #d63900 !important; white-space: nowrap !important; display: inline-block !important;">
+                        <%= log.code %>
+                      </code>
+                      <% if log.occurrence_count > 1 %>
+                        <span style="background: #dc3545 !important; color: white !important; padding: 0.2rem 0.5rem !important; border-radius: 12px !important; font-size: 0.7rem !important; font-weight: 700 !important; white-space: nowrap !important;">
+                          ×<%= log.occurrence_count %>
+                        </span>
+                      <% end %>
+                    </div>
+                  </td>
+                  <!-- 3. Datum (NIEUWE POSITIE!) -->
+                  <td style="padding: 0.5rem !important; border-right: 2px solid #dee2e6 !important;">
+                    <div style="display: flex !important; flex-direction: column !important; gap: 0.2rem !important;">
+                      <span style="font-size: 0.8rem !important; color: #212529 !important; font-weight: 600 !important; white-space: nowrap !important;" title="Laatste keer: <%= log.last_occurrence_at&.strftime('%d-%m-%Y %H:%M') %>">
+                        <%= (log.last_occurrence_at || log.created_at).strftime('%d-%m-%Y %H:%M') %>
+                      </span>
+                      <% if log.occurrence_count > 1 && log.first_occurrence_at %>
+                        <span style="font-size: 0.65rem !important; color: #6c757d !important; font-weight: 500 !important;" title="Eerste keer">
+                          ↳ <%= log.first_occurrence_at.strftime('%d-%m %H:%M') %>
+                        </span>
+                      <% end %>
+                    </div>
+                  </td>
+                  <!-- 4. Type -->
+                  <td style="padding: 0.5rem !important; border-right: 2px solid #dee2e6 !important;">
+                    <% if log.error_class.present? %>
+                      <span style="font-family: monospace !important; font-size: 0.8rem !important; color: #0c7c6f !important; font-weight: 600 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; display: block !important;" title="<%= log.error_class %>">
+                        <%= log.error_class.split('::').last %>
+                      </span>
+                    <% else %>
+                      <span style="color: #6c757d !important; font-style: italic !important;">-</span>
+                    <% end %>
+                  </td>
+                  <!-- 5. Melding -->
+                  <td style="padding: 0.5rem !important; border-right: 2px solid #dee2e6 !important;">
+                    <% if log.error_message.present? %>
+                      <div style="overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; color: #212529 !important; font-weight: 600 !important; font-size: 0.8rem !important;" title="<%= log.error_message %>">
+                        <%= log.short_message %>
+                      </div>
+                    <% else %>
+                      <span style="color: #6c757d !important; font-style: italic !important; font-size: 0.8rem !important;">-</span>
+                    <% end %>
+                  </td>
+                  <!-- 6. Gebruiker -->
+                  <td style="padding: 0.5rem !important; border-right: 2px solid #dee2e6 !important;">
+                    <span style="font-size: 0.8rem !important; color: #212529 !important; font-weight: 600 !important; white-space: nowrap !important;">
+                      <%= log.user ? "#{log.user.name} (ID: #{log.user.id})" : "Gast" %>
+                    </span>
+                  </td>
+                  <!-- 7. Status -->
+                  <td style="padding: 0.5rem !important; border-right: 2px solid #dee2e6 !important;">
+                    <% if log.resolved? %>
+                      <span style="background: #d4edda !important; color: #155724 !important; padding: 0.3rem 0.6rem !important; border-radius: 8px !important; font-size: 0.75rem !important; font-weight: 700 !important; border: 1px solid #28a745 !important; white-space: nowrap !important; display: inline-block !important;" title="Opgelost op <%= log.resolved_at&.strftime('%d-%m-%Y %H:%M') %>">
+                        ✓ Opgelost
+                      </span>
+                    <% else %>
+                      <span style="background: #f8d7da !important; color: #721c24 !important; padding: 0.3rem 0.6rem !important; border-radius: 8px !important; font-size: 0.75rem !important; font-weight: 700 !important; border: 1px solid #dc3545 !important; white-space: nowrap !important; display: inline-block !important;">
+                        ⚠ Open
+                      </span>
+                    <% end %>
+                  </td>
+                  <!-- 8. Acties -->
+                  <td style="padding: 0.5rem !important;" onclick="event.stopPropagation();">
+                    <a href="<%= admin_error_log_path(log) %>" class="btn btn-sm" style="background: #0c7c6f !important; color: #ffffff !important; border: 2px solid #0c7c6f !important; font-weight: 700 !important; padding: 0.4rem 0.7rem !important; font-size: 0.8rem !important; box-shadow: 0 2px 4px rgba(12, 124, 111, 0.3) !important; white-space: nowrap !important; display: inline-block !important; text-decoration: none !important;">Details</a>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Showing latest 100 errors (pagination removed for simplicity) -->
+      <% else %>
+        <div style="background: rgba(40, 167, 69, 0.15); border: 2px solid rgba(40, 167, 69, 0.4); padding: 3rem; border-radius: 12px; text-align: center;">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">✨</div>
+          <h3 style="color: #28a745 !important; font-weight: 700; margin-bottom: 0.5rem;">Geen Fouten Gevonden</h3>
+          <p style="color: #495057 !important; font-weight: 500;">
+            <% if params[:status].present? || params[:period].present? || params[:error_class].present? %>
+              Geen fouten gevonden met de huidige filters.
+            <% else %>
+              De applicatie draait momenteel foutloos! 🎉
+            <% end %>
+          </p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Select all checkbox functionality
+  document.getElementById('select-all')?.addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.error-log-checkbox');
+    checkboxes.forEach(cb => cb.checked = this.checked);
+  });
+  
+  // Sync bulk delete form with bulk resolve form checkboxes
+  document.addEventListener('DOMContentLoaded', function() {
+    const bulkDeleteBtn = document.querySelector('form#bulk-delete-form button');
+    if (bulkDeleteBtn) {
+      bulkDeleteBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const checkboxes = document.querySelectorAll('.error-log-checkbox:checked');
+        const form = this.closest('form');
+        
+        // Clear existing hidden inputs
+        form.querySelectorAll('input[name="error_log_ids[]"]').forEach(input => input.remove());
+        
+        // Add selected IDs
+        checkboxes.forEach(cb => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = 'error_log_ids[]';
+          input.value = cb.value;
+          form.appendChild(input);
+        });
+        
+        if (checkboxes.length === 0) {
+          alert('Selecteer eerst één of meer fouten');
+          return;
+        }
+        
+        if (confirm('Weet je zeker dat je de geselecteerde fouten wilt verwijderen?')) {
+          form.submit();
+        }
+      });
+    }
+  });
+</script>
+
+<style>
+  /* WCAG AA Compliant Form Controls */
+  .form-control:focus,
+  .form-select:focus {
+    background: rgba(0,0,0,0.5) !important;
+    border-color: #0c7c6f !important;
+    color: #212529 !important;
+    box-shadow: 0 0 0 0.25rem rgba(30, 227, 207, 0.25) !important;
+  }
+  
+  /* High Contrast Checkboxes */
+  input[type="checkbox"] {
+    accent-color: #FC4C02;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+  
+  /* Readable Table Hover */
+  .table-hover tbody tr:hover {
+    background: rgba(30, 227, 207, 0.1) !important;
+  }
+  
+  /* High Contrast Buttons */
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+</style>

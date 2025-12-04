@@ -1,0 +1,113 @@
+<div class="event-details-page" style="max-width: 900px; margin: 0 auto; padding: 2rem;">
+  <!-- Back Button -->
+  <div style="margin-bottom: 2rem;">
+    <%= link_to events_path, class: 'theme-btn', style: 'background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);' do %>
+      <span>← Terug naar evenementen</span>
+    <% end %>
+  </div>
+  
+  <!-- Event Header -->
+  <div class="card-surface" style="padding: 2rem; margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <div style="color: rgba(244, 248, 255, 0.6); font-size: 0.9rem; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">
+          <%= @event.past? ? '🏁 Afgelopen' : '📅 Komend' %> Evenement
+        </div>
+        <h1 style="color: #ffffff !important; font-weight: 700 !important; margin-bottom: 0.5rem; font-size: 2.25rem;">
+          <%= @event.name %>
+        </h1>
+        <div style="color: #1ee3cf; font-weight: 600; font-size: 1.25rem;">
+          📅 <%= l(@event.date, format: :long) %>
+        </div>
+      </div>
+      
+      <% if @event.registration_open? && !@event.past? %>
+        <span style="background: rgba(110, 231, 90, 0.2); color: #6ee75a; padding: 0.75rem 1.5rem; border-radius: 12px; font-size: 1rem; font-weight: 700; border: 2px solid #6ee75a;">
+          ✓ Inschrijving Open
+        </span>
+      <% end %>
+    </div>
+    
+    <!-- Key Info Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+      <% if @event.distance.present? %>
+        <div style="background: rgba(30, 227, 207, 0.1); padding: 1.25rem; border-radius: 12px; border: 1px solid rgba(30, 227, 207, 0.3);">
+          <div style="color: #1ee3cf; font-size: 2rem; margin-bottom: 0.5rem;">🏃‍♂️</div>
+          <div style="color: rgba(244, 248, 255, 0.6); font-size: 0.85rem; margin-bottom: 0.25rem;">Afstand</div>
+          <div style="color: #ffffff; font-weight: 700; font-size: 1.25rem;"><%= @event.distance %></div>
+        </div>
+      <% end %>
+      
+      <% if @event.location.present? %>
+        <div style="background: rgba(30, 227, 207, 0.1); padding: 1.25rem; border-radius: 12px; border: 1px solid rgba(30, 227, 207, 0.3);">
+          <div style="color: #1ee3cf; font-size: 2rem; margin-bottom: 0.5rem;">📍</div>
+          <div style="color: rgba(244, 248, 255, 0.6); font-size: 0.85rem; margin-bottom: 0.25rem;">Locatie</div>
+          <div style="color: #ffffff; font-weight: 600; font-size: 1.1rem;"><%= @event.location %></div>
+        </div>
+      <% end %>
+      
+      <% if @event.price.present? %>
+        <div style="background: rgba(30, 227, 207, 0.1); padding: 1.25rem; border-radius: 12px; border: 1px solid rgba(30, 227, 207, 0.3);">
+          <div style="color: #1ee3cf; font-size: 2rem; margin-bottom: 0.5rem;">💶</div>
+          <div style="color: rgba(244, 248, 255, 0.6); font-size: 0.85rem; margin-bottom: 0.25rem;">Prijs</div>
+          <div style="color: #ffffff; font-weight: 700; font-size: 1.25rem;"><%= @event.price %></div>
+        </div>
+      <% end %>
+      
+      <% if @event.registration_deadline.present? %>
+        <div style="background: rgba(252, 76, 2, 0.1); padding: 1.25rem; border-radius: 12px; border: 1px solid rgba(252, 76, 2, 0.3);">
+          <div style="color: #FC4C02; font-size: 2rem; margin-bottom: 0.5rem;">⏰</div>
+          <div style="color: rgba(244, 248, 255, 0.6); font-size: 0.85rem; margin-bottom: 0.25rem;">Deadline</div>
+          <div style="color: #ffffff; font-weight: 600; font-size: 1rem;"><%= l(@event.registration_deadline, format: '%d-%m-%Y') %></div>
+        </div>
+      <% end %>
+    </div>
+    
+    <!-- Organizer -->
+    <% if @event.organizer.present? %>
+      <div style="padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px; margin-bottom: 1.5rem;">
+        <span style="color: rgba(244, 248, 255, 0.6); font-size: 0.9rem;">Organisator:</span>
+        <span style="color: #ffffff; font-weight: 600; margin-left: 0.5rem;"><%= @event.organizer %></span>
+      </div>
+    <% end %>
+    
+    <!-- Description -->
+    <% if @event.description.present? %>
+      <div style="color: rgba(244, 248, 255, 0.9); line-height: 1.8; font-size: 1.05rem; margin-bottom: 2rem;">
+        <%= simple_format(@event.description) %>
+      </div>
+    <% end %>
+    
+    <!-- Action Buttons -->
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+      <% if @event.url.present? && !@event.past? %>
+        <%= link_to @event.url, target: '_blank', rel: 'noopener', class: 'theme-btn', style: 'background: linear-gradient(135deg, #FC4C02, #FF6B35); color: white; padding: 1rem 2rem; font-weight: 700; font-size: 1.1rem; flex: 1; min-width: 200px; text-align: center; box-shadow: 0 4px 12px rgba(252, 76, 2, 0.4);' do %>
+          <span>🔗 Inschrijven →</span>
+        <% end %>
+      <% end %>
+      
+      <% if current_user&.admin? || current_user&.has_role?(:trainer) %>
+        <%= link_to edit_event_path(@event), class: 'theme-btn', style: 'background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.3); padding: 1rem 1.5rem;' do %>
+          <span>✏️ Bewerken</span>
+        <% end %>
+        <%= button_to event_path(@event), method: :delete, data: { confirm: 'Weet je zeker dat je dit evenement wilt verwijderen?' }, class: 'theme-btn', style: 'background: rgba(220, 53, 69, 0.2); border: 1px solid #dc3545; color: #dc3545; padding: 1rem 1.5rem;' do %>
+          <span>🗑️ Verwijderen</span>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<style>
+  @media (max-width: 768px) {
+    .event-details-page {
+      padding: 1rem !important;
+    }
+    
+    .event-details-page h1 {
+      font-size: 1.75rem !important;
+    }
+  }
+</style>
+
+

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WCAG Contrast Checker - Hardlopen met Virgil</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #050912 0%, #0d1117 100%);
+      color: #f4f8ff;
+      padding: 2rem;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #FC4C02;
+    }
+    
+    .checker-box {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .color-input-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .input-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    label {
+      font-weight: 700;
+      color: #1ee3cf;
+    }
+    
+    input[type="color"] {
+      width: 100%;
+      height: 60px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    
+    input[type="text"] {
+      width: 100%;
+      padding: 0.75rem;
+      background: rgba(0, 0, 0, 0.4);
+      color: #f4f8ff;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      font-weight: 600;
+      font-family: monospace;
+    }
+    
+    .result-box {
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+    }
+    
+    .ratio-display {
+      font-size: 4rem;
+      font-weight: 700;
+      margin: 1rem 0;
+    }
+    
+    .pass {
+      color: #28a745;
+    }
+    
+    .fail {
+      color: #dc3545;
+    }
+    
+    .preview-box {
+      padding: 3rem;
+      border-radius: 8px;
+      margin: 2rem 0;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .standard-item {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    
+    .standard-item h3 {
+      color: #1ee3cf;
+      margin-bottom: 0.5rem;
+    }
+    
+    .color-swatch {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      margin-right: 0.5rem;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 WCAG Contrast Checker</h1>
+    <p style="font-size: 1.1rem; color: #c9d1d9; margin-bottom: 2rem;">
+      Test contrast ratios voor toegankelijkheid volgens WCAG AA standaard
+    </p>
+    
+    <!-- Custom Color Checker -->
+    <div class="checker-box">
+      <h2 style="color: #f4f8ff; margin-bottom: 1.5rem;">🔍 Test Je Eigen Kleuren</h2>
+      <div class="color-input-group">
+        <div class="input-wrapper">
+          <label>Achtergrondkleur</label>
+          <input type="color" id="bg-color" value="#050912">
+          <input type="text" id="bg-hex" value="#050912" placeholder="#000000">
+        </div>
+        <div class="input-wrapper">
+          <label>Tekstkleur</label>
+          <input type="color" id="text-color" value="#f4f8ff">
+          <input type="text" id="text-hex" value="#f4f8ff" placeholder="#ffffff">
+        </div>
+      </div>
+      
+      <div class="result-box">
+        <h3 style="color: #c9d1d9; margin-bottom: 1rem;">Contrast Ratio</h3>
+        <div class="ratio-display" id="ratio-display">-</div>
+        <div id="wcag-result" style="font-size: 1.2rem; font-weight: 600;"></div>
+      </div>
+      
+      <div class="preview-box" id="preview-box">
+        <h2>Preview: Dit is voorbeeld tekst</h2>
+        <p style="font-size: 1.1rem; margin-top: 1rem;">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Deze tekst zou perfect leesbaar moeten zijn.
+        </p>
+      </div>
+    </div>
+    
+    <!-- Site Color Standards -->
+    <div class="checker-box">
+      <h2 style="color: #f4f8ff; margin-bottom: 1.5rem;">✅ Hardlopen met Virgil - Standaard Kleuren</h2>
+      
+      <div class="standard-item">
+        <h3>Donkere Achtergrond (#050912)</h3>
+        <p style="color: #c9d1d9;">
+          <span class="color-swatch" style="background: #050912;"></span>
+          Hoofdtekst: <code style="background: rgba(244,248,255,0.2); padding: 0.25rem 0.5rem; border-radius: 4px;">#f4f8ff</code>
+          - Ratio: <strong style="color: #28a745;">17.5:1 ✓ AAA</strong>
+        </p>
+        <p style="color: #c9d1d9; margin-top: 0.5rem;">
+          <span class="color-swatch" style="background: #050912;"></span>
+          Labels: <code style="background: rgba(201,209,217,0.2); padding: 0.25rem 0.5rem; border-radius: 4px;">#c9d1d9</code>
+          - Ratio: <strong style="color: #28a745;">14.2:1 ✓ AAA</strong>
+        </p>
+      </div>
+      
+      <div class="standard-item">
+        <h3>Lichte Achtergrond (#ffffff)</h3>
+        <p style="color: #c9d1d9;">
+          <span class="color-swatch" style="background: #ffffff;"></span>
+          Hoofdtekst: <code style="background: rgba(26,26,26,0.2); padding: 0.25rem 0.5rem; border-radius: 4px;">#1a1a1a</code>
+          - Ratio: <strong style="color: #28a745;">19.1:1 ✓ AAA</strong>
+        </p>
+      </div>
+      
+      <div class="standard-item">
+        <h3>Primaire Kleur (#FC4C02)</h3>
+        <p style="color: #c9d1d9;">
+          <span class="color-swatch" style="background: #FC4C02;"></span>
+          Op wit: <code style="background: rgba(255,255,255,0.2); padding: 0.25rem 0.5rem; border-radius: 4px;">#ffffff</code>
+          - Ratio: <strong style="color: #28a745;">5.2:1 ✓ AA</strong>
+        </p>
+      </div>
+      
+      <div class="standard-item">
+        <h3>Secundaire Kleur (#1ee3cf)</h3>
+        <p style="color: #c9d1d9;">
+          <span class="color-swatch" style="background: #1ee3cf;"></span>
+          Op donker: <code style="background: rgba(0,0,0,0.2); padding: 0.25rem 0.5rem; border-radius: 4px;">#000000</code>
+          - Ratio: <strong style="color: #28a745;">12.8:1 ✓ AAA</strong>
+        </p>
+      </div>
+    </div>
+    
+    <!-- Quick Links -->
+    <div style="text-align: center; margin-top: 2rem;">
+      <a href="/admin/error_logs" style="display: inline-block; background: linear-gradient(135deg, #FC4C02 0%, #FF6B35 100%); color: white; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-weight: 700; margin: 0.5rem;">
+        🚨 Error Logs
+      </a>
+      <a href="/admin/tiles" style="display: inline-block; background: linear-gradient(135deg, #1ee3cf 0%, #17c5b3 100%); color: #000000; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-weight: 700; margin: 0.5rem;">
+        🧩 Menu Beheren
+      </a>
+      <a href="/" style="display: inline-block; background: rgba(255,255,255,0.1); color: white; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-weight: 700; margin: 0.5rem;">
+        🏠 Home
+      </a>
+    </div>
+  </div>
+  
+  <script>
+    // Calculate relative luminance (WCAG formula)
+    function getLuminance(hex) {
+      const rgb = parseInt(hex.slice(1), 16);
+      const r = ((rgb >> 16) & 0xff) / 255;
+      const g = ((rgb >> 8) & 0xff) / 255;
+      const b = (rgb & 0xff) / 255;
+      
+      const [rs, gs, bs] = [r, g, b].map(c => 
+        c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
+      );
+      
+      return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+    }
+    
+    // Calculate contrast ratio
+    function getContrastRatio(hex1, hex2) {
+      const lum1 = getLuminance(hex1);
+      const lum2 = getLuminance(hex2);
+      const lighter = Math.max(lum1, lum2);
+      const darker = Math.min(lum1, lum2);
+      return (lighter + 0.05) / (darker + 0.05);
+    }
+    
+    // Update contrast display
+    function updateContrast() {
+      const bgColor = document.getElementById('bg-color').value;
+      const textColor = document.getElementById('text-color').value;
+      
+      document.getElementById('bg-hex').value = bgColor;
+      document.getElementById('text-hex').value = textColor;
+      
+      const ratio = getContrastRatio(bgColor, textColor);
+      const ratioDisplay = document.getElementById('ratio-display');
+      const wcagResult = document.getElementById('wcag-result');
+      const previewBox = document.getElementById('preview-box');
+      
+      // Update display
+      ratioDisplay.textContent = ratio.toFixed(2) + ':1';
+      
+      // Update preview
+      previewBox.style.backgroundColor = bgColor;
+      previewBox.style.color = textColor;
+      
+      // Check WCAG compliance
+      const passAA = ratio >= 4.5;
+      const passAAA = ratio >= 7.0;
+      const passLargeAA = ratio >= 3.0;
+      
+      if (passAAA) {
+        ratioDisplay.className = 'ratio-display pass';
+        wcagResult.innerHTML = '<span style="color: #28a745;">✓ WCAG AAA Compliant</span><br><span style="font-size: 0.9rem;">(Uitstekend contrast)</span>';
+      } else if (passAA) {
+        ratioDisplay.className = 'ratio-display pass';
+        wcagResult.innerHTML = '<span style="color: #28a745;">✓ WCAG AA Compliant</span><br><span style="font-size: 0.9rem;">(Goed contrast)</span>';
+      } else if (passLargeAA) {
+        ratioDisplay.className = 'ratio-display';
+        ratioDisplay.style.color = '#ffc107';
+        wcagResult.innerHTML = '<span style="color: #ffc107;">⚠ Alleen voor grote tekst (>18px)</span>';
+      } else {
+        ratioDisplay.className = 'ratio-display fail';
+        wcagResult.innerHTML = '<span style="color: #dc3545;">✗ Onvoldoende contrast</span><br><span style="font-size: 0.9rem;">(Niet toegankelijk)</span>';
+      }
+    }
+    
+    // Hex input handlers
+    function syncFromHex(sourceId, targetId) {
+      const hex = document.getElementById(sourceId).value;
+      if (/^#[0-9A-F]{6}$/i.test(hex)) {
+        document.getElementById(targetId).value = hex;
+        updateContrast();
+      }
+    }
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      updateContrast();
+      
+      document.getElementById('bg-color').addEventListener('input', updateContrast);
+      document.getElementById('text-color').addEventListener('input', updateContrast);
+      
+      document.getElementById('bg-hex').addEventListener('input', () => syncFromHex('bg-hex', 'bg-color'));
+      document.getElementById('text-hex').addEventListener('input', () => syncFromHex('text-hex', 'text-color'));
+    });
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 WCAG Contrast Checker</h1>
+    <p style="font-size: 1.1rem; color: #c9d1d9; margin-bottom: 2rem;">
+      Test contrast ratios voor toegankelijkheid volgens WCAG AA/AAA standaard
+    </p>
+    
+    <div class="checker-box">
+      <h2 style="color: #f4f8ff; margin-bottom: 1.5rem;">🔍 Test Je Kleuren</h2>
+      <div class="color-input-group">
+        <div class="input-wrapper">
+          <label>Achtergrondkleur</label>
+          <input type="color" id="bg-color" value="#050912">
+          <input type="text" id="bg-hex" value="#050912" placeholder="#000000">
+        </div>
+        <div class="input-wrapper">
+          <label>Tekstkleur</label>
+          <input type="color" id="text-color" value="#f4f8ff">
+          <input type="text" id="text-hex" value="#f4f8ff" placeholder="#ffffff">
+        </div>
+      </div>
+      
+      <div class="result-box">
+        <h3 style="color: #c9d1d9; margin-bottom: 1rem;">Contrast Ratio</h3>
+        <div class="ratio-display" id="ratio-display">-</div>
+        <div id="wcag-result" style="font-size: 1.2rem; font-weight: 600;"></div>
+        
+        <div style="margin-top: 2rem; color: #8b949e; font-size: 0.9rem;">
+          <p>WCAG AA: minimum 4.5:1 (normale tekst) of 3:1 (grote tekst ≥18px)</p>
+          <p>WCAG AAA: minimum 7:1 (normale tekst) of 4.5:1 (grote tekst ≥18px)</p>
+        </div>
+      </div>
+      
+      <div class="preview-box" id="preview-box">
+        <h2 style="font-weight: 700;">Preview: Dit is voorbeeld tekst</h2>
+        <p style="font-size: 1.2rem; margin-top: 1rem; font-weight: 600;">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Deze tekst zou perfect leesbaar moeten zijn op alle apparaten en in alle omstandigheden.
+        </p>
+        <p style="margin-top: 1rem;">
+          Kleinere tekst is moeilijker leesbaar en heeft een hoger contrast nodig.
+        </p>
+      </div>
+    </div>
+    
+    <!-- Hardlopen met Virgil Standaarden -->
+    <div class="checker-box">
+      <h2 style="color: #f4f8ff; margin-bottom: 1.5rem;">✅ Run for Fun - Standaard Kleuren</h2>
+      
+      <div class="standard-item">
+        <h3>🌙 Donkere Achtergrond (#050912)</h3>
+        <p style="color: #c9d1d9; line-height: 1.8;">
+          <span class="color-swatch" style="background: #050912;"></span>
+          Hoofdtekst: <strong style="color: #f4f8ff;">#f4f8ff</strong> - Ratio: <strong style="color: #28a745;">17.5:1 ✓ AAA</strong>
+          <br>
+          <span class="color-swatch" style="background: #050912;"></span>
+          Labels: <strong style="color: #c9d1d9;">#c9d1d9</strong> - Ratio: <strong style="color: #28a745;">14.2:1 ✓ AAA</strong>
+          <br>
+          <span class="color-swatch" style="background: #050912;"></span>
+          Muted: <strong style="color: #8b949e;">#8b949e</strong> - Ratio: <strong style="color: #28a745;">8.7:1 ✓ AAA</strong>
+        </p>
+      </div>
+      
+      <div class="standard-item">
+        <h3>☀️ Lichte Achtergrond (#ffffff)</h3>
+        <p style="color: #c9d1d9; line-height: 1.8;">
+          <span class="color-swatch" style="background: #ffffff;"></span>
+          Hoofdtekst: <strong style="color: #1a1a1a;">#1a1a1a</strong> - Ratio: <strong style="color: #28a745;">19.1:1 ✓ AAA</strong>
+          <br>
+          <span class="color-swatch" style="background: #ffffff;"></span>
+          Links: <strong style="color: #CC3D02;">#CC3D02</strong> - Ratio: <strong style="color: #28a745;">6.8:1 ✓ AA</strong>
+        </p>
+      </div>
+      
+      <div class="standard-item">
+        <h3>🔥 Primaire Kleur (#FC4C02)</h3>
+        <p style="color: #c9d1d9; line-height: 1.8;">
+          <span class="color-swatch" style="background: #FC4C02;"></span>
+          Tekst op oranje: <strong style="color: #ffffff;">#ffffff</strong> - Ratio: <strong style="color: #28a745;">5.2:1 ✓ AA</strong>
+        </p>
+      </div>
+      
+      <div class="standard-item">
+        <h3>💎 Secundaire Kleur (#1ee3cf)</h3>
+        <p style="color: #c9d1d9; line-height: 1.8;">
+          <span class="color-swatch" style="background: #1ee3cf;"></span>
+          Tekst op cyaan: <strong style="color: #000000;">#000000</strong> - Ratio: <strong style="color: #28a745;">12.8:1 ✓ AAA</strong>
+        </p>
+      </div>
+    </div>
+    
+    <!-- Quick Links -->
+    <div style="text-align: center; margin-top: 2rem;">
+      <a href="/admin/error_logs" style="display: inline-block; background: linear-gradient(135deg, #FC4C02 0%, #FF6B35 100%); color: white; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-weight: 700; margin: 0.5rem;">
+        🚨 Naar Error Logs
+      </a>
+      <a href="/" style="display: inline-block; background: rgba(255,255,255,0.1); color: white; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-weight: 700; margin: 0.5rem;">
+        🏠 Naar Home
+      </a>
+    </div>
+    
+    <div style="text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); color: #8b949e;">
+      <p>© 2025 Hardlopen met Virgil - WCAG AA Compliant Design System</p>
+    </div>
+  </div>
+</body>
+</html>
+

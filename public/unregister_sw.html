@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Service Worker Cleanup</title>
+</head>
+<body>
+    <h1>Service Worker Cleanup</h1>
+    <div id="status">Bezig met verwijderen...</div>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then((registrations) => {
+                registrations.forEach((reg) => {
+                    reg.unregister();
+                    console.log('Removed:', reg.scope);
+                });
+                document.getElementById('status').innerHTML = '<h2 style="color: green;">✓ Alle service workers verwijderd!</h2><p><a href="/training_sessions/601">Ga naar training 601</a></p>';
+            });
+            
+            caches.keys().then((names) => {
+                names.forEach(name => caches.delete(name));
+            });
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+

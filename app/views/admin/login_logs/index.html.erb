@@ -1,0 +1,136 @@
+<div style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+  <h1 style="color: #1a2332; font-size: 2rem; margin-bottom: 1.5rem;">
+    🔐 Login Log
+  </h1>
+  
+  <div style="background: rgba(30, 227, 207, 0.1); border-left: 4px solid #1ee3cf; padding: 1rem; border-radius: 8px; margin-bottom: 2rem;">
+    <p style="color: #1a2332; margin: 0; font-size: 0.95rem;">
+      <strong>Overzicht van alle logins.</strong> Hier zie je wanneer lopers inloggen, vanaf welk IP-adres en met welk apparaat.
+    </p>
+  </div>
+
+  <!-- Filters -->
+  <%= form_with url: admin_login_logs_path, method: :get, local: true do |f| %>
+    <div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+      <h3 style="margin-bottom: 1rem; color: #1a2332;">🔍 Filters</h3>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <div>
+          <%= f.label :user_id, "Loper", style: "display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1a2332;" %>
+          <%= f.select :user_id, 
+              options_for_select([['Alle lopers', '']] + @users.map { |u| [u.name, u.id] }, params[:user_id]),
+              {},
+              class: "app-form-input" %>
+        </div>
+        
+        <div>
+          <%= f.label :date_from, "Van datum", style: "display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1a2332;" %>
+          <%= f.date_field :date_from, value: params[:date_from], class: "app-form-input" %>
+        </div>
+        
+        <div>
+          <%= f.label :date_to, "Tot datum", style: "display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1a2332;" %>
+          <%= f.date_field :date_to, value: params[:date_to], class: "app-form-input" %>
+        </div>
+        
+        <div style="display: flex; align-items: flex-end; gap: 0.5rem;">
+          <%= f.submit "Filter", class: "theme-btn", style: "background: #1ee3cf; color: #0c1730; padding: 0.75rem 1.5rem; font-weight: 600; border-radius: 8px;" %>
+          <%= link_to "Reset", admin_login_logs_path, class: "theme-btn", style: "background: #e5e7eb; color: #1a2332; padding: 0.75rem 1.5rem; font-weight: 600; border-radius: 8px; text-decoration: none; display: inline-block;" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Statistieken -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+    <div style="background: white; border: 2px solid #1ee3cf; border-radius: 12px; padding: 1.5rem; text-align: center;">
+      <div style="font-size: 2.5rem; font-weight: 700; color: #1ee3cf; margin-bottom: 0.5rem;">
+        <%= LoginLog.count %>
+      </div>
+      <div style="color: #6b7280; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">
+        Totaal Logins
+      </div>
+    </div>
+    
+    <div style="background: white; border: 2px solid #34c759; border-radius: 12px; padding: 1.5rem; text-align: center;">
+      <div style="font-size: 2.5rem; font-weight: 700; color: #34c759; margin-bottom: 0.5rem;">
+        <%= LoginLog.where('logged_in_at >= ?', Date.today).count %>
+      </div>
+      <div style="color: #6b7280; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">
+        Vandaag
+      </div>
+    </div>
+    
+    <div style="background: white; border: 2px solid #ff6b35; border-radius: 12px; padding: 1.5rem; text-align: center;">
+      <div style="font-size: 2.5rem; font-weight: 700; color: #ff6b35; margin-bottom: 0.5rem;">
+        <%= LoginLog.where('logged_in_at >= ?', 7.days.ago).count %>
+      </div>
+      <div style="color: #6b7280; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">
+        Deze Week
+      </div>
+    </div>
+  </div>
+
+  <!-- Login logs tabel -->
+  <div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 1.5rem; overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="border-bottom: 2px solid #e5e7eb;">
+          <th style="padding: 1rem; text-align: left; color: #1a2332; font-weight: 700;">Datum & Tijd</th>
+          <th style="padding: 1rem; text-align: left; color: #1a2332; font-weight: 700;">Loper</th>
+          <th style="padding: 1rem; text-align: left; color: #1a2332; font-weight: 700;">IP Adres</th>
+          <th style="padding: 1rem; text-align: left; color: #1a2332; font-weight: 700;">Apparaat</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @login_logs.each do |log| %>
+          <tr style="border-bottom: 1px solid #f3f4f6;">
+            <td style="padding: 1rem; color: #1a2332;">
+              <%= l(log.logged_in_at, format: :long) %>
+              <div style="font-size: 0.85rem; color: #6b7280; margin-top: 0.25rem;">
+                <%= time_ago_in_words(log.logged_in_at) %> geleden
+              </div>
+            </td>
+            <td style="padding: 1rem;">
+              <strong style="color: #1a2332;"><%= log.user.name %></strong>
+              <div style="font-size: 0.85rem; color: #6b7280; margin-top: 0.25rem;">
+                <%= log.user.email %>
+              </div>
+            </td>
+            <td style="padding: 1rem; color: #1a2332; font-family: monospace; font-size: 0.9rem;">
+              <%= log.ip_address %>
+            </td>
+            <td style="padding: 1rem; color: #6b7280; font-size: 0.85rem; max-width: 300px;">
+              <% if log.user_agent.present? %>
+                <% if log.user_agent.include?('Mobile') || log.user_agent.include?('Android') || log.user_agent.include?('iPhone') %>
+                  📱 Mobile
+                <% elsif log.user_agent.include?('iPad') || log.user_agent.include?('Tablet') %>
+                  📱 Tablet
+                <% else %>
+                  💻 Desktop
+                <% end %>
+                <div style="margin-top: 0.25rem; font-size: 0.75rem; color: #9ca3af;">
+                  <%= log.user_agent.truncate(60) %>
+                </div>
+              <% else %>
+                -
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    
+    <% if @login_logs.empty? %>
+      <div style="text-align: center; padding: 3rem; color: #6b7280;">
+        <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">Geen login logs gevonden</p>
+        <p style="font-size: 0.9rem;">Pas de filters aan of wacht tot lopers inloggen.</p>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Info over limiet -->
+  <div style="margin-top: 1rem; text-align: center; color: #6b7280; font-size: 0.9rem;">
+    Toont de laatste 500 login logs. Gebruik filters voor specifieke zoekresultaten.
+  </div>
+</div>

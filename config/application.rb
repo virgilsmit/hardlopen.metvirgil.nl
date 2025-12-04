@@ -18,7 +18,7 @@ module HardlopenMetvirgilNl
     config.load_defaults 7.1
 
     # Algemene configuratie hier plaatsen indien nodig:
-    # config.time_zone = "Amsterdam"
+    config.time_zone = "Amsterdam"
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end

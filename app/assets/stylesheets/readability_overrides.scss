@@ -1,0 +1,494 @@
+// ============================================
+// LEESBAARHEID OVERRIDES
+// Forceert lichte achtergrond en donkere tekst overal
+// ============================================
+
+// Force lichte achtergrond op body en alle containers
+html, body {
+  background: #FAFBFC !important;
+  color: #1a1a1a !important;
+  font-size: 18px !important;
+  line-height: 1.8 !important;
+}
+
+body.readable-body {
+  background: #FAFBFC !important;
+  
+  // Verwijder alle gradient achtergronden
+  background-image: none !important;
+}
+
+// App container
+.app-container,
+.readable-container {
+  background: #FAFBFC !important;
+  color: #1a1a1a !important;
+  min-height: 100vh;
+}
+
+// Main content areas
+main,
+.main-content,
+.content-wrapper,
+.page-content,
+.content-area {
+  background: #FAFBFC !important;
+  color: #1a1a1a !important;
+  padding: 32px !important;
+}
+
+// Header styling
+.theme-header,
+header {
+  background: #FFFFFF !important;
+  color: #1a1a1a !important;
+  border-bottom: 1px solid #e1e4e8 !important;
+  padding: 24px 32px !important;
+}
+
+.theme-header__title {
+  color: #0a0a0a !important;
+  font-size: 24px !important;
+  font-weight: 700 !important;
+}
+
+// Navigation
+.theme-menu,
+nav {
+  background: #FFFFFF !important;
+  border-bottom: 1px solid #e1e4e8 !important;
+  padding: 16px 32px !important;
+}
+
+.theme-btn,
+.theme-menu a,
+nav a {
+  color: #1a1a1a !important;
+  font-size: 18px !important;
+  font-weight: 500 !important;
+  padding: 12px 20px !important;
+  background: transparent !important;
+  border: none !important;
+  text-decoration: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.theme-btn:hover,
+.theme-menu a:hover,
+nav a:hover {
+  color: #E63900 !important;
+  background: #f6f8fa !important;
+  text-decoration: none !important;
+}
+
+// Dropdown menus
+.dropdown-menu {
+  background: #FFFFFF !important;
+  border: 1px solid #e1e4e8 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  padding: 8px !important;
+}
+
+.dropdown-item {
+  color: #1a1a1a !important;
+  font-size: 18px !important;
+  padding: 12px 16px !important;
+  background: transparent !important;
+  text-decoration: none !important;
+}
+
+.dropdown-item:hover {
+  background: #f6f8fa !important;
+  color: #E63900 !important;
+}
+
+// Cards - altijd witte achtergrond met donkere tekst
+.theme-card,
+.card,
+.content-card,
+.stat-card,
+.metric-card,
+.info-card {
+  background: #FFFFFF !important;
+  color: #1a1a1a !important;
+  border: 1px solid #e1e4e8 !important;
+  border-radius: 12px !important;
+  padding: 32px !important;
+  margin-bottom: 24px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+
+// Card headings
+.theme-card h1,
+.theme-card h2,
+.theme-card h3,
+.theme-card h4,
+.theme-card h5,
+.theme-card h6,
+.card h1,
+.card h2,
+.card h3,
+.card h4,
+.card h5,
+.card h6 {
+  color: #0a0a0a !important;
+  margin-bottom: 24px !important;
+}
+
+// Card text
+.theme-card p,
+.theme-card span,
+.theme-card li,
+.theme-card td,
+.theme-card th,
+.theme-card label,
+.card p,
+.card span,
+.card li,
+.card td,
+.card th,
+.card label {
+  color: #1a1a1a !important;
+  font-size: 18px !important;
+  line-height: 1.8 !important;
+}
+
+// Muted text
+.text-muted,
+.muted,
+.theme-card .text-muted,
+.card .text-muted {
+  color: #4a4a4a !important;
+}
+
+// Headings overal
+h1, h2, h3, h4, h5, h6 {
+  color: #0a0a0a !important;
+  font-weight: 700 !important;
+  margin-bottom: 24px !important;
+  line-height: 1.4 !important;
+}
+
+h1 { font-size: 36px !important; }
+h2 { font-size: 30px !important; }
+h3 { font-size: 24px !important; }
+h4 { font-size: 20px !important; }
+h5 { font-size: 18px !important; }
+h6 { font-size: 16px !important; }
+
+// Paragrafen
+p {
+  color: #1a1a1a !important;
+  font-size: 18px !important;
+  line-height: 1.8 !important;
+  margin-bottom: 24px !important;
+}
+
+// Links
+a {
+  color: #E63900 !important;
+  text-decoration: none !important;
+  font-weight: 500 !important;
+  transition: color 0.2s ease !important;
+}
+
+a:hover {
+  color: #FF6B35 !important;
+  text-decoration: underline !important;
+}
+
+// Buttons
+button,
+.btn,
+input[type="submit"],
+input[type="button"] {
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  padding: 14px 28px !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  line-height: 1.5 !important;
+}
+
+.btn-primary,
+button[type="submit"],
+.theme-btn-primary {
+  background: #E63900 !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  box-shadow: 0 2px 4px rgba(230, 57, 0, 0.2) !important;
+}
+
+.btn-primary:hover,
+button[type="submit"]:hover,
+.theme-btn-primary:hover {
+  background: #FF6B35 !important;
+  box-shadow: 0 4px 8px rgba(230, 57, 0, 0.3) !important;
+  transform: translateY(-1px) !important;
+}
+
+// Form elements
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+textarea,
+select {
+  font-size: 18px !important;
+  line-height: 1.8 !important;
+  padding: 12px 16px !important;
+  border: 2px solid #e1e4e8 !important;
+  border-radius: 8px !important;
+  background: #FFFFFF !important;
+  color: #1a1a1a !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none !important;
+  border-color: #E63900 !important;
+  box-shadow: 0 0 0 3px rgba(230, 57, 0, 0.1) !important;
+}
+
+label {
+  color: #0a0a0a !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  margin-bottom: 8px !important;
+  display: block !important;
+}
+
+// Tables
+table {
+  background: #FFFFFF !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  margin-bottom: 32px !important;
+}
+
+thead {
+  background: #f6f8fa !important;
+}
+
+th {
+  color: #0a0a0a !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  padding: 16px !important;
+  border-bottom: 2px solid #e1e4e8 !important;
+  text-align: left !important;
+}
+
+td {
+  color: #1a1a1a !important;
+  font-size: 18px !important;
+  padding: 16px !important;
+  border-bottom: 1px solid #e1e4e8 !important;
+}
+
+tr:hover {
+  background: #f6f8fa !important;
+}
+
+// Lists
+ul, ol {
+  margin-bottom: 24px !important;
+  padding-left: 32px !important;
+}
+
+li {
+  color: #1a1a1a !important;
+  font-size: 18px !important;
+  line-height: 1.8 !important;
+  margin-bottom: 8px !important;
+}
+
+// Alerts
+.alert,
+.notice,
+.alert-card {
+  padding: 24px !important;
+  border-radius: 8px !important;
+  margin-bottom: 24px !important;
+  font-size: 18px !important;
+  line-height: 1.8 !important;
+  border-left: 4px solid !important;
+}
+
+.alert-success {
+  background: #d4edda !important;
+  color: #155724 !important;
+  border-color: #1e7e34 !important;
+}
+
+.alert-warning {
+  background: #fff3cd !important;
+  color: #856404 !important;
+  border-color: #d39e00 !important;
+}
+
+.alert-danger,
+.alert-error {
+  background: #f8d7da !important;
+  color: #721c24 !important;
+  border-color: #bd2130 !important;
+}
+
+// Stats
+.stat-value,
+.metric-value {
+  font-size: 32px !important;
+  font-weight: 700 !important;
+  color: #0a0a0a !important;
+  line-height: 1.2 !important;
+  margin-bottom: 8px !important;
+}
+
+.stat-label,
+.metric-label {
+  font-size: 18px !important;
+  color: #4a4a4a !important;
+  font-weight: 500 !important;
+}
+
+// Badges
+.badge {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  padding: 6px 12px !important;
+  border-radius: 6px !important;
+  background: #e9ecef !important;
+  color: #1a1a1a !important;
+}
+
+.badge-primary {
+  background: #E63900 !important;
+  color: #FFFFFF !important;
+}
+
+.badge-success {
+  background: #1e7e34 !important;
+  color: #FFFFFF !important;
+}
+
+// Mobile menu
+.mobile-menu {
+  background: #FFFFFF !important;
+  color: #1a1a1a !important;
+}
+
+.mobile-menu__item {
+  color: #1a1a1a !important;
+  font-size: 18px !important;
+  padding: 16px !important;
+  text-decoration: none !important;
+}
+
+.mobile-menu__item:hover {
+  background: #f6f8fa !important;
+  color: #E63900 !important;
+}
+
+// Training details specifiek
+.training-details-page {
+  background: #FAFBFC !important;
+  color: #1a1a1a !important;
+  padding: 32px !important;
+}
+
+.training-header {
+  background: #FFFFFF !important;
+  color: #1a1a1a !important;
+  padding: 32px !important;
+  border-radius: 12px !important;
+  margin-bottom: 24px !important;
+}
+
+.training-title {
+  color: #0a0a0a !important;
+  font-size: 36px !important;
+  font-weight: 700 !important;
+  margin-bottom: 16px !important;
+}
+
+.training-meta {
+  color: #4a4a4a !important;
+  font-size: 18px !important;
+  line-height: 1.8 !important;
+}
+
+// Zorg dat ALLES op witte achtergrond staat
+div, section, article, aside, footer {
+  &:not(.badge):not(.btn):not(.alert) {
+    background-color: transparent !important;
+  }
+}
+
+// Specifieke overrides voor donkere elementen
+[style*="background: #0"],
+[style*="background:#0"],
+[style*="background-color: #0"],
+[style*="background-color:#0"],
+[class*="dark"],
+[class*="Dark"] {
+  background: #FFFFFF !important;
+  color: #1a1a1a !important;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  html, body {
+    font-size: 16px !important;
+  }
+  
+  h1 { font-size: 28px !important; }
+  h2 { font-size: 24px !important; }
+  h3 { font-size: 20px !important; }
+  h4 { font-size: 18px !important; }
+  
+  .app-container,
+  main,
+  .main-content {
+    padding: 16px !important;
+  }
+  
+  .theme-card,
+  .card {
+    padding: 24px !important;
+  }
+  
+  button,
+  .btn {
+    padding: 12px 20px !important;
+    font-size: 16px !important;
+  }
+}
+
+// Print
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt !important;
+  }
+  
+  .theme-header,
+  nav,
+  button,
+  .btn {
+    display: none !important;
+  }
+}
+
+
+
+
+
+
+
+

@@ -1,0 +1,41 @@
+<!-- Mobile Bottom Navigation -->
+<nav class="mobile-nav-bar">
+  <% nav_tiles = bottom_nav_tiles(current_user) %>
+  <% if nav_tiles.any? %>
+    <% nav_tiles.each do |tile| %>
+      <%= link_to tile[:url], class: "mobile-nav-item #{current_page?(tile[:url]) ? 'active' : ''}" do %>
+        <span class="mobile-nav-icon"><%= tile[:icon] %></span>
+        <span class="mobile-nav-label"><%= tile[:label] %></span>
+      <% end %>
+    <% end %>
+  <% else %>
+    <!-- Fallback als er geen tiles zijn geconfigureerd -->
+    <%= link_to root_path, class: "mobile-nav-item #{current_page?(root_path) ? 'active' : ''}" do %>
+      <span class="mobile-nav-icon">🏠</span>
+      <span class="mobile-nav-label">Home</span>
+    <% end %>
+    
+    <% if current_user %>
+      <%= link_to user_schema_path(current_user, :schema), class: "mobile-nav-item" do %>
+        <span class="mobile-nav-icon">📅</span>
+        <span class="mobile-nav-label">Schema</span>
+      <% end %>
+      
+      <%= link_to profile_path, class: "mobile-nav-item" do %>
+        <span class="mobile-nav-icon">👤</span>
+        <span class="mobile-nav-label">Profiel</span>
+      <% end %>
+    <% else %>
+      <%= link_to login_path, class: "mobile-nav-item" do %>
+        <span class="mobile-nav-icon">🔑</span>
+        <span class="mobile-nav-label">Login</span>
+      <% end %>
+      
+      <%= link_to register_path, class: "mobile-nav-item" do %>
+        <span class="mobile-nav-icon">📝</span>
+        <span class="mobile-nav-label">Register</span>
+      <% end %>
+    <% end %>
+  <% end %>
+</nav>
+

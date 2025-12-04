@@ -6,6 +6,8 @@ module Admin
 
     def update_role
       @user = User.find(params[:id])
+      
+      # Gebruik de enum direct (Rails converteert automatisch)
       if @user.update(role: params[:role])
         redirect_to admin_users_path, notice: 'Rol bijgewerkt.'
       else

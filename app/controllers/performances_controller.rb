@@ -8,6 +8,10 @@ class PerformancesController < ApplicationController
 
   # GET /performances/1 or /performances/1.json
   def show
+    # Disable caching for this page
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
   end
 
   # GET /performances/new
@@ -28,10 +32,25 @@ class PerformancesController < ApplicationController
 
     respond_to do |format|
       if @performance.save
-        if current_user.id == @performance.user_id
-          format.html { redirect_to profile_path, notice: "Prestatie succesvol toegevoegd." }
+        # Reload om association te laden
+        @performance.reload
+        
+        # Herbereken de wedstrijdtijden prognoses voor de gebruiker
+        user = User.find(@performance.user_id)
+        if user
+          # Trigger herberekening door de zones opnieuw op te halen
+          user.heart_rate_zones
+          user.pace_zones
+          user.race_time_predictions
+        end
+        
+        # Redirect naar zones pagina als we van daar komen
+        if request.referer&.include?('zones')
+          format.html { redirect_to "/users/#{user.id}/zones", notice: "Prestatie succesvol toegevoegd. Prognoses zijn herberekend." }
+        elsif current_user&.id == @performance.user_id
+          format.html { redirect_to profile_path, notice: "Prestatie succesvol toegevoegd. Prognoses zijn herberekend." }
         else
-          format.html { redirect_to user_path(@performance.user_id), notice: "Prestatie succesvol toegevoegd voor loper." }
+          format.html { redirect_to user_path(@performance.user_id), notice: "Prestatie succesvol toegevoegd voor loper. Prognoses zijn herberekend." }
         end
         format.json { render :show, status: :created, location: @performance }
       else
@@ -45,7 +64,24 @@ class PerformancesController < ApplicationController
   def update
     respond_to do |format|
       if @performance.update(performance_params)
-        format.html { redirect_to user_path(@performance.user_id), notice: "Prestatie succesvol aangepast." }
+        # Reload om association te laden
+        @performance.reload
+        
+        # Herbereken de wedstrijdtijden prognoses voor de gebruiker
+        user = User.find(@performance.user_id)
+        if user
+          # Trigger herberekening door de zones opnieuw op te halen
+          user.heart_rate_zones
+          user.pace_zones
+          user.race_time_predictions
+        end
+        
+        # Redirect naar zones pagina als we van daar komen, anders naar profiel
+        if request.referer&.include?('zones')
+          format.html { redirect_to "/users/#{user.id}/zones", notice: "Prestatie succesvol aangepast. Prognoses zijn herberekend." }
+        else
+          format.html { redirect_to user_path(@performance.user_id), notice: "Prestatie succesvol aangepast. Prognoses zijn herberekend." }
+        end
         format.json { render :show, status: :ok, location: @performance }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -76,6 +112,6 @@ class PerformancesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def performance_params
-      params.require(:performance).permit(:user_id, :test_type, :value, :date, :notes, :distance)
+      params.require(:performance).permit(:user_id, :test_type, :value, :date, :notes, :distance, :core_heart_rate)
     end
 end

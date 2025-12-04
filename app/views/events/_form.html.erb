@@ -1,0 +1,97 @@
+<%= form_with model: event, local: true do |f| %>
+  <% if event.errors.any? %>
+    <div style="background: rgba(220, 53, 69, 0.2); border: 2px solid #dc3545; padding: 1.5rem; margin-bottom: 2rem; border-radius: 12px;">
+      <h3 style="color: #dc3545; margin-bottom: 0.75rem;">
+        <%= pluralize(event.errors.count, "fout", "fouten") %> gevonden:
+      </h3>
+      <ul style="color: rgba(244, 248, 255, 0.9); margin-left: 1.5rem;">
+        <% event.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  
+  <div class="card-surface" style="padding: 2rem;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+      
+      <!-- Naam -->
+      <div style="grid-column: 1 / -1;">
+        <%= f.label :name, "Naam van het evenement *", style: "color: #ffffff; font-weight: 600; display: block; margin-bottom: 0.5rem;" %>
+        <%= f.text_field :name, placeholder: "Bijv. Hardloop Gala Utrecht", style: "width: 100%; padding: 0.75rem; border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 1rem;" %>
+      </div>
+      
+      <!-- Datum -->
+      <div>
+        <%= f.label :date, "Datum *", style: "color: #ffffff; font-weight: 600; display: block; margin-bottom: 0.5rem;" %>
+        <%= f.date_field :date, style: "width: 100%; padding: 0.75rem; border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 1rem;" %>
+      </div>
+      
+      <!-- Afstand -->
+      <div>
+        <%= f.label :distance, "Afstand", style: "color: #ffffff; font-weight: 600; display: block; margin-bottom: 0.5rem;" %>
+        <%= f.text_field :distance, placeholder: "Bijv. 5 km, 10 km, halve marathon", style: "width: 100%; padding: 0.75rem; border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 1rem;" %>
+      </div>
+      
+      <!-- Locatie -->
+      <div>
+        <%= f.label :location, "Locatie", style: "color: #ffffff; font-weight: 600; display: block; margin-bottom: 0.5rem;" %>
+        <%= f.text_field :location, placeholder: "Bijv. Utrecht, Zuiderpark", style: "width: 100%; padding: 0.75rem; border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 1rem;" %>
+      </div>
+      
+      <!-- Organisator -->
+      <div>
+        <%= f.label :organizer, "Organisator", style: "color: #ffffff; font-weight: 600; display: block; margin-bottom: 0.5rem;" %>
+        <%= f.text_field :organizer, placeholder: "Bijv. Atletiekvereniging Utrecht", style: "width: 100%; padding: 0.75rem; border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 1rem;" %>
+      </div>
+      
+      <!-- Prijs -->
+      <div>
+        <%= f.label :price, "Prijs", style: "color: #ffffff; font-weight: 600; display: block; margin-bottom: 0.5rem;" %>
+        <%= f.text_field :price, placeholder: "Bijv. €15,00 / Gratis", style: "width: 100%; padding: 0.75rem; border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 1rem;" %>
+      </div>
+      
+      <!-- Inschrijfdeadline -->
+      <div>
+        <%= f.label :registration_deadline, "Inschrijfdeadline", style: "color: #ffffff; font-weight: 600; display: block; margin-bottom: 0.5rem;" %>
+        <%= f.date_field :registration_deadline, style: "width: 100%; padding: 0.75rem; border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 1rem;" %>
+      </div>
+      
+      <!-- URL -->
+      <div style="grid-column: 1 / -1;">
+        <%= f.label :url, "Inschrijf URL", style: "color: #ffffff; font-weight: 600; display: block; margin-bottom: 0.5rem;" %>
+        <%= f.text_field :url, placeholder: "https://inschrijven.nl/evenement/...", style: "width: 100%; padding: 0.75rem; border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 1rem;" %>
+        <small style="color: rgba(244, 248, 255, 0.6); font-size: 0.85rem; display: block; margin-top: 0.5rem;">
+          Link naar de inschrijfpagina van het evenement
+        </small>
+      </div>
+      
+      <!-- Beschrijving -->
+      <div style="grid-column: 1 / -1;">
+        <%= f.label :description, "Beschrijving", style: "color: #ffffff; font-weight: 600; display: block; margin-bottom: 0.5rem;" %>
+        <%= f.text_area :description, rows: 6, placeholder: "Uitgebreide informatie over het evenement...", style: "width: 100%; padding: 0.75rem; border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 1rem; line-height: 1.6; resize: vertical;" %>
+      </div>
+      
+      <!-- Checkboxes -->
+      <div style="grid-column: 1 / -1; display: flex; gap: 2rem; flex-wrap: wrap;">
+        <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
+          <%= f.check_box :visible, style: "width: 24px; height: 24px; cursor: pointer;" %>
+          <span style="color: #ffffff; font-weight: 600;">Zichtbaar voor iedereen</span>
+        </label>
+        
+        <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
+          <%= f.check_box :published, style: "width: 24px; height: 24px; cursor: pointer;" %>
+          <span style="color: #ffffff; font-weight: 600;">Gepubliceerd</span>
+        </label>
+      </div>
+    </div>
+    
+    <!-- Actions -->
+    <div style="display: flex; gap: 1rem; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+      <%= f.submit event.new_record? ? 'Aanmaken' : 'Opslaan', class: 'theme-btn', style: 'background: linear-gradient(135deg, #1ee3cf, #34c759); color: #0c1730; padding: 1rem 2rem; font-weight: 700; font-size: 1.1rem;' %>
+      <%= link_to 'Annuleren', events_path, class: 'theme-btn', style: 'background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); padding: 1rem 2rem;' %>
+    </div>
+  </div>
+<% end %>
+
+

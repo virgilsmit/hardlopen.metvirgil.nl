@@ -1,0 +1,21 @@
+#!/bin/bash
+# Automated restart script that can run as cron job
+# No sudo required - uses touch tmp/restart.txt
+
+cd /home/vsm/webapps/hardlopen.metvirgil.nl
+
+echo "[$(date)] Restarting Rails application..."
+touch tmp/restart.txt
+
+sleep 3
+
+# Check if puma is running
+if pgrep -f "puma.*3001" > /dev/null; then
+    echo "[$(date)] ✅ Rails restarted successfully"
+else
+    echo "[$(date)] ⚠️  Starting Puma..."
+    RAILS_ENV=production bundle exec puma -C config/puma.rb -e production -d
+fi
+
+echo "[$(date)] Application ready"
+
